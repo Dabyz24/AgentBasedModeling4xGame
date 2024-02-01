@@ -24,5 +24,3 @@ Los recursos son recursos para otros, la tecnología es un recurso para otro, es
 Unas reglas básicas para puedes hacer estas cosas y esto servira para esto 
 
 Tener un sistema de puntos económicos que  valore al que mas dinero tenga otro para cada tecnología que desarrollen, puntos para el  que más territorios tenga 
-
-Prueba
