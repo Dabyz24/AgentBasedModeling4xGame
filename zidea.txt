@@ -1,0 +1,28 @@
+Nueva idea es hacer un juego que sea como base para elaborar un sistema en el que los agentes sean capaces de manejar la economia y sean capaces de generar comportamientos emergentes
+
+La idea es que los agentes aprendan sobre la marcha, que puedan establecer nuevas reglas sobre la marcha. (Buscar info sobre como programar comportamientos emergentes para que puedan "programarse 
+a si mismo")
+
+Las reglas pueden ser del tipo de si tienen x mateeriales pueden hacer distintas cosas, primero que jueguen con unas reglas "más estrictas" para tener una idea del funcionamiento principal.
+Una vez tenga eso les puedo dar la posibilidad de hacer algo basado en la economia y unos objetivos
+
+Ideas de la reunión:
+--> Hacer las reglas como Objetos que fuese la accion que se va a realizar esa accion que haya distintos tipos de accion, medir la economia de la civilizacion como iba crececiendo.
+(Tener una economía que vaya incrementando y decreciendo en función de los activos que tenga esa civilización si crece es algo positivo porque la civilización con mejor economía será la ganadora)
+
+--> De tecnologías que permitieran hacer distintas cosas, metal y algun tipo de dinero 
+
+Entorno en el que haya reglas para que estén compitiendo los agentes para que produzcan cosas y beneficios 
+una cosa son las posibilidades y otras las oportunidades.
+
+Exploracion la nave tenga una vision clara para que se puiedan ir mejorando con nuevas tecnologías
+(Puedo hacer que puedan crear naves para la exploración y esas naves vean solo en una distancia determinada, es decir que no sepan ver más allá de x píxeles de la pantalla, una vez que descubran mejoras 
+pueden aumentar los píxeles de visión para identificar planetas más alejados)
+
+Los recursos son recursos para otros, la tecnología es un recurso para otro, es decir todo lo wue generan lo hacen para obtener otro beneficio ya sea más dinero o una manera de producir mas dinero 
+
+Unas reglas básicas para puedes hacer estas cosas y esto servira para esto 
+
+Tener un sistema de puntos económicos que  valore al que mas dinero tenga otro para cada tecnología que desarrollen, puntos para el  que más territorios tenga 
+
+Prueba
