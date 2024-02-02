@@ -21,4 +21,4 @@ class Planetas:
         pg.draw.circle(self.app.screen, color, center, self.len)
 
     def getPos(self):
-        return (self.y, self.x)
+        return (self.x, self.y)

@@ -15,13 +15,14 @@ class Ant:
 
         SIZE = self.app.CELL_SIZE
         rect = self.x * SIZE, self.y * SIZE, SIZE -1, SIZE - 1
-
         
         pg.draw.rect(self.app.screen, self.color, rect)
-        # prevPos = (self.y, self.x)
+        
         
 
         move = self.increments[randint(0, len(self.increments)-1)]
         dx, dy = move
+        
+
         self.x = (self.x + dx) % self.app.COLS
         self.y = (self.y + dy) % self.app.ROWS
