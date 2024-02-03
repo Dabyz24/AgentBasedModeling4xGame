@@ -14,8 +14,7 @@ class Juego:
         self.ROWS, self.COLS = HEIGHT // CELL_SIZE, WIDTH // CELL_SIZE  # 900/12 serán las filas y 1600/12 serán las columnas
         self.grid = [[0 for _ in range(self.COLS)]for _ in range(self.ROWS)]  # EL tablero será una matriz con el numero de columnas y filas inicializado a 0 
         self.ants = [Ant(self, [2, 45], self.get_color()) for _ in range(1)]
-
-
+        # Pensar una manera más sofisticada para crear de una manera equilobrada planetas con más tecnología y otros con más dinero, los que tengan más dinero tendrán más impuestos
         self.planetas = [Planetas(self, pos=[randrange(200, WIDTH), randrange(100, HEIGHT)], length=randrange(10,30), tecnologia=randrange(0,50), dinero=randrange(20,200), impuesto=randrange(10,50))for _ in range(6)]
         for planeta in self.planetas:
             print(planeta.getPos())
