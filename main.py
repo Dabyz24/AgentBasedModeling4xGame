@@ -1,6 +1,3 @@
+from server import server
 
-from juego import Juego
-
-app = Juego()
-
-app.run()
+server.launch(open_browser=True)
