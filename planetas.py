@@ -1,18 +1,18 @@
 from random import randrange
 import pygame as pg
 
-class Planetas:
-    def __init__(self, app, pos, length ,tecnologia, dinero, impuesto):
+class Planets:
+    def __init__(self, app, pos, length ,tech, money, taxes):
         self.app = app
         self.x, self.y = pos
         self.len = length
-        self.recursos = [tecnologia, dinero]
-        self.tax = impuesto
+        self.resources = [tech, money]
+        self.tax = taxes
 
     
     @staticmethod
     def get_color(self):
-        if self.recursos[0] > self.recursos[1]:
+        if self.resources[0] > self.resources[1]:
             # Más azul si el planeta tiene más tecnología que dinero
             return (0,randrange(0,205),255)
         else:
