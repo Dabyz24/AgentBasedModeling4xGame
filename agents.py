@@ -24,6 +24,9 @@ class Player(mesa.Agent):
         self.tech += tech
         self.gold += gold
         self.num_planets += 1
+
+    def getResources(self):
+        return self.tech, self.gold
     
     def payTaxes(self, taxes=20):
         taxes = taxes * self.num_planets
@@ -38,7 +41,7 @@ class Player(mesa.Agent):
 
 
 
-class Planets(mesa.Agent):
+class Planet(mesa.Agent):
     def __init__(self, unique_id, model, pos, tech, gold, taxes=20, populated=False, moore=True):
         """
         unique_id: Servira para identificar al agente por un id unico
@@ -58,7 +61,9 @@ class Planets(mesa.Agent):
         self.populated = populated
         self.moore = moore
 
-        
+    def isInhabit(self):
+        return self.populated
+
     def step(self):
         """
         El step representará cada turno del juego. Comprobará si es habitado o no, en caso positivo dará sus recursos al agente 
