@@ -1,6 +1,6 @@
 import mesa 
 
-from agents import Player, Planets
+from agents import Player, Planet
 
 
 class Game(mesa.model):
@@ -51,7 +51,7 @@ class Game(mesa.model):
         # Creacion de los planetas 
         for _ in range(self.num_planets):
             pos = (self.random.randrange(self.width), self.random.randrange(self.height))
-            planet = Planets(self.next_id(), self, pos, self.tech_planet, self.gold_planet, self.taxes_planet)
+            planet = Planet(self.next_id(), self, pos, self.tech_planet, self.gold_planet, self.taxes_planet)
             self.grid.place_agent(planet, pos)
             self.schedule.add(planet)
 
