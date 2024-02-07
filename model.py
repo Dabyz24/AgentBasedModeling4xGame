@@ -3,7 +3,7 @@ import mesa
 from agents import Player, Planet
 
 
-class Game(mesa.model):
+class Game(mesa.Model):
 
     def __init__(self, width=20, height=20, num_players=2, num_planets=5, prob_factory=0.4, prob_weapon=0.1, prob_space_ship=0.6, tech_planet=20, gold_planet=30, taxes_planet=20):
         """
@@ -18,7 +18,7 @@ class Game(mesa.model):
         gold_planet: Oro que tendrá cada planeta
         taxes_planet: Impuesto que deberán pagar por cada planeta
         """
-        super.__init__()
+        super().__init__()
         self.width = width
         self.height = height
         self.num_players = num_players
@@ -57,7 +57,7 @@ class Game(mesa.model):
 
     def step(self):
         self.schedule.step()
-        self.datacollector.collect(self)
+        #self.datacollector.collect(self)
     
     def run_model(self, n):
         for i in range(n):
