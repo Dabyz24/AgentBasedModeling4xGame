@@ -53,7 +53,7 @@ class Planet(mesa.Agent):
         taxes: Será el impuesto por cada planeta que se colonice
         moore: Si es True el agente podrá moverse en las 8 direcciones, si no solo podrá arriba, abajo, derecha e izquierda
         """
-        super.__init__(unique_id, model)
+        super().__init__(unique_id, model)
         self.pos = pos
         self.tech = tech
         self.gold = gold
