@@ -10,20 +10,21 @@ def game_portrayal(agent):
     portrayal = {}
 
     if type(agent) is Player:
-        portrayal["Shape"] = "re"
+        portrayal["Shape"] = "circle"
+        portrayal["r"] = 0.2
         portrayal["Layer"] = 0
-        portrayal["Filled"] = True
+        portrayal["Filled"] = "true"
         portrayal["Color"] = "black"
         portrayal["text"] = agent.getResources()
         portrayal["text_color"] = "black"
 
     if type(agent) is Planet:
             portrayal["Shape"] = "circle"
-            portrayal["r"] = 0.9
-            portrayal["Layer"] = 0
+            portrayal["r"] = 1
+            portrayal["Layer"] = 1
             portrayal["text"] = agent.isInhabit()
             # Para el color elegirlo dependiendo de si tiene mas tecnologia o mas dinero
-            portrayal["Filled"] = True
+            portrayal["Filled"] = "true"
             portrayal["Color"] = "#AA0000"  
             portrayal["text_color"] = "black"
 
