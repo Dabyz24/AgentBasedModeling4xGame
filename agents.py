@@ -26,7 +26,7 @@ class Player(mesa.Agent):
         self.num_planets += 1
 
     def getResources(self):
-        return self.tech, self.gold
+        return "Tech: " + str(self.tech) + " Gold: " + str(self.gold)
     
     def payTaxes(self, taxes=20):
         taxes = taxes * self.num_planets
