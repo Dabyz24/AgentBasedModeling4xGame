@@ -4,8 +4,21 @@ from agents import Player, Planet
 
 
 class Game(mesa.Model):
+    
+    width = 20 
+    height = 20
+    num_players = 2
+    num_planets = 5
+    prob_factory = 0.4
+    prob_weapon = 0.1
+    prob_space_ship = 0.6
+    tech_planet = 20
+    gold_planet = 30
+    taxes_planet = 20
 
-    def __init__(self, width=20, height=20, num_players=2, num_planets=5, prob_factory=0.4, prob_weapon=0.1, prob_space_ship=0.6, tech_planet=20, gold_planet=30, taxes_planet=20):
+
+    def __init__(self, width=20, height=20, num_players=2, num_planets=5, prob_factory=0.4, prob_weapon=0.1, 
+                 prob_space_ship=0.6, tech_planet=20, gold_planet=30, taxes_planet=20):
         """
         width: Ancho de la matriz donde se encontraran los agentes
         height: Alto de la matriz donde se encontraran los agentes 

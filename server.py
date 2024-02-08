@@ -11,7 +11,7 @@ def game_portrayal(agent):
 
     if type(agent) is Player:
         portrayal["Shape"] = "circle"
-        portrayal["r"] = 0.2
+        portrayal["r"] = 0.3
         portrayal["Layer"] = 0
         portrayal["Filled"] = "true"
         portrayal["Color"] = "black"
