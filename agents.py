@@ -30,10 +30,13 @@ class Player(mesa.Agent):
         # Permite saber si se ha creado una nave para permitir moverse o no, inicialmente será False
         self.move = False
     
-    def addPlanetResources(self, tech, gold):
+    def addPlanetResources(self, tech, gold, populated=False):
         self.tech += tech
         self.gold += gold
-        self.num_planets += 1
+        if not populated:
+            self.num_planets += 1
+
+
 
     def getResources(self):
         return "Tech: " + str(self.tech) + " Gold: " + str(self.gold)
@@ -61,30 +64,35 @@ class Player(mesa.Agent):
         El step representará cada turno del juego. Podrá decidir si moverse, construir o atacar 
         """
         # Tengo que comprobar si tiene alguna fabrica generada o alguna nave para poder moverse
-        options = ["Factory", "Space_ship", "Weapon"]
-        probabilities = [self.model.prob_factory, self.model.prob_space_ship, self.model.prob_weapon]
-        choose_action = self.random.choices(options, weights=probabilities, k=1)[0]
+        if self.move:
+            next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, include_center=False)
+            next_move = self.random.choice(next_moves)                    
+            self.model.grid.move_agent(self, next_move)
+            options = ["Factory", "Weapon"]
+            probabilities = [self.model.prob_factory, self.model.prob_weapon]
+            choose_action = self.random.choices(options, weights=probabilities, k=1)[0]
+        else:
+            options = ["Factory", "Space_ship", "Weapon"]
+            probabilities = [self.model.prob_factory, self.model.prob_space_ship, self.model.prob_weapon]
+            choose_action = self.random.choices(options, weights=probabilities, k=1)[0]
 
         if choose_action == "Factory" and self.enoughResources(5, 30):
             print("Fabrica creada")
-            self.createFactory
+            self.createFactory()
             
-
         if choose_action == "Space_ship":
             print("Space_ship")
             # Determinara si ya ha creado una nave espacial para moverse antes o no 
-            if self.move: 
+            if self.enoughResources(5, 10): 
                 next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, include_center=False)
                 next_move = self.random.choice(next_moves)                    
                 self.model.grid.move_agent(self, next_move)
-            
-            elif self.enoughResources(15, 20):
                 self.move = True
 
         if choose_action == "Weapon" and self.enoughResources(20, 40):
             print("Arma creada")
 
-
+        print(self.num_factories)
         if self.num_factories > 0:
             self.addFactoryResources()
         self.payTaxes()
@@ -110,6 +118,8 @@ class Planet(mesa.Agent):
         self.taxes = taxes
         self.populated = populated
         self.moore = moore
+        # Sirve para saber que agente es el dueño del planeta 
+        self.player = None
 
     def isInhabit(self):
         return self.populated
@@ -127,6 +137,9 @@ class Planet(mesa.Agent):
                 player_selected = self.random.choice(list_players)
                 self.populated = True
                 # pasa a ser habitado por el agente seleccionado
+                self.player = player_selected
                 player_selected.addPlanetResources(self.tech, self.gold)
+        else:
+            self.player.addPlanetResources(1, 10, True)
         
 
