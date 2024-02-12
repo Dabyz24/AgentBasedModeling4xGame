@@ -1,7 +1,7 @@
 import mesa 
 
 from agents import Player, Planet
-
+from scheduler import RandomActivationByTypeFiltered
 
 class Game(mesa.Model):
     
@@ -43,14 +43,13 @@ class Game(mesa.Model):
         self.gold_planet = gold_planet
         self.taxes_planet = taxes_planet
         # Se moverán uno cada vez, es decir el primer turno se movera primero el agente 1 y el siguiente el agente 2 primero
-        self.schedule = mesa.time.RandomActivation(self)
+        self.schedule = RandomActivationByTypeFiltered(self)
         # Creacion de la matriz Torus=True significa que si el agente se encuentra en la izquierda del todo y sigue a la izquierda aparecera en la derecha 
         self.grid = mesa.space.MultiGrid(self.width, self.height, torus=True)
         # Datos que queremos ver 
         self.datacollector = mesa.DataCollector(
             {
-                "Number of players": self.num_players,
-                "Taxes for Planet": self.taxes_planet
+                "Number of players": lambda l: l.schedule.get_type_count(Player)
             }
         )
         
@@ -68,9 +67,12 @@ class Game(mesa.Model):
             self.grid.place_agent(planet, pos)
             self.schedule.add(planet)
 
+        self.running = True
+        self.datacollector.collect(self)
+            
     def step(self):
         self.schedule.step()
-        #self.datacollector.collect(self)
+        self.datacollector.collect(self)
     
     def run_model(self, n):
         for i in range(n):
