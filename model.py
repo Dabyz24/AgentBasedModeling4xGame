@@ -42,6 +42,7 @@ class Game(mesa.Model):
         self.tech_planet = tech_planet
         self.gold_planet = gold_planet
         self.taxes_planet = taxes_planet
+        self.listAgents = []
         # Se moverán uno cada vez, es decir el primer turno se movera primero el agente 1 y el siguiente el agente 2 primero
         self.schedule = RandomActivationByTypeFiltered(self)
         # Creacion de la matriz Torus=True significa que si el agente se encuentra en la izquierda del todo y sigue a la izquierda aparecera en la derecha 
@@ -57,6 +58,7 @@ class Game(mesa.Model):
         for _ in range(self.num_players):
             pos = (self.random.randrange(self.width), self.random.randrange(self.height))
             player = Player(self.next_id(), self, pos)
+            self.listAgents.append(player)
             self.grid.place_agent(player, pos)
             self.schedule.add(player)
         
@@ -69,6 +71,13 @@ class Game(mesa.Model):
 
         self.running = True
         self.datacollector.collect(self)
+
+
+    def propertiesAgents(self):
+        summary = {}    
+        for i in self.listAgents:
+            summary[i.getId()] = i.getResources()
+        return summary
             
     def step(self):
         self.schedule.step()

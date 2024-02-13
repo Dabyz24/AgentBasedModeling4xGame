@@ -12,24 +12,33 @@ def game_portrayal(agent):
     if type(agent) is Player:
         portrayal["Shape"] = "circle"
         portrayal["r"] = 0.3
-        portrayal["Layer"] = 0
+        portrayal["Layer"] = 1
         portrayal["Filled"] = "true"
         portrayal["Color"] = "black"
-        portrayal["text"] = agent.getResources()
-        portrayal["text_color"] = "black"
+        portrayal["Agent Id"] = agent.getId()
 
     if type(agent) is Planet:
             portrayal["Shape"] = "circle"
             portrayal["r"] = 1
-            portrayal["Layer"] = 1
-            portrayal["text"] = agent.isInhabit()
+            portrayal["Layer"] = 0
             # Para el color elegirlo dependiendo de si tiene mas tecnologia o mas dinero
             portrayal["Filled"] = "true"
-            portrayal["Color"] = "#AA0000"  
+            if agent.isInhabit(): 
+                portrayal["Color"] = "green"
+                portrayal["text"] = agent.getPlayer().getId()
+            else:
+                portrayal["Color"] = "red"
+                portrayal["text"] = "None"
             portrayal["text_color"] = "black"
 
     return portrayal
 
+def overviewAgents(model):
+    summary = model.propertiesAgents()
+    aux_str = ""
+    for i, k in summary.items():
+        aux_str += (f"Agent: {i} Resources: {k} <br>")
+    return aux_str
 
 canvas_element = mesa.visualization.CanvasGrid(game_portrayal, 20, 20, 500, 500)
 chart_elemnt = mesa.visualization.ChartModule(
@@ -49,5 +58,5 @@ model_params = {
 
 }
 
-server = mesa.visualization.ModularServer(Game, [canvas_element, chart_elemnt], "Agent based modeling 4x Game", model_params)
+server = mesa.visualization.ModularServer(Game, [canvas_element, overviewAgents, chart_elemnt], "Agent based modeling 4x Game", model_params)
 server.port = 8521
