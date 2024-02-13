@@ -37,7 +37,6 @@ class Player(mesa.Agent):
             self.num_planets += 1
 
 
-
     def getResources(self):
         return "Tech: " + str(self.tech) + " Gold: " + str(self.gold)
     
@@ -58,6 +57,9 @@ class Player(mesa.Agent):
     def payTaxes(self, taxes=20):
         taxes = taxes * self.num_planets
         self.gold -= taxes
+
+    def getId(self):
+        return str(self.unique_id)
 
     def step(self):
         """
@@ -122,15 +124,20 @@ class Planet(mesa.Agent):
         self.player = None
 
     def isInhabit(self):
+        # Dira si el planeta está habitado o no 
         return self.populated
 
+    def getPlayer(self):
+        # Devuelve el agente que habita el planeta 
+        return self.player
+    
     def step(self):
         """
         El step representará cada turno del juego. Comprobará si es habitado o no, en caso positivo dará sus recursos al agente 
         """
         if not self.populated: 
             # Si hay algún jugador presente, pasará a ser quien habite el planeta, para ello compruebo los vecinos del planeta
-            neighbors = self.model.grid.get_cell_list_contents([self.pos])
+            neighbors = self.model.grid.get_neighbors(self.pos, self.moore)
             # Añado a la lista solo los vecinos que sean del tipo player
             list_players = [obj for obj in neighbors if isinstance(obj, Player)]
             if len(list_players) > 0:
