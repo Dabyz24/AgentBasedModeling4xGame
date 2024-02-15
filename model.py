@@ -3,11 +3,15 @@ import mesa
 from agents import Player, Planet
 from scheduler import RandomActivationByTypeFiltered
 
+# Tendrá en cuenta las diagonales
+MOORE_PLAYER = True
+MOORE_PLANET = True
+
 class Game(mesa.Model):
     
     width = 20 
     height = 20
-    num_players = 2
+    num_players = 3
     num_planets = 5
     prob_factory = 0.4
     prob_weapon = 0.1
@@ -17,7 +21,7 @@ class Game(mesa.Model):
     taxes_planet = 20
 
 
-    def __init__(self, width=20, height=20, num_players=2, num_planets=5, prob_factory=0.4, prob_weapon=0.1, 
+    def __init__(self, width=20, height=20, num_players=3, num_planets=5, prob_factory=0.4, prob_weapon=0.1, 
                  prob_space_ship=0.6, tech_planet=20, gold_planet=30, taxes_planet=20):
         """
         width: Ancho de la matriz donde se encontraran los agentes
@@ -48,30 +52,46 @@ class Game(mesa.Model):
         # Creacion de la matriz Torus=True significa que si el agente se encuentra en la izquierda del todo y sigue a la izquierda aparecera en la derecha 
         self.grid = mesa.space.MultiGrid(self.width, self.height, torus=True)
         # Datos que queremos ver 
-        self.datacollector = mesa.DataCollector(
-            {
-                "Number of players": lambda l: l.schedule.get_type_count(Player)
-            }
-        )
+        # self.datacollector = mesa.DataCollector(
+        #     {
+        #         "Number of players": lambda l: l.schedule.get_type_count(Player)
+        #     }
+        # )
         
         # Creacion de los jugadores
         for _ in range(self.num_players):
-            pos = (self.random.randrange(self.width), self.random.randrange(self.height))
-            player = Player(self.next_id(), self, pos)
+            location_found = False
+            while not location_found:
+                location = self.checkSpace(MOORE_PLAYER)
+                location_found = location[0]
+            pos = location[1]
+            player = Player(self.next_id(), self, pos, moore=MOORE_PLAYER)
             self.listAgents.append(player)
             self.grid.place_agent(player, pos)
             self.schedule.add(player)
         
         # Creacion de los planetas 
         for _ in range(self.num_planets):
-            pos = (self.random.randrange(self.width), self.random.randrange(self.height))
-            planet = Planet(self.next_id(), self, pos, self.tech_planet, self.gold_planet, self.taxes_planet)
+            location_found = False
+            while not location_found:
+                location = self.checkSpace(MOORE_PLANET)
+                location_found = location[0]
+            pos = location[1]
+            planet = Planet(self.next_id(), self, pos ,self.tech_planet, self.gold_planet, self.taxes_planet, moore=MOORE_PLANET)
             self.grid.place_agent(planet, pos)
             self.schedule.add(planet)
 
         self.running = True
-        self.datacollector.collect(self)
+        #self.datacollector.collect(self)
 
+    def checkSpace(self, moore):
+        pos = (self.random.randrange(self.width), self.random.randrange(self.height))
+        neighbors = self.grid.get_neighbors(pos, moore)
+        # Añado a la lista los vecinos que sean del tipo player o planet para saber si tiene otros planetas o jugadores alrededor 
+        list_agents = [obj for obj in neighbors if (isinstance(obj, Player) or isinstance(obj, Planet))]
+        if len(list_agents) > 0:
+            return False, pos
+        return True, pos
 
     def propertiesAgents(self):
         summary = {}    
@@ -81,7 +101,7 @@ class Game(mesa.Model):
             
     def step(self):
         self.schedule.step()
-        self.datacollector.collect(self)
+        #self.datacollector.collect(self)
     
     def run_model(self, n):
         for i in range(n):
