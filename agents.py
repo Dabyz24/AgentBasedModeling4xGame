@@ -36,9 +36,8 @@ class Player(mesa.Agent):
         if not populated:
             self.num_planets += 1
 
-
     def getResources(self):
-        return "Tech: " + str(self.tech) + " Gold: " + str(self.gold)
+        return "T: " + str(self.tech) + " G: " + str(self.gold) + " P: " +str(self.num_planets) + " F: "+str(self.num_factories) + " Estelar Points: " + str(self.estelar_points)
     
     def createFactory(self):
         self.num_factories += 1
@@ -79,11 +78,9 @@ class Player(mesa.Agent):
             choose_action = self.random.choices(options, weights=probabilities, k=1)[0]
 
         if choose_action == "Factory" and self.enoughResources(5, 30):
-            print("Fabrica creada")
             self.createFactory()
             
         if choose_action == "Space_ship":
-            print("Space_ship")
             # Determinara si ya ha creado una nave espacial para moverse antes o no 
             if self.enoughResources(5, 10): 
                 next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, include_center=False)
@@ -94,7 +91,6 @@ class Player(mesa.Agent):
         if choose_action == "Weapon" and self.enoughResources(20, 40):
             print("Arma creada")
 
-        print(self.num_factories)
         if self.num_factories > 0:
             self.addFactoryResources()
         self.payTaxes()
