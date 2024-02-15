@@ -41,16 +41,17 @@ def overviewAgents(model):
     return aux_str
 
 canvas_element = mesa.visualization.CanvasGrid(game_portrayal, 20, 20, 500, 500)
-chart_elemnt = mesa.visualization.ChartModule(
-     [
-          {"Label": "Num Estelar Points", "Color": "#AA0000"}
-     ]
-)
+
+# chart_elemnt = mesa.visualization.ChartModule(
+#      [
+#           {"Label": "Num Estelar Points", "Color": "#AA0000"}
+#      ]
+# )
 
 model_params = {
         "title": mesa.visualization.StaticText("Parameters:"),
-        "num_players": mesa.visualization.Slider("Number of players", 2, 1, 6),
-        "num_planets": mesa.visualization.Slider("Number of planets", 5, 2, 10),
+        "num_players": mesa.visualization.Slider("Number of players", 3, 1, 6),
+        "num_planets": mesa.visualization.Slider("Number of planets", 10, 2, 20),
         "prob_factory": mesa.visualization.Slider("Probability of producing Factories", 0.4, 0.0, 1.0, 0.1),
         "prob_weapon": mesa.visualization.Slider("Probability of producing Weapons", 0.1, 0.0, 1.0, 0.1),
         "prob_space_ship": mesa.visualization.Slider("Probability of producing Space Ships", 0.6, 0.0, 1.0, 0.1, description="Space ships allowed the player to move"),
@@ -58,5 +59,5 @@ model_params = {
 
 }
 
-server = mesa.visualization.ModularServer(Game, [canvas_element, overviewAgents, chart_elemnt], "Agent based modeling 4x Game", model_params)
+server = mesa.visualization.ModularServer(Game, [canvas_element, overviewAgents], "Agent based modeling 4x Game", model_params)
 server.port = 8521
