@@ -7,7 +7,7 @@ TECH_FROM_FACTORIES = 5
 
 
 class Player(mesa.Agent):
-    def __init__(self, unique_id, model, pos, tech=INITIAL_PLAYER_TECH, gold=INITIAL_PLAYER_GOLD, num_planets=0, num_factories=0 ,estelar_points=0, moore=True):
+    def __init__(self, unique_id, model, pos, tech=INITIAL_PLAYER_TECH, gold=INITIAL_PLAYER_GOLD, num_planets=0, num_factories=0 ,stellar_points=0, moore=True):
         """
         unique_id: Servira para identificar al agente por un id unico
         model: Se trata del modelo donde habitara el agente
@@ -16,7 +16,7 @@ class Player(mesa.Agent):
         gold: Valor de oro que tendrá el agente de manera inicial será 100
         num_planets: Número de planetas conquistados
         num_factories: Número de fabricas que ha creado cada agente
-        estelar_points: El valor más importante del juego, decidirá quien es el ganador
+        stellar_points: El valor más importante del juego, decidirá quien es el ganador
         moore: Si es True el agente podrá moverse en las 8 direcciones, si no solo podrá arriba, abajo, derecha e izquierda
         """
         super().__init__(unique_id, model)
@@ -25,7 +25,7 @@ class Player(mesa.Agent):
         self.gold = gold
         self.num_planets = num_planets
         self.num_factories = num_factories
-        self.estelar_points = estelar_points
+        self.stellar_points = stellar_points
         self.moore = moore
         # Permite saber si se ha creado una nave para permitir moverse o no, inicialmente será False
         self.move = False
@@ -35,9 +35,6 @@ class Player(mesa.Agent):
         self.gold += gold
         if not populated:
             self.num_planets += 1
-
-    def getResources(self):
-        return "T: " + str(self.tech) + " G: " + str(self.gold) + " P: " +str(self.num_planets) + " F: "+str(self.num_factories) + " Estelar Points: " + str(self.estelar_points)
     
     def createFactory(self):
         self.num_factories += 1
@@ -59,6 +56,27 @@ class Player(mesa.Agent):
 
     def getId(self):
         return str(self.unique_id)
+
+    def getTech(self):
+        return self.tech
+
+    def getGold(self):
+        return self.gold
+
+    def getPlanets(self):
+        return self.num_planets
+
+    def getFactories(self):
+        return self.num_factories
+    
+    def getResources(self):
+        return {"Tech": self.tech, "Gold": self.gold, "Planets": self.num_planets, "Factories": self.num_factories}
+    
+    def addPoint(self):
+        self.stellar_points += 1
+
+    def getAgentInfo(self):
+        return "T: " + str(self.tech) + " G: " + str(self.gold) + " P: " +str(self.num_planets) + " F: "+str(self.num_factories) + " Stellar Points: " + str(self.stellar_points)
 
     def step(self):
         """
@@ -93,6 +111,7 @@ class Player(mesa.Agent):
 
         if self.num_factories > 0:
             self.addFactoryResources()
+        #TODO: Hacer que luchen def maybeFight()
         self.payTaxes()
 
 
