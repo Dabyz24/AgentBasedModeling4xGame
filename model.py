@@ -96,11 +96,51 @@ class Game(mesa.Model):
     def propertiesAgents(self):
         summary = {}    
         for i in self.listAgents:
-            summary[i.getId()] = i.getResources()
+            summary[i.getId()] = i.getAgentInfo()
         return summary
             
+    def checkAgentsValues(self):
+        values = {}
+        for i in self.listAgents:
+            values[i] = i.getResources()
+        return values
+    
+    def addStellarPoints(self):
+        dict_values = self.checkAgentsValues()
+        agent_more_factories = ""
+        agent_more_planets = ""
+        initial_factories = 0
+        initial_planets = 0
+        check_factories_list = []
+        check_planets_list = []
+        for player, resources in dict_values.items():
+            # Comparar los valores de num fabricas y num de planetas y ver cual es el mas alto 
+            for key, value in resources.items():
+                if key == "Planets":
+                    if initial_planets < value:
+                        agent_more_planets = player
+                        initial_planets = value
+                        check_planets_list = [value]
+                    elif initial_planets == value:
+                        check_planets_list.append(value)
+                if key == "Factories":
+                    if initial_factories < value:
+                        agent_more_factories = player
+                        initial_factories = value
+                        check_factories_list = [value]
+                    elif initial_planets == value:
+                        check_factories_list.append(value) 
+        if len(check_planets_list) == 1:
+            print(f"El agente con más planetas es {agent_more_planets.getId()}")
+            agent_more_planets.addPoint()
+
+        if len(check_factories_list) == 1:
+            print(f"El agente con más fabricas es {agent_more_factories.getId()}")
+            agent_more_factories.addPoint()
+
     def step(self):
         self.schedule.step()
+        self.addStellarPoints()
         #self.datacollector.collect(self)
     
     def run_model(self, n):
