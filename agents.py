@@ -2,8 +2,8 @@ import mesa
 
 INITIAL_PLAYER_GOLD = 100
 INITIAL_PLAYER_TECH = 30
-GOLD_FROM_FACTORIES = 20
-TECH_FROM_FACTORIES = 5
+GOLD_FROM_FACTORIES = 5
+TECH_FROM_FACTORIES = 1
 
 
 class Player(mesa.Agent):
@@ -29,20 +29,28 @@ class Player(mesa.Agent):
         self.moore = moore
         # Permite saber si se ha creado una nave para permitir moverse o no, inicialmente será False
         self.move = False
-    
+
+    # Funciones para modificar los planetas del agente 
     def addPlanetResources(self, tech, gold, populated=False):
         self.tech += tech
         self.gold += gold
         if not populated:
             self.num_planets += 1
     
+    def removePlantet(self):
+        self.num_planets -= 1 
+
+    # Funciones para modificar las fabricas del agente 
     def createFactory(self):
         self.num_factories += 1
 
     def addFactoryResources(self):
-        self.tech += TECH_FROM_FACTORIES
-        self.gold += GOLD_FROM_FACTORIES
+        self.tech += TECH_FROM_FACTORIES * self.num_factories
+        self.gold += GOLD_FROM_FACTORIES * self.num_factories
 
+    # TODO: Funciones para modificar las armas del agente
+        
+    # Funciones para comprobar y restar los recursos de los jugadores
     def enoughResources(self, tech, gold):
         if self.gold >= gold and self.tech >= tech:
             self.tech -= tech
@@ -51,9 +59,13 @@ class Player(mesa.Agent):
         return False
              
     def payTaxes(self, taxes=20):
-        taxes = taxes * self.num_planets
-        self.gold -= taxes
+        self.gold -= taxes * self.num_planets
 
+    # Funcion para añadir puntos estelares
+    def addPoint(self):
+        self.stellar_points += 1
+
+    # Getters de los atributos principales del jugador
     def getId(self):
         return str(self.unique_id)
 
@@ -71,13 +83,11 @@ class Player(mesa.Agent):
     
     def getResources(self):
         return {"Tech": self.tech, "Gold": self.gold, "Planets": self.num_planets, "Factories": self.num_factories}
-    
-    def addPoint(self):
-        self.stellar_points += 1
 
     def getAgentInfo(self):
         return "T: " + str(self.tech) + " G: " + str(self.gold) + " P: " +str(self.num_planets) + " F: "+str(self.num_factories) + " Stellar Points: " + str(self.stellar_points)
 
+    # Funcion para representar cada turno del jugador
     def step(self):
         """
         El step representará cada turno del juego. Podrá decidir si moverse, construir o atacar 
@@ -161,6 +171,11 @@ class Planet(mesa.Agent):
                 # pasa a ser habitado por el agente seleccionado
                 self.player = player_selected
                 player_selected.addPlanetResources(self.tech, self.gold)
+        # Si el jugador elegido para controlar el planeta se queda sin dinero se borrara el planeta al jugador y el propio jugador del planeta pasando a no estar habitado
+        elif self.player.getGold() <= 0:
+            self.player.removePlantet()
+            self.player = None
+            self.populated = False
         else:
             self.player.addPlanetResources(1, 10, True)
         
