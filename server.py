@@ -37,7 +37,7 @@ def overviewAgents(model):
     summary = model.propertiesAgents()
     aux_str = ""
     for i, k in summary.items():
-        aux_str += (f"Agent: {i} Resources: {k} <br>")
+        aux_str += (f"<strong>Agent: {i} </strong> Resources: {k} <br>")
     return aux_str
 
 canvas_element = mesa.visualization.CanvasGrid(game_portrayal, 20, 20, 500, 500)
