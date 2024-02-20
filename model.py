@@ -131,11 +131,11 @@ class Game(mesa.Model):
                     elif initial_planets == value:
                         check_factories_list.append(value) 
         if len(check_planets_list) == 1:
-            print(f"El agente con más planetas es {agent_more_planets.getId()}")
+            #print(f"El agente con más planetas es {agent_more_planets.getId()}")
             agent_more_planets.addPoint()
 
         if len(check_factories_list) == 1:
-            print(f"El agente con más fabricas es {agent_more_factories.getId()}")
+            #print(f"El agente con más fabricas es {agent_more_factories.getId()}")
             agent_more_factories.addPoint()
 
     def step(self):
