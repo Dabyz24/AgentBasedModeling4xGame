@@ -96,7 +96,7 @@ class Game(mesa.Model):
     def propertiesAgents(self):
         summary = {}    
         for i in self.listAgents:
-            summary[i.getId()] = i.getAgentInfo()
+            summary[i] = i.getAgentInfo()
         return summary
             
     def checkAgentsValues(self):
