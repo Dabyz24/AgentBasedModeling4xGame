@@ -1,4 +1,5 @@
 import mesa
+from weapons import Weapon
 
 INITIAL_PLAYER_GOLD = 100
 INITIAL_PLAYER_TECH = 30
@@ -27,6 +28,9 @@ class Player(mesa.Agent):
         self.num_factories = num_factories
         self.stellar_points = stellar_points
         self.moore = moore
+        # Permite saber el arma actual del agente
+        self.player_weapon = Weapon()
+        self.battles_won = 0
         # Permite saber si se ha creado una nave para permitir moverse o no, inicialmente será False
         self.move = False
 
@@ -48,8 +52,35 @@ class Player(mesa.Agent):
         self.tech += TECH_FROM_FACTORIES * self.num_factories
         self.gold += GOLD_FROM_FACTORIES * self.num_factories
 
-    # TODO: Funciones para modificar las armas del agente
-        
+    # Funciones para modificar las armas del agente
+ 
+    def maybeFight(self):
+    # Si hay algún jugador presente lucharé contra el 
+        neighbors = self.model.grid.get_neighbors(self.pos, self.moore)
+        # Añado a la lista solo los vecinos que sean del tipo player
+        list_players = [obj for obj in neighbors if isinstance(obj, Player)]
+        if len(list_players) > 0:
+            print("Luchando")
+            player_selected = self.random.choice(list_players)
+            enemy_weapon = player_selected.getPlayerWeapon()
+            if enemy_weapon == "None":
+                print(f"El gandor es el jugador {self.unique_id}")
+                self.addPoint()
+            else:
+                player_value = self.getPlayerWeapon()[1] * self.random.randint(1,20)
+                enemy_value = enemy_weapon[1] * self.random.randint(1,20)
+                print(player_value, enemy_value)
+                if player_value != enemy_value:
+                    winner = max(player_value, enemy_value)
+                    if winner == player_value:
+                        print(f"Punto ganado por {self.unique_id}")
+                        self.addPoint()
+                        self.addBattleWon()
+                    else:
+                        print(f"Punto ganado por {player_selected.getId()}")
+                        player_selected.addPoint()
+                        player_selected.addBattleWon()
+                            
     # Funciones para comprobar y restar los recursos de los jugadores
     def enoughResources(self, tech, gold):
         if self.gold >= gold and self.tech >= tech:
@@ -61,9 +92,12 @@ class Player(mesa.Agent):
     def payTaxes(self, taxes=20):
         self.gold -= taxes * self.num_planets
 
-    # Funcion para añadir puntos estelares
+    # Funciones para añadir puntos estelares y para añadir batallas ganadas
     def addPoint(self):
         self.stellar_points += 1
+
+    def addBattleWon(self):
+        self.battles_won += 1
 
     # Getters de los atributos principales del jugador
     def getId(self):
@@ -80,7 +114,13 @@ class Player(mesa.Agent):
 
     def getFactories(self):
         return self.num_factories
+
+    def getPlayerWeapon(self):
+        return self.player_weapon.getWeapon()
     
+    def getBattlesWon(self):
+        return self.battles_won
+
     def getResources(self):
         return {"Tech": self.tech, "Gold": self.gold, "Planets": self.num_planets, "Factories": self.num_factories}
 
@@ -117,11 +157,19 @@ class Player(mesa.Agent):
                 self.move = True
 
         if choose_action == "Weapon" and self.enoughResources(20, 40):
-            print("Arma creada")
+            # las tres primeras veces que se ejecute solo se mejorara el arma
+            if self.player_weapon.getNumUpgrades() < 3:
+                print("Arma creada")
+                self.player_weapon.upgradeWeapon()
+            #else:
+                # Aumentar el numero de armas para que aumente su probabilidad de sacar un numero mas grande
+                
 
         if self.num_factories > 0:
             self.addFactoryResources()
-        #TODO: Hacer que luchen def maybeFight()
+
+        if self.getPlayerWeapon() != "None":
+            self.maybeFight()
         self.payTaxes()
 
 
