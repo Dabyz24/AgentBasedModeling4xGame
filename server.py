@@ -28,7 +28,8 @@ def game_portrayal(agent):
                 portrayal["text"] = agent.getPlayer().getId()
             else:
                 portrayal["Color"] = "red"
-                portrayal["text"] = "None"
+                portrayal["text"] = agent.getPlanetId()
+                portrayal["Resources"] = agent.getResources()
             portrayal["text_color"] = "black"
 
     return portrayal
