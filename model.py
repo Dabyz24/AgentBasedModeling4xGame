@@ -77,16 +77,17 @@ class Game(mesa.Model):
                 location = self.checkSpace(MOORE_PLANET)
                 location_found = location[0]
             pos = location[1]
-            planet = Planet(self.next_id(), self, pos ,self.tech_planet, self.gold_planet, self.taxes_planet, moore=MOORE_PLANET)
+            planet = Planet(self.next_id(), self, pos ,self.random.randrange(0, tech_planet),
+                            self.random.randrange(0, self.gold_planet), self.taxes_planet, moore=MOORE_PLANET)
             self.grid.place_agent(planet, pos)
             self.schedule.add(planet)
-
+            print(planet.getResources())
         self.running = True
         #self.datacollector.collect(self)
 
     def checkSpace(self, moore):
         pos = (self.random.randrange(self.width), self.random.randrange(self.height))
-        neighbors = self.grid.get_neighbors(pos, moore)
+        neighbors = self.grid.get_neighbors(pos, moore, include_center=True)
         # Añado a la lista los vecinos que sean del tipo player o planet para saber si tiene otros planetas o jugadores alrededor 
         list_agents = [obj for obj in neighbors if (isinstance(obj, Player) or isinstance(obj, Planet))]
         if len(list_agents) > 0:
