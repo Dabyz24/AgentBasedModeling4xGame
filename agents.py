@@ -204,6 +204,20 @@ class Planet(mesa.Agent):
         # Devuelve el agente que habita el planeta 
         return self.player
     
+    # Getters de los atributos básicos del planeta
+    def getPlanetId(self):
+        return f"P {self.unique_id}"
+    
+    def getPlanetTech(self):
+        return self.tech
+
+    def getPlanetGold(self):
+        return self.gold
+    
+    def getResources(self):
+        return f"Planet Id:{self.unique_id} Tech: {self.tech} Gold: {self.gold} " 
+    
+    # Funcion para representar cada turno de los planetas
     def step(self):
         """
         El step representará cada turno del juego. Comprobará si es habitado o no, en caso positivo dará sus recursos al agente 
