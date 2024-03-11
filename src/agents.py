@@ -1,5 +1,6 @@
 import mesa
 from weapons import Weapon
+from upgrades import Upgrades
 
 INITIAL_PLAYER_GOLD = 100
 INITIAL_PLAYER_TECH = 30
@@ -35,6 +36,8 @@ class Player(mesa.Agent):
         self.battles_won = 0
         # Permite saber si se ha creado una nave para permitir moverse o no, inicialmente será False
         self.move = False
+        # Permite saber las mejoras que tienen 
+        self.agent_upgrades = Upgrades()
 
     # Funciones para modificar los planetas del agente 
     def addPlanetResources(self, tech, gold, populated=False):
@@ -142,7 +145,7 @@ class Player(mesa.Agent):
         """
         # Tengo que comprobar si ha fabricado la nave para poder moverse
         if self.move:
-            next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, include_center=False)
+            next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, include_center=False, radius=1)
             next_move = self.random.choice(next_moves)                    
             self.model.grid.move_agent(self, next_move)
             options = ["Factory", "Weapon"]
