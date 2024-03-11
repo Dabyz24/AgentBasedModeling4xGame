@@ -14,22 +14,26 @@ def game_portrayal(agent):
         portrayal["r"] = 0.3
         portrayal["Layer"] = 1
         portrayal["Filled"] = "true"
-        portrayal["Color"] = "black"
+        portrayal["Color"] = agent.getAgentColor()
+        portrayal["stroke_color"] = "black"
         portrayal["Agent Id"] = agent.getId()
 
     if type(agent) is Planet:
             portrayal["Shape"] = "circle"
             portrayal["r"] = 1
-            portrayal["Layer"] = 0
+            portrayal["Layer"] = 1
             # Para el color elegirlo dependiendo de si tiene mas tecnologia o mas dinero
             portrayal["Filled"] = "true"
             if agent.isInhabit(): 
                 portrayal["Color"] = "green"
-                portrayal["text"] = agent.getPlayer().getId()
+                portrayal["text"] = "A "+agent.getPlayer().getId()
+                portrayal["Planet Id"] = agent.getPlanetId()
+                
             else:
                 portrayal["Color"] = "red"
                 portrayal["text"] = agent.getPlanetId()
-                portrayal["Resources"] = agent.getResources()
+            
+            portrayal["Resources"] = agent.getResources()
             portrayal["text_color"] = "black"
 
     return portrayal
@@ -39,7 +43,9 @@ def overviewAgents(model):
     aux_str = ""
     for i, k in summary.items():
         aux_str += (f"""<strong>Agent: {i.getId()} </strong> Resources: {k} <br>
-                     Agent Weapon: <strong>{i.getPlayerWeapon()[0]} </strong> Battles Won: {i.getBattlesWon()}<br> <hr>""")
+                     Agent Weapon: <strong>{i.getPlayerWeapon()[0]} </strong> Battles Won: {i.getBattlesWon()} 
+                     <strong>Color: </strong> <span style="display: inline-block; width:30px; height:10px; background-color:{i.getAgentColor()};"></span>
+                     <br> <hr>""")
     return aux_str
 
 canvas_element = mesa.visualization.CanvasGrid(game_portrayal, 20, 20, 500, 500)
@@ -52,12 +58,12 @@ canvas_element = mesa.visualization.CanvasGrid(game_portrayal, 20, 20, 500, 500)
 
 model_params = {
         "title": mesa.visualization.StaticText("Parameters:"),
-        "num_players": mesa.visualization.Slider("Number of players", 3, 1, 6),
-        "num_planets": mesa.visualization.Slider("Number of planets", 10, 2, 20),
-        "prob_factory": mesa.visualization.Slider("Probability of producing Factories", 0.4, 0.0, 1.0, 0.1),
-        "prob_weapon": mesa.visualization.Slider("Probability of producing Weapons", 0.1, 0.0, 1.0, 0.1),
-        "prob_space_ship": mesa.visualization.Slider("Probability of producing Space Ships", 0.6, 0.0, 1.0, 0.1, description="Space ships allowed the player to move"),
-        "taxes_planet": mesa.visualization.Slider("Taxes apply to planets", 20, 10, 100, 10),
+        "num_players": mesa.visualization.Slider("Number of players", Game.num_players, 1, 6),
+        "num_planets": mesa.visualization.Slider("Number of planets", Game.num_planets, 2, 20),
+        "prob_factory": mesa.visualization.Slider("Probability of producing Factories", Game.prob_factory, 0.0, 1.0, 0.1),
+        "prob_weapon": mesa.visualization.Slider("Probability of producing Weapons", Game.prob_weapon, 0.0, 1.0, 0.1),
+        "prob_space_ship": mesa.visualization.Slider("Probability of producing Space Ships", Game.prob_space_ship, 0.0, 1.0, 0.1, description="Space ships allowed the player to move"),
+        "taxes_planet": mesa.visualization.Slider("Taxes apply to planets", Game.taxes_planet, 10, 100, 10),
 
 }
 
