@@ -13,7 +13,7 @@ class Game(mesa.Model):
     height = 20
     num_players = 3
     num_planets = 10
-    prob_factory = 0.4
+    prob_factory = 0.3
     prob_weapon = 0.1
     prob_space_ship = 0.6
     tech_planet = 20
@@ -21,7 +21,7 @@ class Game(mesa.Model):
     taxes_planet = 20
 
 
-    def __init__(self, width=20, height=20, num_players=3, num_planets=5, prob_factory=0.4, prob_weapon=0.1, 
+    def __init__(self, width=20, height=20, num_players=3, num_planets=5, prob_factory=0.3, prob_weapon=0.1, 
                  prob_space_ship=0.6, tech_planet=20, gold_planet=30, taxes_planet=20):
         """
         width: Ancho de la matriz donde se encontraran los agentes
