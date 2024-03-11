@@ -28,6 +28,8 @@ class Player(mesa.Agent):
         self.num_factories = num_factories
         self.stellar_points = stellar_points
         self.moore = moore
+        # El color del agente por defecto será negro, pero en la creacion en el modelo se le atribuira otro color
+        self.color = "black"
         # Permite saber el arma actual del agente
         self.player_weapon = Weapon()
         self.battles_won = 0
@@ -99,7 +101,7 @@ class Player(mesa.Agent):
     def addBattleWon(self):
         self.battles_won += 1
 
-    # Getters de los atributos principales del jugador
+    # Getters y setters de los atributos principales del jugador
     def getId(self):
         return str(self.unique_id)
 
@@ -120,6 +122,12 @@ class Player(mesa.Agent):
     
     def getBattlesWon(self):
         return self.battles_won
+    
+    def getAgentColor(self):
+        return self.color
+    
+    def setAgentColor(self, new_color):
+        self.color = new_color
 
     def getResources(self):
         return {"Tech": self.tech, "Gold": self.gold, "Planets": self.num_planets, "Factories": self.num_factories}
@@ -132,7 +140,7 @@ class Player(mesa.Agent):
         """
         El step representará cada turno del juego. Podrá decidir si moverse, construir o atacar 
         """
-        # Tengo que comprobar si tiene alguna fabrica generada o alguna nave para poder moverse
+        # Tengo que comprobar si ha fabricado la nave para poder moverse
         if self.move:
             next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, include_center=False)
             next_move = self.random.choice(next_moves)                    
@@ -140,6 +148,7 @@ class Player(mesa.Agent):
             options = ["Factory", "Weapon"]
             probabilities = [self.model.prob_factory, self.model.prob_weapon]
             choose_action = self.random.choices(options, weights=probabilities, k=1)[0]
+        # Si no ha fabricado la nave tengo que darle las tres opciones
         else:
             options = ["Factory", "Space_ship", "Weapon"]
             probabilities = [self.model.prob_factory, self.model.prob_space_ship, self.model.prob_weapon]
@@ -215,7 +224,7 @@ class Planet(mesa.Agent):
         return self.gold
     
     def getResources(self):
-        return f"Planet Id:{self.unique_id} Tech: {self.tech} Gold: {self.gold} " 
+        return f"Tech: {self.tech} Gold: {self.gold}" 
     
     # Funcion para representar cada turno de los planetas
     def step(self):
