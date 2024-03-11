@@ -12,7 +12,7 @@ class Game(mesa.Model):
     width = 20 
     height = 20
     num_players = 3
-    num_planets = 5
+    num_planets = 10
     prob_factory = 0.4
     prob_weapon = 0.1
     prob_space_ship = 0.6
@@ -46,7 +46,8 @@ class Game(mesa.Model):
         self.tech_planet = tech_planet
         self.gold_planet = gold_planet
         self.taxes_planet = taxes_planet
-        self.listAgents = []
+        self.list_agents = []
+        self.list_agents_colors = ["Aqua","Blue","Fuchsia","Gray","Lime","Maroon","Orange","Teal","Yellow"]
         # Se moverán uno cada vez, es decir el primer turno se movera primero el agente 1 y el siguiente el agente 2 primero
         self.schedule = RandomActivationByTypeFiltered(self)
         # Creacion de la matriz Torus=True significa que si el agente se encuentra en la izquierda del todo y sigue a la izquierda aparecera en la derecha 
@@ -58,7 +59,7 @@ class Game(mesa.Model):
         #     }
         # )
         
-        # Creacion de los jugadores
+        # Creacion de los jugadores evito que haya dos agentes en el mismo espacio con chekspace y creo y añado el agente
         for _ in range(self.num_players):
             location_found = False
             while not location_found:
@@ -66,7 +67,14 @@ class Game(mesa.Model):
                 location_found = location[0]
             pos = location[1]
             player = Player(self.next_id(), self, pos, moore=MOORE_PLAYER)
-            self.listAgents.append(player)
+            # Una vez creado le asigno un color de la lista de colores, cada uno tendrá un color único
+            try:
+                chosen_color = self.list_agents_colors.pop(self.random.randrange(0, len(self.list_agents_colors)))
+            except:
+                # Si se añaden más jugadores que colores en la lista el color será negro
+                chosen_color = "black"
+            player.setAgentColor(chosen_color)
+            self.list_agents.append(player)
             self.grid.place_agent(player, pos)
             self.schedule.add(player)
         
@@ -81,7 +89,6 @@ class Game(mesa.Model):
                             self.random.randrange(0, self.gold_planet), self.taxes_planet, moore=MOORE_PLANET)
             self.grid.place_agent(planet, pos)
             self.schedule.add(planet)
-            print(planet.getResources())
         self.running = True
         #self.datacollector.collect(self)
 
@@ -96,13 +103,13 @@ class Game(mesa.Model):
 
     def propertiesAgents(self):
         summary = {}    
-        for i in self.listAgents:
+        for i in self.list_agents:
             summary[i] = i.getAgentInfo()
         return summary
             
     def checkAgentsValues(self):
         values = {}
-        for i in self.listAgents:
+        for i in self.list_agents:
             values[i] = i.getResources()
         return values
     
