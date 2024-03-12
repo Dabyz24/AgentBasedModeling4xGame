@@ -8,8 +8,18 @@ Pensar en una lógica para poder cambiar los valores sabiendo que tengo las mejo
 Ideas:
     Podrían mejorar la probabilidad de las armas, para así poder ganar más combates, si tiene esa mejora hace que se añada 5 al valor
     Pueden ampliar el rango de movimiento para que se puedan mover dos posiciones en un mismo turno (radius en get_neigborhood)
-'''
 
+Manera de implementar algo dinamico en ejecucion mediante exec()
+
+name = "David"
+age = 12
+code = f"""def greet():
+        print("Name: {name}")
+        print("Age: {age}")
+        """
+exec(code)
+greet()
+'''
 class Upgrades():
 
     def __init__(self):
