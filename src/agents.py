@@ -2,11 +2,12 @@ import mesa
 from weapons import Weapon
 from upgrades import Upgrades
 
-INITIAL_PLAYER_GOLD = 100
 INITIAL_PLAYER_TECH = 30
-GOLD_FROM_FACTORIES = 5
+INITIAL_PLAYER_GOLD = 100
 TECH_FROM_FACTORIES = 1
-
+GOLD_FROM_FACTORIES = 5
+TECH_BATTLES_PERCENTAGE = 0.05
+GOLD_BATTLES_PERCENTAGE = 0.1
 
 class Player(mesa.Agent):
     def __init__(self, unique_id, model, pos, tech=INITIAL_PLAYER_TECH, gold=INITIAL_PLAYER_GOLD, num_planets=0, num_factories=0 ,stellar_points=0, moore=True):
@@ -57,34 +58,44 @@ class Player(mesa.Agent):
         self.tech += TECH_FROM_FACTORIES * self.num_factories
         self.gold += GOLD_FROM_FACTORIES * self.num_factories
 
-    # Funciones para modificar las armas del agente
- 
+    # Funciones para gestionar las luchas entre agentes y las recompensas de los mismos 
+    def addBattleResources(self, enemy):
+        enemy_tech = round(enemy.getTech() * TECH_BATTLES_PERCENTAGE)
+        enemy_gold = round(enemy.getGold() * GOLD_BATTLES_PERCENTAGE)
+        self.tech += enemy_tech
+        self.gold += enemy_gold
+        enemy.takeAgentResources(enemy_tech, enemy_gold)
+
     def maybeFight(self):
     # Si hay algún jugador presente lucharé contra el 
         neighbors = self.model.grid.get_neighbors(self.pos, self.moore)
         # Añado a la lista solo los vecinos que sean del tipo player
         list_players = [obj for obj in neighbors if isinstance(obj, Player)]
         if len(list_players) > 0:
-            print("Luchando")
+            #print("Luchando")
             player_selected = self.random.choice(list_players)
             enemy_weapon = player_selected.getPlayerWeapon()
             if enemy_weapon == "None":
-                print(f"El gandor es el jugador {self.unique_id}")
+                #print(f"El ganador es el jugador {self.unique_id}")
                 self.addPoint()
+                self.addBattleResources(player_selected)
             else:
                 player_value = self.getPlayerWeapon()[1] * self.random.randint(1,20)
                 enemy_value = enemy_weapon[1] * self.random.randint(1,20)
-                print(player_value, enemy_value)
+                #print(player_value, enemy_value)
+                # Evita que los dos jugadores tengan el mismo resultado, si tienen el mimo no ocurrira nada
                 if player_value != enemy_value:
                     winner = max(player_value, enemy_value)
                     if winner == player_value:
-                        print(f"Punto ganado por {self.unique_id}")
+                        #print(f"Punto ganado por {self.unique_id}")
                         self.addPoint()
                         self.addBattleWon()
+                        self.addBattleResources(player_selected)
                     else:
-                        print(f"Punto ganado por {player_selected.getId()}")
+                        #print(f"Punto ganado por {player_selected.getId()}")
                         player_selected.addPoint()
                         player_selected.addBattleWon()
+                        player_selected.addBattleResources(self)
                             
     # Funciones para comprobar y restar los recursos de los jugadores
     def enoughResources(self, tech, gold):
@@ -93,7 +104,11 @@ class Player(mesa.Agent):
             self.gold -= gold
             return True
         return False
-             
+    
+    def takeAgentResources(self, tech, gold):
+        self.tech -= tech
+        self.gold -= gold
+
     def payTaxes(self, taxes=20):
         self.gold -= taxes * self.num_planets
 
