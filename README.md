@@ -8,7 +8,10 @@
 [✔] 3. Hacer que las peleas resten recursos a algunos y los sumen al ganador
 - [] 3.1. Hacer que las peleas se vean de alguna manera (script para que se vea en el html???) 
 
-[ ] 4. Modificar los agentes para introducri Q-learning en los steps, para que puedan hacer lo más óptimo 
+[ ] 4. Modificar los agentes para introducir Q-learning en los steps, para que puedan hacer lo más óptimo 
+- Los agentes recibiran una recompensa muy grande cuando reciban puntos estelares, que los podrán obtener por medio de tener el mayor número de fábricas o planetas conquistados o por ganar batallas
+- Los agentes recibiran una ligera penalización si no consiguen obtener puntos estelares en ese step
+- Los agentes recibiran una penalización mayor si pierden algún planeta por no poder mantenerlo 
 
 [ ] 5. Ver como poder introducir codigo de manera dinamica para poder crear nuevas funcionalidades (alianzas)
 - [] 5.1 Buscar info sobre la metaprogramacion y sobre como introducirla
