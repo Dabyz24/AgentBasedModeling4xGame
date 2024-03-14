@@ -25,7 +25,7 @@ def game_portrayal(agent):
             # Para el color elegirlo dependiendo de si tiene mas tecnologia o mas dinero
             portrayal["Filled"] = "true"
             if agent.isInhabit(): 
-                portrayal["Color"] = "green"
+                portrayal["Color"] = agent.getPlayer().getAgentColor()
                 portrayal["text"] = "A "+agent.getPlayer().getId()
                 portrayal["Planet Id"] = agent.getPlanetId()
                 
@@ -42,10 +42,12 @@ def overviewAgents(model):
     summary = model.propertiesAgents()
     aux_str = ""
     for i, k in summary.items():
-        aux_str += (f"""<strong>Agent: {i.getId()} </strong> Resources: {k} <br>
-                     Agent Weapon: <strong>{i.getPlayerWeapon()[0]} </strong> Battles Won: {i.getBattlesWon()} 
-                     <strong>Color: </strong> <span style="display: inline-block; width:30px; height:10px; background-color:{i.getAgentColor()};"></span>
-                     <br> <hr>""")
+        aux_str += (f"""
+                    <span style="display: inline-block; width:10px; height:10px; background-color:{i.getAgentColor()};border-style:solid;border-width:1px;"></span>
+                    <strong>Agent: {i.getId()} </strong> Resources: {k} <br>
+                    Agent Weapon: <strong>{i.getPlayerWeapon()[0]} </strong> Battles Won: {i.getBattlesWon()} 
+                    Upgrades: <strong>{i.getAgentUpgrades().getUpgrades()} </strong>
+                    <br> <hr>""")
     return aux_str
 
 canvas_element = mesa.visualization.CanvasGrid(game_portrayal, 20, 20, 500, 500)
