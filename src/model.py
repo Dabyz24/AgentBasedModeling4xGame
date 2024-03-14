@@ -47,7 +47,7 @@ class Game(mesa.Model):
         self.gold_planet = gold_planet
         self.taxes_planet = taxes_planet
         self.list_agents = []
-        self.list_agents_colors = ["Aqua","Blue","Fuchsia","Gray","Lime","Maroon","Orange","Teal","Yellow"]
+        self.list_agents_colors = ["Aqua","Green","Pink","Gray","Purple","Yellow"]
         # Se moverán uno cada vez, es decir el primer turno se movera primero el agente 1 y el siguiente el agente 2 primero
         self.schedule = RandomActivationByTypeFiltered(self)
         # Creacion de la matriz Torus=True significa que si el agente se encuentra en la izquierda del todo y sigue a la izquierda aparecera en la derecha 
