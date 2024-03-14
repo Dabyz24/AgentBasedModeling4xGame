@@ -3,10 +3,13 @@ class Weapon():
     
     def __init__(self):
         """
-        actual_weapon: Arma actual del agente, empezará sin arma
-        num_upgrades: Numero de mejoras que se han hecho al arma como maximo se podrán 3
-        list_weapons: lista de armas del juego
-        value_weapons: Diccionario con el daño asociado a cada arma
+        Clase que sirve para tener unas mejoras de armas para poder combatir con otros agentes 
+
+        Atributos:
+            actual_weapon: Arma actual del agente, empezará sin arma
+            num_upgrades: Numero de mejoras que se han hecho al arma como maximo se podrán 3
+            list_weapons: lista de armas del juego
+            value_weapons: Diccionario con el daño asociado a cada arma
         """
         self.actual_weapon = ""
         self.num_upgrades = 0
