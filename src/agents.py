@@ -2,10 +2,27 @@ import mesa
 from weapons import Weapon
 from upgrades import Upgrades
 
+# Constantes iniciales del jugador
 INITIAL_PLAYER_TECH = 30
 INITIAL_PLAYER_GOLD = 100
+# Constantes para los recursos que gastan por movimiento 
+SPACE_SHIP_TECH_COST = 5
+SPACE_SHIP_GOLD_COST = 10
+# Constantes de las fabricas
 TECH_FROM_FACTORIES = 1
 GOLD_FROM_FACTORIES = 5
+FACTORIES_TECH_COST = 5
+FACTORIES_GOLD_COST = 30
+# Constantes para el gasto por fabricar armas y las mejoras
+WEAPON_TECH_COST = 20
+WEAPON_GOLD_COST = 40
+UPGRADE_DAMAGE_TECH_COST = 100
+UPGRADE_DAMAGE_GOLD_COST = 500
+UPGRADE_MOVEMENT_TECH_COST = 200
+UPGRADE_MOVEMENT_GOLD_COST = 1000
+UPGRADE_FACTORIES_TECH_COST = 300
+UPGRADE_FACTORIES_GOLD_COST = 1500
+# Constantes para las ganancias de las luchas
 TECH_BATTLES_PERCENTAGE = 0.05
 GOLD_BATTLES_PERCENTAGE = 0.1
 
@@ -39,7 +56,12 @@ class Player(mesa.Agent):
         self.move = False
         # Permite saber las mejoras que tienen 
         self.agent_upgrades = Upgrades()
-
+        # Modificaciones de las mejoras
+        self.upgrade_options = self.agent_upgrades.getListUpgrades()
+        self.damage_increase = 0
+        self.movement_radius = 1
+        self.increase_factories_resources = 1
+        
     # Funciones para modificar los planetas del agente 
     def addPlanetResources(self, tech, gold, populated=False):
         self.tech += tech
@@ -55,8 +77,8 @@ class Player(mesa.Agent):
         self.num_factories += 1
 
     def addFactoryResources(self):
-        self.tech += TECH_FROM_FACTORIES * self.num_factories
-        self.gold += GOLD_FROM_FACTORIES * self.num_factories
+        self.tech += TECH_FROM_FACTORIES * self.num_factories * self.increase_factories_resources
+        self.gold += GOLD_FROM_FACTORIES * self.num_factories * self.increase_factories_resources
 
     # Funciones para gestionar las luchas entre agentes y las recompensas de los mismos 
     def addBattleResources(self, enemy):
@@ -80,8 +102,8 @@ class Player(mesa.Agent):
                 self.addPoint()
                 self.addBattleResources(player_selected)
             else:
-                player_value = self.getPlayerWeapon()[1] * self.random.randint(1,20)
-                enemy_value = enemy_weapon[1] * self.random.randint(1,20)
+                player_value = self.getPlayerWeapon()[1] * self.random.randint(1,20) + self.damage_increase
+                enemy_value = enemy_weapon[1] * self.random.randint(1,20) + player_selected.getDamageIncrease()
                 #print(player_value, enemy_value)
                 # Evita que los dos jugadores tengan el mismo resultado, si tienen el mimo no ocurrira nada
                 if player_value != enemy_value:
@@ -147,11 +169,26 @@ class Player(mesa.Agent):
     def setAgentColor(self, new_color):
         self.color = new_color
 
+    def getDamageIncrease(self):
+        return self.damage_increase
+
+    def increaseDamage(self):
+        self.damage_increase = 5
+
+    def doubleMovementRadius(self):
+        self.movement_radius = 2
+    
+    def doubleFactoriesResources(self):
+        self.increase_factories_resources = 2
+
+    def getAgentUpgrades(self):
+        return self.agent_upgrades
+    
     def getResources(self):
         return {"Tech": self.tech, "Gold": self.gold, "Planets": self.num_planets, "Factories": self.num_factories}
 
     def getAgentInfo(self):
-        return "T: " + str(self.tech) + " G: " + str(self.gold) + " P: " +str(self.num_planets) + " F: "+str(self.num_factories) + " Stellar Points: " + str(self.stellar_points)
+        return "T: " + str(self.tech) + " G: " + str(self.gold) + " P: " +str(self.num_planets) + " F: "+str(self.num_factories) + " <strong>Stellar Points: " + str(self.stellar_points)+"</strong>"
 
     # Funcion para representar cada turno del jugador
     def step(self):
@@ -160,7 +197,7 @@ class Player(mesa.Agent):
         """
         # Tengo que comprobar si ha fabricado la nave para poder moverse
         if self.move:
-            next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, include_center=False, radius=1)
+            next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, include_center=False, radius=self.movement_radius)
             next_move = self.random.choice(next_moves)                    
             self.model.grid.move_agent(self, next_move)
             options = ["Factory", "Weapon"]
@@ -172,25 +209,39 @@ class Player(mesa.Agent):
             probabilities = [self.model.prob_factory, self.model.prob_space_ship, self.model.prob_weapon]
             choose_action = self.random.choices(options, weights=probabilities, k=1)[0]
 
-        if choose_action == "Factory" and self.enoughResources(5, 30):
+        if choose_action == "Factory" and self.enoughResources(FACTORIES_TECH_COST, FACTORIES_GOLD_COST):
             self.createFactory()
             
         if choose_action == "Space_ship":
             # Determinara si ya ha creado una nave espacial para moverse antes o no 
-            if self.enoughResources(5, 10): 
+            if self.enoughResources(SPACE_SHIP_TECH_COST, SPACE_SHIP_GOLD_COST): 
                 next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, include_center=False)
                 next_move = self.random.choice(next_moves)                    
                 self.model.grid.move_agent(self, next_move)
                 self.move = True
 
-        if choose_action == "Weapon" and self.enoughResources(20, 40):
+        if choose_action == "Weapon" and self.enoughResources(WEAPON_TECH_COST, WEAPON_GOLD_COST):
             # las tres primeras veces que se ejecute solo se mejorara el arma
             if self.player_weapon.getNumUpgrades() < 3:
-                print("Arma creada")
                 self.player_weapon.upgradeWeapon()
-            #else:
-                # Aumentar el numero de armas para que aumente su probabilidad de sacar un numero mas grande
+            # Comprobar si el agente tiene mas mejoras disponibles
+            elif self.agent_upgrades.isUpgradeAvailable():
+                if len(self.upgrade_options) == 1:
+                    random_choice = 0
+                else:
+                    random_choice = self.random.randint(0,len(self.upgrade_options)-1)
+                choose_upgrade = self.upgrade_options[random_choice]
+                if choose_upgrade == "Damage" and self.enoughResources(UPGRADE_DAMAGE_TECH_COST, UPGRADE_DAMAGE_GOLD_COST):
+                    self.agent_upgrades.upgradeDamage()
+                    self.increaseDamage()
                 
+                elif choose_upgrade == "Movement" and self.enoughResources(UPGRADE_MOVEMENT_TECH_COST, UPGRADE_MOVEMENT_GOLD_COST):
+                    self.agent_upgrades.upgradeMovement()
+                    self.doubleMovementRadius()
+                
+                elif choose_upgrade == "Factory" and self.enoughResources(UPGRADE_FACTORIES_TECH_COST, UPGRADE_FACTORIES_GOLD_COST):
+                    self.agent_upgrades.upgradeFactories()
+                    self.doubleFactoriesResources()
 
         if self.num_factories > 0:
             self.addFactoryResources()
