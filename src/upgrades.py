@@ -1,44 +1,67 @@
 
-'''
-1. Crear una clase que permita incluir mejoras a los atributos o las habilidades de los agentes utilizando su tecnología
-Tengo que tener en cuenta que los atributos se podrán cambiar en ejecución por lo que tengo que programar las cosas para que se puedan modificar facilmente
-Puedo hacer una clase así con booleanos para que el codigo lo pueda cambiar mas facil desde una única clase y no tenga qeu buscar por todos los archivos
-
-Pensar en una lógica para poder cambiar los valores sabiendo que tengo las mejoras, se me ocurre un if pero pensar una manera más elaborada
-Ideas:
-    Podrían mejorar la probabilidad de las armas, para así poder ganar más combates, si tiene esa mejora hace que se añada 5 al valor
-    Pueden ampliar el rango de movimiento para que se puedan mover dos posiciones en un mismo turno (radius en get_neigborhood)
-
-Manera de implementar algo dinamico en ejecucion mediante exec()
-
-name = "David"
-age = 12
-code = f"""def greet():
-        print("Name: {name}")
-        print("Age: {age}")
-        """
-exec(code)
-greet()
-'''
 class Upgrades():
 
     def __init__(self):
         """
-        damage_upgrade: Permite mejorar la probabilidad a la hora de ganar los combates 
-        movement_upgrade: Permite moverse dos posiciones en un turno
+        Clase que sirve para tener un arbol de tecnologías para poder mejorar atributos de los agentes 
 
-        num_upgrades: Llevará la cuenta de las mejoras para saber si se pueden mejorar más o ya ha alcanzado el límite
+        Atributos:
+
+            damage_upgrade: Permite mejorar la probabilidad a la hora de ganar los combates 
+            movement_upgrade: Permite moverse dos posiciones en un turno
+            factories_upgrades: Permite duplicar las ganancias de las fabricas
+            list_upgrades: Tendrá guardadas todos las mejoras para poder obtener el numero maximo de upgrades permitidos
+            num_upgrades: Llevará la cuenta de las mejoras para saber si se pueden mejorar más o ya ha alcanzado el límite
         """
         self.damage_upgrade = False
         self.movement_upgrade = False
+        self.factories_upgrade = False
+        self.list_upgrades = ["Damage","Movement","Factory"]
         self.num_upgrades = 0
 
     def upgradeDamage(self):
-        self.damage_upgrade = True
+        if not self.damage_upgrade:
+            self.damage_upgrade = True
+            self.num_upgrades += 1
+            self.list_upgrades.remove("Damage")
 
     def upgradeMovement(self):
-        self.movement_upgrade = True
+        if not self.movement_upgrade:
+            self.movement_upgrade = True
+            self.num_upgrades += 1
+            self.list_upgrades.remove("Movement")
     
+    def upgradeFactories(self):
+        if not self.factories_upgrade:
+            self.factories_upgrade = True
+            self.num_upgrades += 1
+            self.list_upgrades.remove("Factory")
+
+    # getters y setters para los atributos y poder manejarlo para cada agente
+    def isDamageUpgraded(self):
+        return self.damage_upgrade
+    
+    def isMovementUpgraded(self):
+        return self.movement_upgrade
+
     def getNumUpgrades(self):
         return self.num_upgrades
-
+    
+    def isUpgradeAvailable(self):
+        # Añado 1 para que cuando solo quede una mejora disponible se pueda seleccionar
+        return self.num_upgrades <= len(self.list_upgrades)+ 1
+    
+    def getListUpgrades(self):
+        return self.list_upgrades
+    
+    def getUpgrades(self):
+        aux_str = ""
+        if self.damage_upgrade:
+            aux_str += "D ↑ "
+        if self.movement_upgrade:
+            aux_str += "M ↑ "
+        if self.factories_upgrade:
+            aux_str += "F ↑ "
+        if aux_str == "": return "None"
+        return aux_str
+        
