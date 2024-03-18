@@ -69,7 +69,7 @@ class Player(mesa.Agent):
         if not populated:
             self.num_planets += 1
     
-    def removePlantet(self):
+    def removePlanet(self):
         self.num_planets -= 1 
 
     # Funciones para modificar las fabricas del agente 
@@ -144,6 +144,9 @@ class Player(mesa.Agent):
     # Getters y setters de los atributos principales del jugador
     def getId(self):
         return str(self.unique_id)
+    
+    def getAgentPos(self):
+        return self.pos
 
     def getTech(self):
         return self.tech
@@ -190,34 +193,21 @@ class Player(mesa.Agent):
     def getAgentInfo(self):
         return "T: " + str(self.tech) + " G: " + str(self.gold) + " P: " +str(self.num_planets) + " F: "+str(self.num_factories) + " <strong>Stellar Points: " + str(self.stellar_points)+"</strong>"
 
-    # Funcion para representar cada turno del jugador
-    def step(self):
-        """
-        El step representará cada turno del juego. Podrá decidir si moverse, construir o atacar 
-        """
-        # Tengo que comprobar si ha fabricado la nave para poder moverse
-        if self.move:
-            next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, include_center=False, radius=self.movement_radius)
-            next_move = self.random.choice(next_moves)                    
-            self.model.grid.move_agent(self, next_move)
-            options = ["Factory", "Weapon"]
-            probabilities = [self.model.prob_factory, self.model.prob_weapon]
-            choose_action = self.random.choices(options, weights=probabilities, k=1)[0]
-        # Si no ha fabricado la nave tengo que darle las tres opciones
-        else:
-            options = ["Factory", "Space_ship", "Weapon"]
-            probabilities = [self.model.prob_factory, self.model.prob_space_ship, self.model.prob_weapon]
-            choose_action = self.random.choices(options, weights=probabilities, k=1)[0]
+    def do_move(self):
+        next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, include_center=False, radius=self.movement_radius)
+        next_move = self.random.choice(next_moves)                    
+        self.model.grid.move_agent(self, next_move)
 
+    def do_action(self, choose_action):
         if choose_action == "Factory" and self.enoughResources(FACTORIES_TECH_COST, FACTORIES_GOLD_COST):
             self.createFactory()
             
         if choose_action == "Space_ship":
             # Determinara si ya ha creado una nave espacial para moverse antes o no 
-            if self.enoughResources(SPACE_SHIP_TECH_COST, SPACE_SHIP_GOLD_COST): 
-                next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, include_center=False)
-                next_move = self.random.choice(next_moves)                    
-                self.model.grid.move_agent(self, next_move)
+            if self.move:
+                self.do_move()
+            elif self.enoughResources(SPACE_SHIP_TECH_COST, SPACE_SHIP_GOLD_COST): 
+                self.do_move()
                 self.move = True
 
         if choose_action == "Weapon" and self.enoughResources(WEAPON_TECH_COST, WEAPON_GOLD_COST):
@@ -242,6 +232,19 @@ class Player(mesa.Agent):
                 elif choose_upgrade == "Factory" and self.enoughResources(UPGRADE_FACTORIES_TECH_COST, UPGRADE_FACTORIES_GOLD_COST):
                     self.agent_upgrades.upgradeFactories()
                     self.doubleFactoriesResources()
+
+    # Funcion para representar cada turno del jugador
+    def step(self):
+        """
+        El step representará cada turno del juego. Podrá decidir si moverse, construir o atacar 
+        """
+        # Tengo que comprobar si ha fabricado la nave para poder moverse
+        options = ["Factory", "Space_ship", "Weapon"]
+        probabilities = [self.model.prob_factory, self.model.prob_space_ship, self.model.prob_weapon]
+        choose_action = self.random.choices(options, weights=probabilities, k=1)[0]
+
+        self.do_action(choose_action)
+        
 
         if self.num_factories > 0:
             self.addFactoryResources()
@@ -286,6 +289,9 @@ class Planet(mesa.Agent):
     def getPlanetId(self):
         return f"P {self.unique_id}"
     
+    def getPlanetPos(self):
+        return self.pos
+    
     def getPlanetTech(self):
         return self.tech
 
@@ -313,7 +319,7 @@ class Planet(mesa.Agent):
                 player_selected.addPlanetResources(self.tech, self.gold)
         # Si el jugador elegido para controlar el planeta se queda sin dinero se borrara el planeta al jugador y el propio jugador del planeta pasando a no estar habitado
         elif self.player.getGold() <= 0:
-            self.player.removePlantet()
+            self.player.removePlanet()
             self.player = None
             self.populated = False
         else:
