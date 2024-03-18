@@ -146,7 +146,7 @@ class Player(mesa.Agent):
         return str(self.unique_id)
     
     def getAgentPos(self):
-        return self.pos
+        return f"X: {self.pos[0]} Y:{self.pos[1]}"
 
     def getTech(self):
         return self.tech
@@ -290,7 +290,7 @@ class Planet(mesa.Agent):
         return f"P {self.unique_id}"
     
     def getPlanetPos(self):
-        return self.pos
+        return f"X: {self.pos[0]} Y:{self.pos[1]}"
     
     def getPlanetTech(self):
         return self.tech
