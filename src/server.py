@@ -17,6 +17,7 @@ def game_portrayal(agent):
         portrayal["Color"] = agent.getAgentColor()
         portrayal["stroke_color"] = "black"
         portrayal["Agent Id"] = agent.getId()
+        portrayal["Position"] = agent.getAgentPos()
 
     if type(agent) is Planet:
             portrayal["Shape"] = "circle"
@@ -32,7 +33,7 @@ def game_portrayal(agent):
             else:
                 portrayal["Color"] = "red"
                 portrayal["text"] = agent.getPlanetId()
-            
+            portrayal["Position"] = agent.getPlanetPos()
             portrayal["Resources"] = agent.getResources()
             portrayal["text_color"] = "black"
 
