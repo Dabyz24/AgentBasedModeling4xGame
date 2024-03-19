@@ -104,3 +104,8 @@ class MoneyModel(Model):
         """Runs a single tick of the clock in our simulation."""
         self.datacollector.collect(self)
         self.schedule.step()
+
+Posiciones del get_neighbors para determinar las posiciones de los estados del agentes
+[(-1,-1), (-1,0), (-1,1), (0,-1),(0,1),(1,-1),(1,0),(1,1)]
+diagonal inferior izquierda , izquierda, diagonal superior izquierda, abajo, arriba, diagonal inferior derecha, derecha, diagonal superior derecha
+Osea next_moves = [LLD, L, ULD, D, U, LRD, R, URD]
