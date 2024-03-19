@@ -10,7 +10,7 @@
 
 [ ] 4. Modificar los agentes para introducir Q-learning en los steps, para que puedan hacer lo más óptimo 
 - [✔] 4.1 Hacerlo estatico quitando la opcion de aparecer random de los agentes, para que se pueda entrenar el modelo (solo para 3 jugadores y 10 planetas)
-- [] 4.2 Establecer todos los estados y las acciones posibles del sistema
+- [✔] 4.2 Establecer todos los estados y las acciones posibles del sistema
 - [] 4.3 Crear la Q-table con los estados y las acciones
 - [] 4.4 Establecer sistema de rewards para los agentes y establecer un final de partida para poder parar la simulación (algo como 200 puntos estelares)
   - Los agentes recibiran una recompensa muy grande cuando reciban puntos estelares, que los podrán obtener por medio de tener el mayor número de fábricas o planetas conquistados o por ganar batallas
