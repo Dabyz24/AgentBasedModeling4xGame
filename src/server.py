@@ -61,8 +61,8 @@ canvas_element = mesa.visualization.CanvasGrid(game_portrayal, 20, 20, 500, 500)
 
 model_params = {
         "title": mesa.visualization.StaticText("Parameters:"),
-        "num_players": mesa.visualization.Slider("Number of players", Game.num_players, 1, 6),
-        "num_planets": mesa.visualization.Slider("Number of planets", Game.num_planets, 2, 20),
+        # "num_players": mesa.visualization.Slider("Number of players", Game.num_players, 1, 6),
+        # "num_planets": mesa.visualization.Slider("Number of planets", Game.num_planets, 2, 20),
         "prob_factory": mesa.visualization.Slider("Probability of producing Factories", Game.prob_factory, 0.0, 1.0, 0.1),
         "prob_weapon": mesa.visualization.Slider("Probability of producing Weapons", Game.prob_weapon, 0.0, 1.0, 0.1),
         "prob_space_ship": mesa.visualization.Slider("Probability of producing Space Ships", Game.prob_space_ship, 0.0, 1.0, 0.1, description="Space ships allowed the player to move"),
