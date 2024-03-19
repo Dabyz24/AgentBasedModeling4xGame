@@ -54,6 +54,19 @@ class Game(mesa.Model):
         self.schedule = RandomActivationByTypeFiltered(self)
         # Creacion de la matriz Torus=True significa que si el agente se encuentra en la izquierda del todo y sigue a la izquierda aparecera en la derecha 
         self.grid = mesa.space.MultiGrid(self.width, self.height, torus=True)
+        # Creacion de variables para poder implentar el Q-Learning 
+        self.state_space = [i for i in range(self.width*self.height)]
+        self.action_space = {"LLD": 0, "L": 1, "ULD": 2, "D": 3, "U": 4, "LRD": 5, "R": 6, "URD": 7, "F": "Factory", "W": "Weapon"}
+        """ Las siglas se corresponden con:
+                LLD = Lower Left Diagonal, L = Left, ULD = Upper Left Diagonal
+                D = Down, U = Up
+                LRD = Lower Right Diagonal, R = Right, URD = Upper right diagonal
+            y hacen referencia al indice de la lista de posibles movientos de cada agente 
+            F = Fabricar una fabrica 
+            W = Crear un arma o mejorar una habilidad 
+        """
+        self.possible_actions = ["LLD", "L", "ULD", "D", "U", "LRD", "R", "URD", "F", "W"]
+
         # Datos que queremos ver 
         # self.datacollector = mesa.DataCollector(
         #     {
