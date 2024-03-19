@@ -109,3 +109,12 @@ Posiciones del get_neighbors para determinar las posiciones de los estados del a
 [(-1,-1), (-1,0), (-1,1), (0,-1),(0,1),(1,-1),(1,0),(1,1)]
 diagonal inferior izquierda , izquierda, diagonal superior izquierda, abajo, arriba, diagonal inferior derecha, derecha, diagonal superior derecha
 Osea next_moves = [LLD, L, ULD, D, U, LRD, R, URD]
+
+moves = [(18, 9), (18, 10), (18, 11), (19, 9), (19, 11), (0, 9), (0, 10), (0, 11)]
+action_space = {"LLD": 0, "L": 1, "ULD": 2, "D": 3, "U": 4, "LRD": 5, "R": 6, "URD": 7, "F": "Factory", "W": "Weapon"}
+possible_actions = ["LLD", "L", "ULD", "D", "U", "LRD", "R", "URD", "F", "W"]
+moves_action = ["LLD", "L", "ULD", "D", "U", "LRD", "R", "URD"]
+action  = random.choice(list(action_space.keys()))
+print(action)
+if action in moves_action:
+    print(moves[action_space.get(action)])
