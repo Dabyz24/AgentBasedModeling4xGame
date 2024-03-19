@@ -19,9 +19,11 @@ class Game(mesa.Model):
     tech_planet = 20
     gold_planet = 30
     taxes_planet = 20
-
-
-    def __init__(self, width=20, height=20, num_players=3, num_planets=5, prob_factory=0.3, prob_weapon=0.1, 
+    # Posiciones guardadas para solo 3 jugadores y 10 planetas, si se quiere aumentar el número de jugadores se tendrá que aumentar la lista con su posicion
+    list_possible_player_pos = [(0,10),(19,10),(10,0)]
+    list_possible_planet_pos = [(6,16),(3,18),(18,18),(12,18),(14,12),(10,10),(5,8),(4,4),(14,5),(17,1)]
+    
+    def __init__(self, width=20, height=20, num_players=3, num_planets=10, prob_factory=0.3, prob_weapon=0.1, 
                  prob_space_ship=0.6, tech_planet=20, gold_planet=30, taxes_planet=20):
         """
         width: Ancho de la matriz donde se encontraran los agentes
@@ -60,12 +62,8 @@ class Game(mesa.Model):
         # )
         
         # Creacion de los jugadores evito que haya dos agentes en el mismo espacio con chekspace y creo y añado el agente
-        for _ in range(self.num_players):
-            location_found = False
-            while not location_found:
-                location = self.checkSpace(MOORE_PLAYER)
-                location_found = location[0]
-            pos = location[1]
+        for i in range(self.num_players):
+            pos = self.list_possible_player_pos[i]
             player = Player(self.next_id(), self, pos, moore=MOORE_PLAYER)
             # Una vez creado le asigno un color de la lista de colores, cada uno tendrá un color único
             try:
@@ -79,27 +77,14 @@ class Game(mesa.Model):
             self.schedule.add(player)
         
         # Creacion de los planetas 
-        for _ in range(self.num_planets):
-            location_found = False
-            while not location_found:
-                location = self.checkSpace(MOORE_PLANET)
-                location_found = location[0]
-            pos = location[1]
+        for i in range(self.num_planets):
+            pos = self.list_possible_planet_pos[i]
             planet = Planet(self.next_id(), self, pos ,self.random.randrange(0, tech_planet),
                             self.random.randrange(0, self.gold_planet), self.taxes_planet, moore=MOORE_PLANET)
             self.grid.place_agent(planet, pos)
             self.schedule.add(planet)
         self.running = True
         #self.datacollector.collect(self)
-
-    def checkSpace(self, moore):
-        pos = (self.random.randrange(self.width), self.random.randrange(self.height))
-        neighbors = self.grid.get_neighbors(pos, moore, include_center=True)
-        # Añado a la lista los vecinos que sean del tipo player o planet para saber si tiene otros planetas o jugadores alrededor 
-        list_agents = [obj for obj in neighbors if (isinstance(obj, Player) or isinstance(obj, Planet))]
-        if len(list_agents) > 0:
-            return False, pos
-        return True, pos
 
     def propertiesAgents(self):
         summary = {}    
