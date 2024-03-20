@@ -193,24 +193,27 @@ class Player(mesa.Agent):
     def getAgentInfo(self):
         return "T: " + str(self.tech) + " G: " + str(self.gold) + " P: " +str(self.num_planets) + " F: "+str(self.num_factories) + " <strong>Stellar Points: " + str(self.stellar_points)+"</strong>"
 
-    def do_move(self):
+    def do_move(self, action):
         next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, include_center=False, radius=self.movement_radius)
-        next_move = self.random.choice(next_moves)                    
+        next_move = next_moves[self.model.action_space.get(action)]                 
         self.model.grid.move_agent(self, next_move)
 
     def do_action(self, choose_action):
-        if choose_action == "Factory" and self.enoughResources(FACTORIES_TECH_COST, FACTORIES_GOLD_COST):
+        
+        if choose_action == "F" and self.enoughResources(FACTORIES_TECH_COST, FACTORIES_GOLD_COST):
             self.createFactory()
-            
-        if choose_action == "Space_ship":
+
+        list_moves = ["LLD", "L", "ULD", "D", "U", "LRD", "R", "URD"]    
+
+        if choose_action in list_moves:
             # Determinara si ya ha creado una nave espacial para moverse antes o no 
             if self.move:
-                self.do_move()
+                self.do_move(choose_action)
             elif self.enoughResources(SPACE_SHIP_TECH_COST, SPACE_SHIP_GOLD_COST): 
-                self.do_move()
+                self.do_move(choose_action)
                 self.move = True
 
-        if choose_action == "Weapon" and self.enoughResources(WEAPON_TECH_COST, WEAPON_GOLD_COST):
+        if choose_action == "W" and self.enoughResources(WEAPON_TECH_COST, WEAPON_GOLD_COST):
             # las tres primeras veces que se ejecute solo se mejorara el arma
             if self.player_weapon.getNumUpgrades() < 3:
                 self.player_weapon.upgradeWeapon()
@@ -223,12 +226,7 @@ class Player(mesa.Agent):
                 choose_upgrade = self.upgrade_options[random_choice]
                 if choose_upgrade == "Damage" and self.enoughResources(UPGRADE_DAMAGE_TECH_COST, UPGRADE_DAMAGE_GOLD_COST):
                     self.agent_upgrades.upgradeDamage()
-                    self.increaseDamage()
-                
-                elif choose_upgrade == "Movement" and self.enoughResources(UPGRADE_MOVEMENT_TECH_COST, UPGRADE_MOVEMENT_GOLD_COST):
-                    self.agent_upgrades.upgradeMovement()
-                    self.doubleMovementRadius()
-                
+                    self.increaseDamage()               
                 elif choose_upgrade == "Factory" and self.enoughResources(UPGRADE_FACTORIES_TECH_COST, UPGRADE_FACTORIES_GOLD_COST):
                     self.agent_upgrades.upgradeFactories()
                     self.doubleFactoriesResources()
@@ -238,14 +236,11 @@ class Player(mesa.Agent):
         """
         El step representará cada turno del juego. Podrá decidir si moverse, construir o atacar 
         """
-        # Tengo que comprobar si ha fabricado la nave para poder moverse
-        options = ["Factory", "Space_ship", "Weapon"]
-        probabilities = [self.model.prob_factory, self.model.prob_space_ship, self.model.prob_weapon]
-        choose_action = self.random.choices(options, weights=probabilities, k=1)[0]
+        # El agente cogera un valor de la lista de posibles acciones del modelo el [0] es porque devolvera una lista y necesito el elemento
+        choose_action = self.random.choices(self.model.possible_actions)[0]
 
         self.do_action(choose_action)
         
-
         if self.num_factories > 0:
             self.addFactoryResources()
 
