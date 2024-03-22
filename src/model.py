@@ -152,6 +152,22 @@ class Game(mesa.Model):
         self.addStellarPoints()
         #self.datacollector.collect(self)
     
-    def run_model(self, n):
-        for i in range(n):
+    def run_model(self):
+        done = False
+        i = 1 
+        while not done:
+            print(f"step {i}")
             self.step()
+            for agent in self.schedule.agents:
+                if type(agent) == Player:
+                    print(f"Player {agent.getAgentPos()}")
+                    print(f"Resources: {agent.getAgentInfo()}")
+                    if agent.getStellarPoints() >= 100:
+                        done = True
+            i += 1
+            print("------")
+            # Actualizar la tabla Q de cada agente 
+                    
+
+model = Game()
+model.run_model()
