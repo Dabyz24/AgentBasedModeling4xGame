@@ -187,6 +187,9 @@ class Player(mesa.Agent):
     def getAgentUpgrades(self):
         return self.agent_upgrades
     
+    def getStellarPoints(self):
+        return self.stellar_points
+    
     def getResources(self):
         return {"Tech": self.tech, "Gold": self.gold, "Planets": self.num_planets, "Factories": self.num_factories}
 
