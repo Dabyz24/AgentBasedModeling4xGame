@@ -123,10 +123,12 @@ class Game(mesa.Model):
             # Comparar los valores de num fabricas y num de planetas y ver cual es el mas alto 
             for key, value in resources.items():
                 if key == "Planets":
+                # Si el valor de los planetas es mayor al numero inicial se guarda el jugador y se guarda el valor en la lista
                     if initial_planets < value:
                         agent_more_planets = player
                         initial_planets = value
                         check_planets_list = [value]
+                    # Si otro agente tiene el mismo valor se guarda en la lista 
                     elif initial_planets == value:
                         check_planets_list.append(value)
                 if key == "Factories":
@@ -136,10 +138,11 @@ class Game(mesa.Model):
                         check_factories_list = [value]
                     elif initial_planets == value:
                         check_factories_list.append(value) 
+        # Si solo hay un valor significa que es el que mas planetas tiene por lo que se le recompensará con un punto estelar
         if len(check_planets_list) == 1:
             #print(f"El agente con más planetas es {agent_more_planets.getId()}")
             agent_more_planets.addPoint()
-
+        # El mismo funcionamiento con el numero de fabricas
         if len(check_factories_list) == 1:
             #print(f"El agente con más fabricas es {agent_more_factories.getId()}")
             agent_more_factories.addPoint()
