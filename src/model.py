@@ -168,6 +168,6 @@ class Game(mesa.Model):
             print("------")
             # Actualizar la tabla Q de cada agente 
                     
-
-model = Game()
-model.run_model()
+if __name__ == "__main__":
+    model = Game()
+    model.run_model()
