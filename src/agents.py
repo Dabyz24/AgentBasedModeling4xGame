@@ -1,30 +1,7 @@
 import mesa
 from weapons import Weapon
 from upgrades import Upgrades
-
-# Constantes iniciales del jugador
-INITIAL_PLAYER_TECH = 30
-INITIAL_PLAYER_GOLD = 100
-# Constantes para los recursos que gastan por movimiento 
-SPACE_SHIP_TECH_COST = 5
-SPACE_SHIP_GOLD_COST = 10
-# Constantes de las fabricas
-TECH_FROM_FACTORIES = 1
-GOLD_FROM_FACTORIES = 5
-FACTORIES_TECH_COST = 5
-FACTORIES_GOLD_COST = 30
-# Constantes para el gasto por fabricar armas y las mejoras
-WEAPON_TECH_COST = 20
-WEAPON_GOLD_COST = 40
-UPGRADE_DAMAGE_TECH_COST = 100
-UPGRADE_DAMAGE_GOLD_COST = 500
-UPGRADE_MOVEMENT_TECH_COST = 200
-UPGRADE_MOVEMENT_GOLD_COST = 1000
-UPGRADE_FACTORIES_TECH_COST = 300
-UPGRADE_FACTORIES_GOLD_COST = 1500
-# Constantes para las ganancias de las luchas
-TECH_BATTLES_PERCENTAGE = 0.05
-GOLD_BATTLES_PERCENTAGE = 0.1
+from global_constants import *
 
 class Player(mesa.Agent):
     def __init__(self, unique_id, model, pos, tech=INITIAL_PLAYER_TECH, gold=INITIAL_PLAYER_GOLD, num_planets=0, num_factories=0 ,stellar_points=0, moore=True):
@@ -52,6 +29,9 @@ class Player(mesa.Agent):
         # Permite saber el arma actual del agente
         self.player_weapon = Weapon()
         self.battles_won = 0
+        # Permite saber si he ganado punto en ese turno 
+        self.win_factory_point = False
+        self.win_planet_point = False
         # Permite saber si se ha creado una nave para permitir moverse o no, inicialmente será False
         self.move = False
         # Permite saber las mejoras que tienen 
@@ -62,6 +42,7 @@ class Player(mesa.Agent):
         self.movement_radius = 1
         self.increase_factories_resources = 1
         
+
     # Funciones para modificar los planetas del agente 
     def addPlanetResources(self, tech, gold, populated=False):
         self.tech += tech
@@ -135,7 +116,11 @@ class Player(mesa.Agent):
         self.gold -= taxes * self.num_planets
 
     # Funciones para añadir puntos estelares y para añadir batallas ganadas
-    def addPoint(self):
+    def addPoint(self, point_factory=False, point_planet=False):
+        if point_factory:
+            self.win_factory_point = True
+        if point_planet:
+            self.win_planet_point = True
         self.stellar_points += 1
 
     def addBattleWon(self):
@@ -145,8 +130,10 @@ class Player(mesa.Agent):
     def getId(self):
         return str(self.unique_id)
     
-    def getAgentPos(self):
-        return f"X: {self.pos[0]} Y:{self.pos[1]}"
+    def getAgentPos(self, verbose=False):
+        if verbose:
+            return f"X: {self.pos[0]} Y:{self.pos[1]}"
+        return self.pos
 
     def getTech(self):
         return self.tech
@@ -193,22 +180,19 @@ class Player(mesa.Agent):
     def getResources(self):
         return {"Tech": self.tech, "Gold": self.gold, "Planets": self.num_planets, "Factories": self.num_factories}
 
-    def getAgentInfo(self):
-        return "T: " + str(self.tech) + " G: " + str(self.gold) + " P: " +str(self.num_planets) + " F: "+str(self.num_factories) + " <strong>Stellar Points: " + str(self.stellar_points)+"</strong>"
-
+    def getAgentInfo(self, verbose=False):
+        if verbose:
+            return "T: " + str(self.tech) + " G: " + str(self.gold) + " P: " +str(self.num_planets) + " F: "+str(self.num_factories) + " <strong>Stellar Points: " + str(self.stellar_points)+"</strong>"
+        return [self.tech, self.gold, self.num_planets, self.num_factories, self.player_weapon, self.stellar_points]
+    
     def do_move(self, action):
         next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, include_center=False, radius=self.movement_radius)
-        next_move = next_moves[self.model.action_space.get(action)]                 
+        next_move = next_moves[action]                 
         self.model.grid.move_agent(self, next_move)
 
     def do_action(self, choose_action):
         
-        if choose_action == "F" and self.enoughResources(FACTORIES_TECH_COST, FACTORIES_GOLD_COST):
-            self.createFactory()
-
-        list_moves = ["LLD", "L", "ULD", "D", "U", "LRD", "R", "URD"]    
-
-        if choose_action in list_moves:
+        if choose_action >= 0 and choose_action <= 7:
             # Determinara si ya ha creado una nave espacial para moverse antes o no 
             if self.move:
                 self.do_move(choose_action)
@@ -216,7 +200,10 @@ class Player(mesa.Agent):
                 self.do_move(choose_action)
                 self.move = True
 
-        if choose_action == "W" and self.enoughResources(WEAPON_TECH_COST, WEAPON_GOLD_COST):
+        if choose_action == 8 and self.enoughResources(FACTORIES_TECH_COST, FACTORIES_GOLD_COST):
+            self.createFactory()
+        
+        if choose_action == 9 and self.enoughResources(WEAPON_TECH_COST, WEAPON_GOLD_COST):
             # las tres primeras veces que se ejecute solo se mejorara el arma
             if self.player_weapon.getNumUpgrades() < 3:
                 self.player_weapon.upgradeWeapon()
@@ -240,7 +227,7 @@ class Player(mesa.Agent):
         El step representará cada turno del juego. Podrá decidir si moverse, construir o atacar 
         """
         # El agente cogera un valor de la lista de posibles acciones del modelo el [0] es porque devolvera una lista y necesito el elemento
-        choose_action = self.random.choices(self.model.possible_actions)[0]
+        choose_action = self.random.choices(POSSIBLE_ACTIONS)[0]
 
         self.do_action(choose_action)
         
