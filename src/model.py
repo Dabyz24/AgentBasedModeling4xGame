@@ -2,10 +2,7 @@ import mesa
 
 from agents import Player, Planet
 from scheduler import RandomActivationByTypeFiltered
-
-# Tendrá en cuenta las diagonales
-MOORE_PLAYER = True
-MOORE_PLANET = True
+from global_constants import * 
 
 class Game(mesa.Model):
     
@@ -19,10 +16,7 @@ class Game(mesa.Model):
     tech_planet = 20
     gold_planet = 30
     taxes_planet = 20
-    # Posiciones guardadas para solo 3 jugadores y 10 planetas, si se quiere aumentar el número de jugadores se tendrá que aumentar la lista con su posicion
-    list_possible_player_pos = [(0,10),(19,10),(10,0)]
-    list_possible_planet_pos = [(6,16),(3,18),(18,18),(12,18),(14,12),(10,10),(5,8),(4,4),(14,5),(17,1)]
-    
+        
     def __init__(self, width=20, height=20, num_players=3, num_planets=10, prob_factory=0.3, prob_weapon=0.1, 
                  prob_space_ship=0.6, tech_planet=20, gold_planet=30, taxes_planet=20):
         """
@@ -54,18 +48,6 @@ class Game(mesa.Model):
         self.schedule = RandomActivationByTypeFiltered(self)
         # Creacion de la matriz Torus=True significa que si el agente se encuentra en la izquierda del todo y sigue a la izquierda aparecera en la derecha 
         self.grid = mesa.space.MultiGrid(self.width, self.height, torus=True)
-        # Creacion de variables para poder implentar el Q-Learning 
-        self.state_space = [i for i in range(self.width*self.height)]
-        self.action_space = {"LLD": 0, "L": 1, "ULD": 2, "D": 3, "U": 4, "LRD": 5, "R": 6, "URD": 7, "F": "Factory", "W": "Weapon"}
-        """ Las siglas se corresponden con:
-                LLD = Lower Left Diagonal, L = Left, ULD = Upper Left Diagonal
-                D = Down, U = Up
-                LRD = Lower Right Diagonal, R = Right, URD = Upper right diagonal
-            y hacen referencia al indice de la lista de posibles movientos de cada agente 
-            F = Fabricar una fabrica 
-            W = Crear un arma o mejorar una habilidad 
-        """
-        self.possible_actions = ["LLD", "L", "ULD", "D", "U", "LRD", "R", "URD", "F", "W"]
 
         # Datos que queremos ver 
         # self.datacollector = mesa.DataCollector(
@@ -76,7 +58,7 @@ class Game(mesa.Model):
         
         # Creacion de los jugadores evito que haya dos agentes en el mismo espacio con chekspace y creo y añado el agente
         for i in range(self.num_players):
-            pos = self.list_possible_player_pos[i]
+            pos = INITIAL_PLAYER_POS[i]
             player = Player(self.next_id(), self, pos, moore=MOORE_PLAYER)
             # Una vez creado le asigno un color de la lista de colores, cada uno tendrá un color único
             try:
@@ -91,7 +73,7 @@ class Game(mesa.Model):
         
         # Creacion de los planetas 
         for i in range(self.num_planets):
-            pos = self.list_possible_planet_pos[i]
+            pos = INITIAL_PLANET_POS[i]
             planet = Planet(self.next_id(), self, pos ,self.random.randrange(0, tech_planet),
                             self.random.randrange(0, self.gold_planet), self.taxes_planet, moore=MOORE_PLANET)
             self.grid.place_agent(planet, pos)
@@ -102,7 +84,7 @@ class Game(mesa.Model):
     def propertiesAgents(self):
         summary = {}    
         for i in self.list_agents:
-            summary[i] = i.getAgentInfo()
+            summary[i] = i.getAgentInfo(verbose=True)
         return summary
             
     def checkAgentsValues(self):
@@ -160,8 +142,8 @@ class Game(mesa.Model):
             self.step()
             for agent in self.schedule.agents:
                 if type(agent) == Player:
-                    print(f"Player {agent.getAgentPos()}")
-                    print(f"Resources: {agent.getAgentInfo()}")
+                    print(f"Player {agent.getAgentPos(verbose=True)}")
+                    print(f"Resources: {agent.getAgentInfo(verbose=True)}")
                     if agent.getStellarPoints() >= 100:
                         done = True
             i += 1
