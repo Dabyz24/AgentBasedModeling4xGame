@@ -43,6 +43,7 @@ class Game(mesa.Model):
         self.gold_planet = gold_planet
         self.taxes_planet = taxes_planet
         self.list_agents = []
+        self.list_planets = []
         self.list_agents_colors = ["Aqua","Green","Pink","Gray","Purple","Yellow"]
         # Se moverán uno cada vez, es decir el primer turno se movera primero el agente 1 y el siguiente el agente 2 primero
         self.schedule = RandomActivationByTypeFiltered(self)
@@ -76,6 +77,7 @@ class Game(mesa.Model):
             pos = INITIAL_PLANET_POS[i]
             planet = Planet(self.next_id(), self, pos ,self.random.randrange(0, tech_planet),
                             self.random.randrange(0, self.gold_planet), self.taxes_planet, moore=MOORE_PLANET)
+            self.list_planets.append(planet)
             self.grid.place_agent(planet, pos)
             self.schedule.add(planet)
         self.running = True
@@ -118,7 +120,7 @@ class Game(mesa.Model):
                         agent_more_factories = player
                         initial_factories = value
                         check_factories_list = [value]
-                    elif initial_planets == value:
+                    elif initial_factories == value:
                         check_factories_list.append(value) 
         # Si solo hay un valor significa que es el que mas planetas tiene por lo que se le recompensará con un punto estelar
         if len(check_planets_list) == 1:
@@ -130,7 +132,10 @@ class Game(mesa.Model):
             agent_more_factories.addPoint()
 
     def step(self):
-        self.schedule.step()
+        for agent in self.list_agents:
+            agent.step()
+        for planet in self.list_planets:
+            planet.step()
         self.addStellarPoints()
         #self.datacollector.collect(self)
     
