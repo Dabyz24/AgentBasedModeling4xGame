@@ -2,6 +2,7 @@ import mesa
 
 from agents import Player, Planet
 from model import Game
+from global_constants import TAXES_PLANET
 
 def game_portrayal(agent):
     if agent is None:
@@ -63,7 +64,7 @@ model_params = {
         "title": mesa.visualization.StaticText("Parameters:"),
         # "num_players": mesa.visualization.Slider("Number of players", Game.num_players, 1, 6),
         # "num_planets": mesa.visualization.Slider("Number of planets", Game.num_planets, 2, 20),
-        "taxes_planet": mesa.visualization.Slider("Taxes apply to planets", Game.TAXES_PLANET, 10, 100, 10),
+        "taxes_planet": mesa.visualization.Slider("Taxes apply to planets", TAXES_PLANET, 10, 100, 10),
 
 }
 
