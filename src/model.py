@@ -5,15 +5,7 @@ from scheduler import RandomActivationByTypeFiltered
 from global_constants import * 
 
 class Game(mesa.Model):
-    
-    WIDTH = 20 
-    HEIGHT = 20
-    NUM_PLAYERS = 3
-    NUM_PLANETS = 10
-    TECH_PLANETS = 20
-    GOLD_PLANETS = 30
-    TAXES_PLANET = 50
-        
+         
     def __init__(self, width=WIDTH, height=HEIGHT, num_players=NUM_PLAYERS, num_planets=NUM_PLANETS, 
                  tech_planet=TECH_PLANETS, gold_planet=GOLD_PLANETS, taxes_planet=TAXES_PLANET):
         """
