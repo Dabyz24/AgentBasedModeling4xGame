@@ -1,8 +1,16 @@
+# Constantes iniciales para el juego 
+WIDTH = 20
+HEIGHT = 20
+NUM_PLAYERS = 3
+NUM_PLANETS = 10
+TECH_PLANETS = 20
+GOLD_PLANETS = 30
+TAXES_PLANET = 50
+
 # Posiciones iniciales de los agentes y de los planetas
 # Posiciones guardadas para solo 3 jugadores y 10 planetas, si se quiere aumentar el número de jugadores se tendrá que aumentar la lista con su posicion
 INITIAL_PLAYER_POS = [(0,10),(19,10),(10,0)]
 INITIAL_PLANET_POS = [(6,16),(3,18),(18,18),(12,18),(14,12),(10,10),(5,8),(4,4),(14,5),(17,1)]
-
 # Tendrá en cuenta las diagonales
 MOORE_PLAYER = True
 MOORE_PLANET = True
@@ -48,3 +56,4 @@ Las siglas se corresponden con:
         """
 POSSIBLE_ACTIONS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 POSSIBLE_MOVES = ["LLD", "L", "ULD", "D", "U", "LRD", "R", "URD"]
+STATE_SPACE = [i for i in range(WIDTH*HEIGHT)]
