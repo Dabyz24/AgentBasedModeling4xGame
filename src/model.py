@@ -6,27 +6,21 @@ from global_constants import *
 
 class Game(mesa.Model):
     
-    width = 20 
-    height = 20
-    num_players = 3
-    num_planets = 10
-    prob_factory = 0.3
-    prob_weapon = 0.1
-    prob_space_ship = 0.6
-    tech_planet = 20
-    gold_planet = 30
-    taxes_planet = 20
+    WIDTH = 20 
+    HEIGHT = 20
+    NUM_PLAYERS = 3
+    NUM_PLANETS = 10
+    TECH_PLANETS = 20
+    GOLD_PLANETS = 30
+    TAXES_PLANET = 50
         
-    def __init__(self, width=20, height=20, num_players=3, num_planets=10, prob_factory=0.3, prob_weapon=0.1, 
-                 prob_space_ship=0.6, tech_planet=20, gold_planet=30, taxes_planet=20):
+    def __init__(self, width=WIDTH, height=HEIGHT, num_players=NUM_PLAYERS, num_planets=NUM_PLANETS, 
+                 tech_planet=TECH_PLANETS, gold_planet=GOLD_PLANETS, taxes_planet=TAXES_PLANET):
         """
         width: Ancho de la matriz donde se encontraran los agentes
         height: Alto de la matriz donde se encontraran los agentes 
         num_players: Se trata del numero de jugadores que queremos en la partida
         num_planets: Se trata del numero de planetas que querremos en la partida
-        prob_factory: Probabilidad de construir una fabrica en el turno
-        prob_weapon: Probabilidad de construir un arma en el turno
-        prob_space_ship: Probabilidad de construir una nave espacial para la exploracion en el turno
         tech_planet: Tecnología que tendrá cada planeta
         gold_planet: Oro que tendrá cada planeta
         taxes_planet: Impuesto que deberán pagar por cada planeta
@@ -36,9 +30,6 @@ class Game(mesa.Model):
         self.height = height
         self.num_players = num_players
         self.num_planets = num_planets
-        self.prob_factory = prob_factory
-        self.prob_weapon = prob_weapon 
-        self.prob_space_ship = prob_space_ship
         self.tech_planet = tech_planet
         self.gold_planet = gold_planet
         self.taxes_planet = taxes_planet
@@ -75,7 +66,7 @@ class Game(mesa.Model):
         # Creacion de los planetas 
         for i in range(self.num_planets):
             pos = INITIAL_PLANET_POS[i]
-            planet = Planet(self.next_id(), self, pos ,self.random.randrange(0, tech_planet),
+            planet = Planet(self.next_id(), self, pos ,self.random.randrange(0, self.tech_planet),
                             self.random.randrange(0, self.gold_planet), self.taxes_planet, moore=MOORE_PLANET)
             self.list_planets.append(planet)
             self.grid.place_agent(planet, pos)
@@ -133,7 +124,10 @@ class Game(mesa.Model):
 
     def step(self):
         for agent in self.list_agents:
-            agent.step()
+            # Actualizar los valores de la tabla Q y todo aquí para hacerlo individual para cada agente y poder devolver su recompensa y su observacion
+            # El agente cogera un valor de la lista de posibles acciones del modelo el [0] es porque devolvera una lista y necesito el elemento
+            choose_action = self.random.choices(POSSIBLE_ACTIONS)[0]
+            agent.step(choose_action)
         for planet in self.list_planets:
             planet.step()
         self.addStellarPoints()
