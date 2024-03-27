@@ -41,6 +41,10 @@ class Player(mesa.Agent):
         self.damage_increase = 0
         self.movement_radius = 1
         self.increase_factories_resources = 1
+        # Variables para crear la tabla Q para cada agente
+        self.Q = {}             # Tabla Q
+        self.actions_history = []  # Historial de acciones pasadas
+        self.last_action = None  # Inicializar la última acción como None
         
 
     # Funciones para modificar los planetas del agente 
@@ -223,14 +227,12 @@ class Player(mesa.Agent):
                     self.doubleFactoriesResources()
 
     # Funcion para representar cada turno del jugador
-    def step(self):
+    def step(self, action):
         """
         El step representará cada turno del juego. Podrá decidir si moverse, construir o atacar 
         """
-        # El agente cogera un valor de la lista de posibles acciones del modelo el [0] es porque devolvera una lista y necesito el elemento
-        choose_action = self.random.choices(POSSIBLE_ACTIONS)[0]
 
-        self.do_action(choose_action)
+        self.do_action(action)
         
         if self.num_factories > 0:
             self.addFactoryResources()
