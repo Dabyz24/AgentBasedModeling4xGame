@@ -81,6 +81,7 @@ class Player(mesa.Agent):
             if enemy_weapon == "None":
                 #print(f"El ganador es el jugador {self.unique_id}")
                 self.addPoint()
+                self.addBattleWon()
                 self.addBattleResources(player_selected)
             else:
                 player_value = self.getPlayerWeapon()[1] * self.random.randint(1,20) + self.damage_increase
