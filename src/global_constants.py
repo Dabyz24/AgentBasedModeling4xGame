@@ -7,6 +7,11 @@ INITIAL_PLANET_POS = [(6,16),(3,18),(18,18),(12,18),(14,12),(10,10),(5,8),(4,4),
 MOORE_PLAYER = True
 MOORE_PLANET = True
 
+# Constantes para la creacion de la tabla Q
+EPSILON = 0.1   # Permite la exploracion del agente si el valor es menor a EPSILON
+ALPHA = 0.1     # Es el grado de actualización de nuestros valores Q en cada iteración
+GAMMA = 0.9     # Determina cuanto valor le queremos dar a futuras rewards
+
 # Constantes iniciales del jugador
 INITIAL_PLAYER_TECH = 30
 INITIAL_PLAYER_GOLD = 100
