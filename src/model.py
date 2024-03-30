@@ -3,7 +3,6 @@ import mesa
 from agents import Player, Planet
 from scheduler import RandomActivationByTypeFiltered
 from global_constants import * 
-
 class Game(mesa.Model):
          
     def __init__(self, width=WIDTH, height=HEIGHT, num_players=NUM_PLAYERS, num_planets=NUM_PLANETS, 
@@ -32,6 +31,8 @@ class Game(mesa.Model):
         self.schedule = RandomActivationByTypeFiltered(self)
         # Creacion de la matriz Torus=True significa que si el agente se encuentra en la izquierda del todo y sigue a la izquierda aparecera en la derecha 
         self.grid = mesa.space.MultiGrid(self.width, self.height, torus=True)
+        # Tener un control sobre el numero de turnos del modelo
+        self.step_count = 0
 
         # Datos que queremos ver 
         # self.datacollector = mesa.DataCollector(
@@ -115,6 +116,7 @@ class Game(mesa.Model):
             agent_more_factories.addPoint()
 
     def step(self):
+        self.step_count += 1
         for agent in self.list_agents:
             # Actualizar los valores de la tabla Q y todo aquí para hacerlo individual para cada agente y poder devolver su recompensa y su observacion
             # El agente cogera un valor de la lista de posibles acciones del modelo el [0] es porque devolvera una lista y necesito el elemento
@@ -123,6 +125,24 @@ class Game(mesa.Model):
         for planet in self.list_planets:
             planet.step()
         self.addStellarPoints()
+# Forma de modificar los atributos en ejecucion mediante los metodos exec, parecido a poner una condicion y ejecutarlo directamente
+#         if self.step_count % 10 == 0: 
+#             code = """
+# print(self.step_count)
+# for elemento in dir(self):
+#     print(elemento)
+#     # setattr(lista1, "producto" + str(i), elemento)
+    
+# print(dir(self))
+
+# for i in dir(self):
+#     if i.startswith("_"):
+#         continue
+#     elif i == "list_agents":
+#         random_agent = self.__getattribute__(i)[0]
+#         random_agent.setAgentColor("black")
+# """
+#             exec(code)
         #self.datacollector.collect(self)
     
     def run_model(self):
