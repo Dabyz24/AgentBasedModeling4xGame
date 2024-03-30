@@ -118,3 +118,26 @@ action  = random.choice(list(action_space.keys()))
 print(action)
 if action in moves_action:
     print(moves[action_space.get(action)])
+
+Como ejecutar de manera dinamica y cambiar atributos del modelo
+Forma de modificar los atributos en ejecucion mediante los metodos exec, parecido a poner una condicion y ejecutarlo directamente
+Para que funcione el codigo de exec tiene que estar pegado sin ningun tab ni espacio 
+
+        if self.step_count % 10 == 0: 
+            code = """
+print(self.step_count)
+for elemento in dir(self):
+    print(elemento)
+    # setattr(lista1, "producto" + str(i), elemento)
+    
+print(dir(self))
+
+for i in dir(self):
+    if i.startswith("_"):
+        continue
+    elif i == "list_agents":
+        random_agent = self.__getattribute__(i)[0]
+        random_agent.setAgentColor("black")
+"""
+            exec(code)
+
