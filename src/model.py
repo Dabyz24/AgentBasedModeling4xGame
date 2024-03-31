@@ -1,3 +1,4 @@
+import re
 import mesa 
 
 from agents import Player, Planet
@@ -115,6 +116,23 @@ class Game(mesa.Model):
             #print(f"El agente con más fabricas es {agent_more_factories.getId()}")
             agent_more_factories.addPoint()
 
+    def addAttribute(self, class_name, attribute_name, new_type, value, id=None):
+        if new_type == "int":
+            value = int(value)
+        elif new_type == "float":
+            value = float(value)
+        elif new_type == "bool":
+            if value == "true":
+                value = True
+            elif value == "false":
+                value = False
+        if class_name == "m":
+            setattr(self, attribute_name, value)
+        elif class_name == "a":
+            agent_selected = self.list_agents[int(id)]
+            setattr(agent_selected, attribute_name, value)
+            print(agent_selected.__getattribute__(attribute_name))
+
     def step(self):
         self.step_count += 1
         for agent in self.list_agents:
@@ -127,12 +145,25 @@ class Game(mesa.Model):
         self.addStellarPoints()
 # Forma de modificar los atributos en ejecucion mediante los metodos exec, parecido a poner una condicion y ejecutarlo directamente
 #         if self.step_count % 10 == 0: 
+#             new_atribute = input("""Introduzca un nuevo atributo, señalando si quieres que sea para el modelo o para un agente determinado. 
+# Ejemplo (M  nombre_var tipo_var valor) ó (A id(0-{}) nombre_var tipo_var valor): """.format(len(self.list_agents))).lower()
+#             if new_atribute == "":
+#                 pass
+#             else:
+#                 if re.match("^m\s[a-z(0-9)?]+\s(int|bool|float|str)\s[a-z0-9]+" + "|" + "^a\s[0-9]\s[a-z(0-9)?]+\s(int|bool|float|str)\s[a-z0-9]+",
+#                             new_atribute):
+#                     method_attributes = new_atribute.split()
+#                     if len(method_attributes) == 5:
+#                         self.addAttribute(class_name=method_attributes[0], attribute_name=method_attributes[2],
+#                                         new_type=method_attributes[3], value=method_attributes[4], id=method_attributes[1])
+#                     else:
+#                         self.addAttribute(class_name=method_attributes[0], attribute_name=method_attributes[1],
+#                                         new_type=method_attributes[2], value=method_attributes[3])
+#                     print(self.__getattribute__(method_attributes[1]))
 #             code = """
 # print(self.step_count)
-# for elemento in dir(self):
-#     print(elemento)
-#     # setattr(lista1, "producto" + str(i), elemento)
-    
+# setattr(self, "allies", False)
+
 # print(dir(self))
 
 # for i in dir(self):
@@ -143,6 +174,8 @@ class Game(mesa.Model):
 #         random_agent.setAgentColor("black")
 # """
 #             exec(code)
+#             self.allies = True
+#             print(self.allies)
         #self.datacollector.collect(self)
     
     def run_model(self):
