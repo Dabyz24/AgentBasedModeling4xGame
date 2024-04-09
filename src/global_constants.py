@@ -48,7 +48,7 @@ GOLD_BATTLES_PERCENTAGE = 0.1
 ACTION_SPACE = {0: "LLD", 1: "L", 2: "ULD", 3: "D", 4: "U", 5: "LRD", 6: "R", 7: "URD", 8: "Factory", 9: "Weapon"}
 """ 
 Las siglas se corresponden con:
-        LLD = , L = Left, ULD = Upper Left Diagonal
+        LLD = Lower Left Diagonal, L = Left, ULD = Upper Left Diagonal
         D = Down, U = Up
         LRD = Lower Right Diagonal, R = Right, URD = Upper right diagonal y hacen referencia al indice de la lista de posibles movientos de cada agente 
     F = Fabricar una fabrica 
