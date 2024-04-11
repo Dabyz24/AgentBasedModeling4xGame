@@ -6,18 +6,13 @@
 - Si quiero revertirlo solo tengo que cambiar en server la parte de color del html y en model y agente la lista de colores y los getters y setters
 
 [✔] 3. Hacer que las peleas resten recursos a algunos y los sumen al ganador
-- [] 3.1 Pensar posibilidad de que al perder una pelea pierdan el planeta
 
-[ ] 4. Modificar los agentes para introducir Q-learning en los steps, para que puedan hacer lo más óptimo 
-- [✔] 4.1 Hacerlo estatico quitando la opcion de aparecer random de los agentes, para que se pueda entrenar el modelo (solo para 3 jugadores y 10 planetas)
-- [✔] 4.2 Establecer todos los estados y las acciones posibles del sistema
-- [] 4.3 Crear la Q-table con los estados y las acciones
-- [] 4.4 Establecer sistema de rewards para los agentes y establecer un final de partida para poder parar la simulación (algo como 200 puntos estelares)
-  - Los agentes recibiran una recompensa muy grande cuando reciban puntos estelares, que los podrán obtener por medio de tener el mayor número de fábricas o planetas conquistados o por ganar batallas
-  - Los agentes recibiran una ligera penalización si no consiguen obtener puntos estelares en ese step
-  - Los agentes recibiran una penalización mayor si pierden algún planeta por no poder mantenerlo 
-- [] 4.4 Entrenar el modelo Q
+[ ] 4. Modificar los agentes para poder introducir comportamientos en cada uno de los agentes 
+- [] 4.1 Crear las condiciones para que cada agente no decida aleatorio y lo haga basandose en una lógica 
+- [] 4.2 Deshacer estatico añadiendo la opcion de aparecer random de los agentes y de los planetas
+- [] 4.3 Quitar todas las variables creadas únicamente para el Q-learning y limpiar todas las variables innutilizadas 
 
 [ ] 5. Ver como poder introducir codigo de manera dinamica para poder crear nuevas funcionalidades (alianzas)
-- [] 5.1 Buscar info sobre la metaprogramacion y sobre como introducirla
+- [] 5.1 Introducir una nueva funcionalidad en el step 50 para cambiar el funcionamiento del agente (sin método)
+- [] 5.2 Crear un método de manera dinámica para poder cambiar el funcionamiento del agente a partir de los 50 steps 
 
