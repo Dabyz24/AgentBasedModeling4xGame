@@ -15,10 +15,8 @@ INITIAL_PLANET_POS = [(6,16),(3,18),(18,18),(12,18),(14,12),(10,10),(5,8),(4,4),
 MOORE_PLAYER = True
 MOORE_PLANET = True
 
-# Constantes para la creacion de la tabla Q
+# Constante para permitir la exploración de acciones aleatorias por parte del agente 
 EPSILON = 0.1   # Permite la exploracion del agente si el valor es menor a EPSILON
-ALPHA = 0.1     # Es el grado de actualización de nuestros valores Q en cada iteración
-GAMMA = 0.9     # Determina cuanto valor le queremos dar a futuras rewards
 
 # Constantes iniciales del jugador
 INITIAL_PLAYER_TECH = 30
@@ -53,7 +51,5 @@ Las siglas se corresponden con:
         LRD = Lower Right Diagonal, R = Right, URD = Upper right diagonal y hacen referencia al indice de la lista de posibles movientos de cada agente 
     F = Fabricar una fabrica 
     W = Crear un arma o mejorar una habilidad 
-        """
+"""
 POSSIBLE_ACTIONS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-POSSIBLE_MOVES = ["LLD", "L", "ULD", "D", "U", "LRD", "R", "URD"]
-STATE_SPACE = [i for i in range(WIDTH*HEIGHT)]
