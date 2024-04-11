@@ -41,11 +41,6 @@ class Player(mesa.Agent):
         self.damage_increase = 0
         self.movement_radius = 1
         self.increase_factories_resources = 1
-        # Variables para crear la tabla Q para cada agente
-        self.Q = {}             # Tabla Q
-        self.actions_history = []  # Historial de acciones pasadas
-        self.last_action = None  # Inicializar la última acción como None
-        
 
     # Funciones para modificar los planetas del agente 
     def addPlanetResources(self, tech, gold, populated=False):
