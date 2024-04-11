@@ -4,8 +4,10 @@ import mesa
 from agents import Player, Planet
 from scheduler import RandomActivationByTypeFiltered
 from global_constants import * 
+
+
 class Game(mesa.Model):
-         
+    
     def __init__(self, width=WIDTH, height=HEIGHT, num_players=NUM_PLAYERS, num_planets=NUM_PLANETS, 
                  tech_planet=TECH_PLANETS, gold_planet=GOLD_PLANETS, taxes_planet=TAXES_PLANET):
         """
@@ -43,8 +45,12 @@ class Game(mesa.Model):
         # )
         
         # Creacion de los jugadores evito que haya dos agentes en el mismo espacio con chekspace y creo y añado el agente
-        for i in range(self.num_players):
-            pos = INITIAL_PLAYER_POS[i]
+        for _ in range(self.num_players):
+            location_found = False
+            while not location_found:
+                location = self.checkSpace(MOORE_PLAYER)
+                location_found = location[0]
+            pos = location[1]
             player = Player(self.next_id(), self, pos, moore=MOORE_PLAYER)
             # Una vez creado le asigno un color de la lista de colores, cada uno tendrá un color único
             try:
@@ -58,8 +64,12 @@ class Game(mesa.Model):
             self.schedule.add(player)
         
         # Creacion de los planetas 
-        for i in range(self.num_planets):
-            pos = INITIAL_PLANET_POS[i]
+        for _ in range(self.num_planets):
+            location_found = False
+            while not location_found:
+                location = self.checkSpace(MOORE_PLANET, planet_space=True)
+                location_found = location[0]
+            pos = location[1]
             planet = Planet(self.next_id(), self, pos ,self.random.randrange(0, self.tech_planet),
                             self.random.randrange(0, self.gold_planet), self.taxes_planet, moore=MOORE_PLANET)
             self.list_planets.append(planet)
@@ -67,6 +77,18 @@ class Game(mesa.Model):
             self.schedule.add(planet)
         self.running = True
         #self.datacollector.collect(self)
+
+    def checkSpace(self, moore, planet_space=False):
+        pos = (self.random.randrange(self.width), self.random.randrange(self.height))
+        if planet_space:
+            neighbors = self.grid.get_neighbors(pos, moore, include_center=True, radius=2)
+        else:
+            neighbors = self.grid.get_neighbors(pos, moore, include_center=True, radius=2)
+        # Añado a la lista los vecinos que sean del tipo player o planet para saber si tiene otros planetas o jugadores alrededor 
+        list_agents = [obj for obj in neighbors if (isinstance(obj, Player) or isinstance(obj, Planet))]
+        if len(list_agents) > 0:
+            return False, pos
+        return True, pos
 
     def propertiesAgents(self):
         summary = {}    
@@ -116,7 +138,8 @@ class Game(mesa.Model):
             #print(f"El agente con más fabricas es {agent_more_factories.getId()}")
             agent_more_factories.addPoint()
 
-    def addAttribute(self, class_name, attribute_name, new_type, value, id=None):
+    # Método para añadir de manera dinámica atributos al modelo o al agente
+    def _addAttribute(self, class_name, attribute_name, new_type, value, id=None):
         if new_type == "int":
             value = int(value)
         elif new_type == "float":
@@ -136,7 +159,7 @@ class Game(mesa.Model):
     def step(self):
         self.step_count += 1
         for agent in self.list_agents:
-            # Actualizar los valores de la tabla Q y todo aquí para hacerlo individual para cada agente y poder devolver su recompensa y su observacion
+            # Tengo que crear una lógica en el modelo para que dependiendo de las habilidades del agente haga una cosa u otra
             # El agente cogera un valor de la lista de posibles acciones del modelo el [0] es porque devolvera una lista y necesito el elemento
             choose_action = self.random.choices(POSSIBLE_ACTIONS)[0]
             agent.step(choose_action)
@@ -177,7 +200,8 @@ class Game(mesa.Model):
 #             self.allies = True
 #             print(self.allies)
         #self.datacollector.collect(self)
-    
+
+    # Método para comprobar rápidamente el funcionamiento del juego sin tener que ejecutar el servidor
     def run_model(self):
         done = False
         i = 1 
@@ -192,7 +216,6 @@ class Game(mesa.Model):
                         done = True
             i += 1
             print("------")
-            # Actualizar la tabla Q de cada agente 
                     
 if __name__ == "__main__":
     model = Game()
