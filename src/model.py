@@ -160,8 +160,38 @@ class Game(mesa.Model):
         self.step_count += 1
         for agent in self.list_agents:
             # Tengo que crear una lógica en el modelo para que dependiendo de las habilidades del agente haga una cosa u otra
-            # El agente cogera un valor de la lista de posibles acciones del modelo el [0] es porque devolvera una lista y necesito el elemento
-            choose_action = self.random.choices(POSSIBLE_ACTIONS)[0]
+            # El agente cogera un valor de la lista de posibles acciones del modelo. [0] es porque devolvera una lista y necesito el elemento
+            if self.random.uniform(0, 1) < EPSILON:
+                choose_action = self.random.choices(POSSIBLE_ACTIONS)[0]
+            else:
+                if self.step_count == 1:
+                    # En el primer turno elijo un movimiento aleatorio
+                    choose_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
+                elif agent.getGold() < 30:
+                    # Si tiene arma perseguir a algún jugador para luchar y poder ganar recursos del combate
+                    if agent.getGold() < 0:
+                        print("Buscando a un agente para luchar")
+                        # Crear lógica para buscar un jugador por ahora se mueve random
+                        choose_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
+                    else:
+                        # Buscar un planeta cercano para conquistarlo y poder ganar sus recursos
+                        print("Buscando planeta cercano")
+                        # Crear lógica para buscar un planeta que no este conquistado por ahora se mueve random 
+                        choose_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
+    # Comprobar para que pueda hacer otra cosa y no se quede todo el rato haciendo esta accion una vez se cumplan las demas condiciones
+                elif agent.getGold() > 40 and agent.getTech() > 20 and agent.getFactories() > 6:
+                    # Si tengo suficientes fabricas para poder sobrevivir economicamente tengo que desarrollar armas
+                    if agent.getNumPlayerWeapon() == 3:
+                    # Tengo que comprobar si puedo hacer mejoras de los recurosos de fabricas o la mejora de daño
+                        if agent.getAgentUpgrades().isUpgradeAvailable():
+                            # Seleccionar algun valor de la lista de opciones de mejoras y hacer las mejoras
+                            print("Mejorando")
+                    choose_action = ACTION_SPACE.get("Weapon")
+                elif agent.getGold() >= 30 and agent.getTech() >= 5:
+                    # Crear una fabrica para poder conseguir recursos y sobrevivir
+                    print("Creando fábrica")
+                    choose_action = ACTION_SPACE.get("Factory")
+
             agent.step(choose_action)
         for planet in self.list_planets:
             planet.step()
