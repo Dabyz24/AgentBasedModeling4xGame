@@ -39,7 +39,7 @@ TECH_BATTLES_PERCENTAGE = 0.05
 GOLD_BATTLES_PERCENTAGE = 0.1
 
 # Conjunto de acciones posibles por el agente
-ACTION_SPACE = {0: "LLD", 1: "L", 2: "ULD", 3: "D", 4: "U", 5: "LRD", 6: "R", 7: "URD", 8: "Factory", 9: "Weapon"}
+ACTION_SPACE = {"LLD": 0 , "L": 1, "ULD": 2, "D": 3, "U": 4, "LRD": 5, "R": 6, "URD": 7, "Factory": 8, "Weapon":9}
 """ 
 Las siglas se corresponden con:
         LLD = Lower Left Diagonal, L = Left, ULD = Upper Left Diagonal
