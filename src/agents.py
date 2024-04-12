@@ -150,6 +150,9 @@ class Player(mesa.Agent):
     def getPlayerWeapon(self):
         return self.player_weapon.getWeapon()
     
+    def getNumPlayerWeapon(self):
+        return self.player_weapon.getNumUpgrades()
+
     def getBattlesWon(self):
         return self.battles_won
     
