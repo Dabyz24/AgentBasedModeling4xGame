@@ -41,6 +41,8 @@ class Player(mesa.Agent):
         self.damage_increase = 0
         self.movement_radius = 1
         self.increase_factories_resources = 1
+        # Permite saber el tipo de comportamiento del agente, por defecto serán exploradores
+        self.behaviour = self.random.choice(POSSIBLE_BEHAVIOURS)
 
     # Funciones para modificar los planetas del agente 
     def addPlanetResources(self, tech, gold, populated=False):
@@ -137,9 +139,15 @@ class Player(mesa.Agent):
 
     def getTech(self):
         return self.tech
+    
+    def setTech(self, new_value):
+        self.tech = new_value
 
     def getGold(self):
         return self.gold
+    
+    def setGold(self, new_value):
+        self.gold = new_value
 
     def getPlanets(self):
         return self.num_planets
@@ -180,6 +188,9 @@ class Player(mesa.Agent):
     def getStellarPoints(self):
         return self.stellar_points
     
+    def getBehaviour(self):
+        return self.behaviour
+    
     def getResources(self):
         return {"Tech": self.tech, "Gold": self.gold, "Planets": self.num_planets, "Factories": self.num_factories}
 
@@ -193,20 +204,20 @@ class Player(mesa.Agent):
         next_move = next_moves[action]                 
         self.model.grid.move_agent(self, next_move)
 
-    def do_action(self, choose_action):
+    def do_action(self, chosen_ation):
         
-        if choose_action >= 0 and choose_action <= 7:
+        if chosen_ation >= 0 and chosen_ation <= 7:
             # Determinara si ya ha creado una nave espacial para moverse antes o no 
             if self.move:
-                self.do_move(choose_action)
+                self.do_move(chosen_ation)
             elif self.enoughResources(SPACE_SHIP_TECH_COST, SPACE_SHIP_GOLD_COST): 
-                self.do_move(choose_action)
+                self.do_move(chosen_ation)
                 self.move = True
 
-        if choose_action == 8 and self.enoughResources(FACTORIES_TECH_COST, FACTORIES_GOLD_COST):
+        if chosen_ation == 8 and self.enoughResources(FACTORIES_TECH_COST, FACTORIES_GOLD_COST):
             self.createFactory()
         
-        if choose_action == 9 and self.enoughResources(WEAPON_TECH_COST, WEAPON_GOLD_COST):
+        if chosen_ation == 9 and self.enoughResources(WEAPON_TECH_COST, WEAPON_GOLD_COST):
             # las tres primeras veces que se ejecute solo se mejorara el arma
             if self.player_weapon.getNumUpgrades() < 3:
                 self.player_weapon.upgradeWeapon()
@@ -272,11 +283,17 @@ class Planet(mesa.Agent):
         return self.player
     
     # Getters de los atributos básicos del planeta
-    def getPlanetId(self):
-        return f"P {self.unique_id}"
-    
-    def getPlanetPos(self):
-        return f"X: {self.pos[0]} Y:{self.pos[1]}"
+    def getPlanetId(self, verbose=False):
+        if verbose:
+            return f"P {self.unique_id}"
+        else:
+            return self.unique_id
+        
+    def getPlanetPos(self, verbose=False):
+        if verbose:
+            return f"X: {self.pos[0]} Y:{self.pos[1]}"
+        else:
+            return self.pos
     
     def getPlanetTech(self):
         return self.tech
