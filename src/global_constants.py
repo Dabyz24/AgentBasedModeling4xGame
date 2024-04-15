@@ -39,7 +39,7 @@ TECH_BATTLES_PERCENTAGE = 0.05
 GOLD_BATTLES_PERCENTAGE = 0.1
 
 # Conjunto de acciones posibles por el agente
-ACTION_SPACE = {"LLD": 0 , "L": 1, "ULD": 2, "D": 3, "U": 4, "LRD": 5, "R": 6, "URD": 7, "Factory": 8, "Weapon":9}
+ACTION_SPACE = {(-1,-1): 0 , (-1,0): 1, (-1,1): 2, (0,-1): 3, (0,1): 4, (1,-1): 5, (1,0): 6, (1,1): 7, "Factory": 8, "Weapon":9}
 """ 
 Las siglas se corresponden con:
         LLD = Lower Left Diagonal, L = Left, ULD = Upper Left Diagonal
@@ -49,3 +49,6 @@ Las siglas se corresponden con:
     W = Crear un arma o mejorar una habilidad 
 """
 POSSIBLE_ACTIONS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+# Conjunto de comportamientos posibles en el agente
+POSSIBLE_BEHAVIOURS = ["Chaser", "Explorer", "Farmer"]
