@@ -33,8 +33,8 @@ def game_portrayal(agent):
                 
             else:
                 portrayal["Color"] = "red"
-                portrayal["text"] = agent.getPlanetId()
-            portrayal["Position"] = agent.getPlanetPos()
+                portrayal["text"] = agent.getPlanetId(verbose=True)
+            portrayal["Position"] = agent.getPlanetPos(verbose=True)
             portrayal["Resources"] = agent.getResources()
             portrayal["text_color"] = "black"
 
@@ -47,7 +47,8 @@ def overviewAgents(model):
         aux_str += (f"""
                     <span style="display: inline-block; width:10px; height:10px; background-color:{i.getAgentColor()};border-style:solid;border-width:1px;"></span>
                     <strong>Agent: {i.getId()} </strong> Resources: {k} <br>
-                    Agent Weapon: <strong>{i.getPlayerWeapon()[0]} </strong> Battles Won: {i.getBattlesWon()} 
+                    Behaviour: <strong> {i.getBehaviour()} </strong>
+                    Weapon: <strong>{i.getPlayerWeapon()[0]} </strong> Battles Won: {i.getBattlesWon()} 
                     Upgrades: <strong>{i.getAgentUpgrades().getUpgrades()} </strong>
                     <br> <hr>""")
     return aux_str
