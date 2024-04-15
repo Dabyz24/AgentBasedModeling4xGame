@@ -1,5 +1,6 @@
 import re
 import mesa 
+import math
 
 from agents import Player, Planet
 from scheduler import RandomActivationByTypeFiltered
@@ -67,7 +68,7 @@ class Game(mesa.Model):
         for _ in range(self.num_planets):
             location_found = False
             while not location_found:
-                location = self.checkSpace(MOORE_PLANET, planet_space=True)
+                location = self.checkSpace(MOORE_PLANET)
                 location_found = location[0]
             pos = location[1]
             planet = Planet(self.next_id(), self, pos ,self.random.randrange(0, self.tech_planet),
@@ -78,30 +79,31 @@ class Game(mesa.Model):
         self.running = True
         #self.datacollector.collect(self)
 
-    def checkSpace(self, moore, planet_space=False):
+    # Método que comprueba que exista un espacio de dos casillas entre los jugadores y los planetas
+    def checkSpace(self, moore):
         pos = (self.random.randrange(self.width), self.random.randrange(self.height))
-        if planet_space:
-            neighbors = self.grid.get_neighbors(pos, moore, include_center=True, radius=2)
-        else:
-            neighbors = self.grid.get_neighbors(pos, moore, include_center=True, radius=2)
+        neighbors = self.grid.get_neighbors(pos, moore, include_center=True, radius=2)
         # Añado a la lista los vecinos que sean del tipo player o planet para saber si tiene otros planetas o jugadores alrededor 
         list_agents = [obj for obj in neighbors if (isinstance(obj, Player) or isinstance(obj, Planet))]
         if len(list_agents) > 0:
             return False, pos
         return True, pos
 
+    # Método para poder tener la informcaion agrupada del agente para poder representarla en el servidor
     def propertiesAgents(self):
         summary = {}    
         for i in self.list_agents:
             summary[i] = i.getAgentInfo(verbose=True)
         return summary
-            
+    
+    # Metodo para poder obtener todos los recursos del agente en un diccionario para poder comprobar el numero de planetas o fabricas
     def checkAgentsValues(self):
         values = {}
         for i in self.list_agents:
             values[i] = i.getResources()
         return values
     
+    # Método para añadir un punto estelar en funcion de si el agente tiene mas planetas o fabricas que el resto
     def addStellarPoints(self):
         dict_values = self.checkAgentsValues()
         agent_more_factories = ""
@@ -138,48 +140,81 @@ class Game(mesa.Model):
             #print(f"El agente con más fabricas es {agent_more_factories.getId()}")
             agent_more_factories.addPoint()
 
-    # Método para añadir de manera dinámica atributos al modelo o al agente
-    def _addAttribute(self, class_name, attribute_name, new_type, value, id=None):
-        if new_type == "int":
-            value = int(value)
-        elif new_type == "float":
-            value = float(value)
-        elif new_type == "bool":
-            if value == "true":
-                value = True
-            elif value == "false":
-                value = False
-        if class_name == "m":
-            setattr(self, attribute_name, value)
-        elif class_name == "a":
-            agent_selected = self.list_agents[int(id)]
-            setattr(agent_selected, attribute_name, value)
-            print(agent_selected.__getattribute__(attribute_name))
+    # Devuelve una lista con las tuplas de posiciones de los jugadores
+    def getAllPlayersPos(self):
+        aux_list = []
+        for i in self.list_agents:
+            aux_list.append(i.getAgentPos())
+        return aux_list     
+    
+    # Devuelve una lista con las tuplas de posiciones de todos los planetas sin habitar
+    def getAllPlanetPos(self):
+        aux_list = []
+        for i in self.list_planets:
+            if not i.isInhabit():
+                aux_list.append(i.getPlanetPos())
+        return aux_list     # [(1,2), (13, 4), ...]
 
+    # Método privado que obtiene la distancia entre dos puntos 
+    def _distance(self, my_position, target_position):
+        print(f"Posicion del agente actual es {my_position}, y la posicion target es {target_position}")
+        return math.sqrt((int(target_position[0]) - int(my_position[0]))**2 + (int(target_position[1]) - int(my_position[1]))**2) 
+
+    # Método para calcular la distancia mas cercana a un punto especifico
+    def closestTarget(self, my_position, list_positions):
+        minimun_distance = float("inf")
+        minimum_tuple = None
+
+        for target_position in list_positions:
+            if target_position == my_position:
+                continue
+            dist = self._distance(my_position, target_position)
+            if dist < minimun_distance:
+                minimun_distance = dist
+                minimum_tuple = target_position
+        
+        difference_x = minimum_tuple[0] - my_position[0]
+        difference_y = minimum_tuple[1] - my_position[1]
+        move_x =  int(difference_x / abs(difference_x)) if difference_x != 0 else 0
+        move_y = int(difference_y / abs(difference_y)) if difference_y != 0 else 0
+        
+        move = (move_x, move_y)
+        chosen_move = ACTION_SPACE.get(move)
+        return minimum_tuple, chosen_move
+
+    # El step representa cada turno del juego
     def step(self):
         self.step_count += 1
         for agent in self.list_agents:
-            # Tengo que crear una lógica en el modelo para que dependiendo de las habilidades del agente haga una cosa u otra
             # Si el valor aletorio es menor que EPSILON (0.1) realizará una accion aleatoria, esto permite que no todos los agentes tengan el mismo comportamiento
             if self.random.uniform(0, 1) < EPSILON:
                 # El agente cogera un valor de la lista de posibles acciones del modelo. [0] es porque devolvera una lista y necesito el elemento
-                choose_action = self.random.choices(POSSIBLE_ACTIONS)[0]
+                chosen_ation = self.random.choices(POSSIBLE_ACTIONS)[0]
             else:
                 # Si es el primer turno interesa que se mnuevan para poder generar la nave con recursos para poder moverse aunque no tengan recursos
                 if self.step_count == 1:
                     # En el primer turno elijo un movimiento aleatorio
-                    choose_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
+                    chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
                 elif agent.getGold() < 30:
                     # Si tiene arma perseguir a algún jugador para luchar y poder ganar recursos del combate
                     if agent.getGold() < 0:
+                        try:
+                            list_enemies = self.getAllPlayersPos()
+                            _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_enemies)
+                            chosen_ation = chosen_move
+                        except:
+                            chosen_ation = self.random.choices(POSSIBLE_ACTIONS)[0]
                         print("Buscando a un agente para luchar")
-                        # Crear lógica para buscar un jugador por ahora se mueve random
-                        choose_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
+                        
                     else:
                         # Buscar un planeta cercano para conquistarlo y poder ganar sus recursos
+                        list_uninhabited_planets = self.getAllPlanetPos()
+                        try:
+                            _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_uninhabited_planets)
+                            chosen_ation = chosen_move
+                        except:
+                            chosen_ation = self.random.choices(POSSIBLE_ACTIONS)[0]
                         print("Buscando planeta cercano")
-                        # Crear lógica para buscar un planeta que no este conquistado por ahora se mueve random 
-                        choose_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
     # Comprobar para que pueda hacer otra cosa y no se quede todo el rato haciendo esta accion una vez se cumplan las demas condiciones
                 elif agent.getGold() > 40 and agent.getTech() > 20 and agent.getFactories() > 6 and (agent.getNumPlayerWeapon() < 3 or agent.getAgentUpgrades().isUpgradeAvailable()):
                     # Si tengo suficientes fabricas para poder sobrevivir economicamente tengo que desarrollar armas
@@ -187,56 +222,57 @@ class Game(mesa.Model):
                     # Tengo que comprobar si puedo hacer mejoras de los recurosos de fabricas o la mejora de daño
                         if agent.getAgentUpgrades().isUpgradeAvailable() and (agent.getGold() > UPGRADE_FACTORIES_GOLD_COST and agent.getTech() > UPGRADE_FACTORIES_TECH_COST):
                             # Seleccionar algun valor de la lista de opciones de mejoras y hacer las mejoras
-                            choose_action = ACTION_SPACE.get("Weapon")
+                            chosen_ation = ACTION_SPACE.get("Weapon")
                         else:
-                            choose_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
+                            chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
                     else:
-                        choose_action = ACTION_SPACE.get("Weapon")     
+                        chosen_ation = ACTION_SPACE.get("Weapon")     
                     
                 elif agent.getGold() >= 30 and agent.getTech() >= 5:
-                    # Crear una fabrica para poder conseguir recursos y sobrevivir
-                    choose_action = ACTION_SPACE.get("Factory")
+                    if not agent.getAgentUpgrades().isUpgradeAvailable():
+                        # Si no tiene mejoras disponibles crear una lógica para que en función de unas variables cambie de funcionamiento 
+                        if agent.getBehaviour() == "Chaser":
+                            list_enemies = self.getAllPlayersPos()
+                            try:
+                                _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_enemies)
+                                chosen_ation = chosen_move
+                            except:
+                                chosen_ation = self.random.choices(POSSIBLE_ACTIONS)[0]
+                            #Se pone a perseguir al enemigo más cercano para luchar con él
+                            print("Persigue al enemigo")
+                        elif agent.getBehaviour() == "Explorer":    
+                        # Se pone a buscar planetas cercanos sin explorar
+                            print("Busca planeta sin explorar")
+                            list_uninhabited_planets = self.getAllPlanetPos()
+                            try:
+                                _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_uninhabited_planets)
+                                chosen_ation = chosen_move
+                            except:
+                                chosen_ation = self.random.choices(POSSIBLE_ACTIONS)[0]
+                        elif agent.getBehaviour() == "Farmer":
+                            # o se ponga a fabricar fabricas intecalando con movimientos
+                            if self.step_count % 2 == 0:
+                                # Creara una fabrica en los turnos pares y en los impares se movera
+                                chosen_ation = ACTION_SPACE.get("Factory")
+                            else:
+                                chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
+                    else:
+                        # Crear una fabrica para poder conseguir recursos y sobrevivir
+                        chosen_ation = ACTION_SPACE.get("Factory")
                 else:
-                    choose_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
+                    chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
             # Tengo que pensar alguna forma para poder moverme y que no se tiren quietos todo el rato, porque es muy poco dinámico y no hay casi exploración 
-            print(f"agent: {agent.getId()} elige el movimiento {choose_action}")
-            agent.step(choose_action)
+            print(f"agent: {agent.getId()} elige el movimiento {chosen_ation}")
+            agent.step(chosen_ation)
         for planet in self.list_planets:
             planet.step()
+        # Al final de cada turno compruebo quien es el agente que mas planetas y fabricas tiene para asignarle los puntos estelares
         self.addStellarPoints()
+
 # Forma de modificar los atributos en ejecucion mediante los metodos exec, parecido a poner una condicion y ejecutarlo directamente
-#         if self.step_count % 10 == 0: 
-#             new_atribute = input("""Introduzca un nuevo atributo, señalando si quieres que sea para el modelo o para un agente determinado. 
-# Ejemplo (M  nombre_var tipo_var valor) ó (A id(0-{}) nombre_var tipo_var valor): """.format(len(self.list_agents))).lower()
-#             if new_atribute == "":
-#                 pass
-#             else:
-#                 if re.match("^m\s[a-z(0-9)?]+\s(int|bool|float|str)\s[a-z0-9]+" + "|" + "^a\s[0-9]\s[a-z(0-9)?]+\s(int|bool|float|str)\s[a-z0-9]+",
-#                             new_atribute):
-#                     method_attributes = new_atribute.split()
-#                     if len(method_attributes) == 5:
-#                         self.addAttribute(class_name=method_attributes[0], attribute_name=method_attributes[2],
-#                                         new_type=method_attributes[3], value=method_attributes[4], id=method_attributes[1])
-#                     else:
-#                         self.addAttribute(class_name=method_attributes[0], attribute_name=method_attributes[1],
-#                                         new_type=method_attributes[2], value=method_attributes[3])
-#                     print(self.__getattribute__(method_attributes[1]))
-#             code = """
-# print(self.step_count)
-# setattr(self, "allies", False)
-
-# print(dir(self))
-
-# for i in dir(self):
-#     if i.startswith("_"):
-#         continue
-#     elif i == "list_agents":
-#         random_agent = self.__getattribute__(i)[0]
-#         random_agent.setAgentColor("black")
-# """
-#             exec(code)
-#             self.allies = True
-#             print(self.allies)
+        # if self.step_count == 10: 
+        #     new_atribute = input("Introduzca el nuevo valor de un atributo para uno de los agentes. ")
+        #     self.list_agents[0].setGold(int(new_atribute))
         #self.datacollector.collect(self)
 
     # Método para comprobar rápidamente el funcionamiento del juego sin tener que ejecutar el servidor
@@ -254,6 +290,24 @@ class Game(mesa.Model):
                         done = True
             i += 1
             print("------")
+
+    # Método para añadir de manera dinámica atributos al modelo o al agente
+    def _addAttribute(self, class_name, attribute_name, new_type, value, id=None):
+        if new_type == "int":
+            value = int(value)
+        elif new_type == "float":
+            value = float(value)
+        elif new_type == "bool":
+            if value == "true":
+                value = True
+            elif value == "false":
+                value = False
+        if class_name == "m":
+            setattr(self, attribute_name, value)
+        elif class_name == "a":
+            agent_selected = self.list_agents[int(id)]
+            setattr(agent_selected, attribute_name, value)
+            print(agent_selected.__getattribute__(attribute_name))
                     
 if __name__ == "__main__":
     model = Game()
