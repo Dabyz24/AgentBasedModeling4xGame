@@ -46,7 +46,7 @@ class Game(mesa.Model):
         # )
         
         # Creacion de los jugadores evito que haya dos agentes en el mismo espacio con chekspace y creo y añado el agente
-        for _ in range(self.num_players):
+        for i in range(self.num_players):
             location_found = False
             while not location_found:
                 location = self.checkSpace(MOORE_PLAYER)
@@ -54,12 +54,10 @@ class Game(mesa.Model):
             pos = location[1]
             player = Player(self.next_id(), self, pos, moore=MOORE_PLAYER)
             # Una vez creado le asigno un color de la lista de colores, cada uno tendrá un color único
-            try:
-                chosen_color = self.list_agents_colors.pop(self.random.randrange(0, len(self.list_agents_colors)))
-            except:
-                # Si se añaden más jugadores que colores en la lista el color será negro
-                chosen_color = "black"
+            chosen_color = self.list_agents_colors.pop(self.random.randrange(0, len(self.list_agents_colors)))
             player.setAgentColor(chosen_color)
+            # Asigno un comportamiento diferente a cada agente
+            player.setBehaviour(POSSIBLE_BEHAVIOURS[(0+i)%len(POSSIBLE_BEHAVIOURS)])
             self.list_agents.append(player)
             self.grid.place_agent(player, pos)
             self.schedule.add(player)
@@ -157,7 +155,7 @@ class Game(mesa.Model):
 
     # Método privado que obtiene la distancia entre dos puntos 
     def _distance(self, my_position, target_position):
-        print(f"Posicion del agente actual es {my_position}, y la posicion target es {target_position}")
+        #print(f"Posicion del agente actual es {my_position}, y la posicion target es {target_position}")
         return math.sqrt((int(target_position[0]) - int(my_position[0]))**2 + (int(target_position[1]) - int(my_position[1]))**2) 
 
     # Método para calcular la distancia mas cercana a un punto especifico
@@ -195,7 +193,7 @@ class Game(mesa.Model):
                 if self.step_count == 1:
                     # En el primer turno elijo un movimiento aleatorio
                     chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
-                elif agent.getGold() < 30:
+                elif agent.getGold() < FACTORIES_GOLD_COST:
                     # Si tiene arma perseguir a algún jugador para luchar y poder ganar recursos del combate
                     if agent.getGold() < 0:
                         try:
@@ -204,8 +202,7 @@ class Game(mesa.Model):
                             chosen_ation = chosen_move
                         except:
                             chosen_ation = self.random.choices(POSSIBLE_ACTIONS)[0]
-                        print("Buscando a un agente para luchar")
-                        
+                                                
                     else:
                         # Buscar un planeta cercano para conquistarlo y poder ganar sus recursos
                         list_uninhabited_planets = self.getAllPlanetPos()
@@ -214,50 +211,55 @@ class Game(mesa.Model):
                             chosen_ation = chosen_move
                         except:
                             chosen_ation = self.random.choices(POSSIBLE_ACTIONS)[0]
-                        print("Buscando planeta cercano")
-    # Comprobar para que pueda hacer otra cosa y no se quede todo el rato haciendo esta accion una vez se cumplan las demas condiciones
-                elif agent.getGold() > 40 and agent.getTech() > 20 and agent.getFactories() > 6 and (agent.getNumPlayerWeapon() < 3 or agent.getAgentUpgrades().isUpgradeAvailable()):
-                    # Si tengo suficientes fabricas para poder sobrevivir economicamente tengo que desarrollar armas
+                # Si el agente tiene oro, tecnologia y fabricas sufcientes para subsistir, entonces crear armas o mejorar siempre que se pueda seguir creando nuevas armas y mejoras                    
+                elif agent.getGold() > WEAPON_GOLD_COST and agent.getTech() > WEAPON_TECH_COST and agent.getFactories() > 6 and (agent.getNumPlayerWeapon() < 3 or agent.getAgentUpgrades().isUpgradeAvailable()):
+                    # Si tengo todas las armas creadas puedo desarrollar las mejoras
                     if agent.getNumPlayerWeapon() == 3:
-                    # Tengo que comprobar si puedo hacer mejoras de los recurosos de fabricas o la mejora de daño
+                    # Tengo que comprobar si puedo hacer mejoras de los recursos de fabricas o la mejora de daño
                         if agent.getAgentUpgrades().isUpgradeAvailable() and (agent.getGold() > UPGRADE_FACTORIES_GOLD_COST and agent.getTech() > UPGRADE_FACTORIES_TECH_COST):
                             # Seleccionar algun valor de la lista de opciones de mejoras y hacer las mejoras
                             chosen_ation = ACTION_SPACE.get("Weapon")
                         else:
-                            chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
+                            # Si no tengo recursos sufciente realizo una accion aleatoria quitando la opción de desarrollar un arma/mejora
+                            chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:9])[0]
                     else:
+                        # Si todavia no tengo todas las armas las creo
                         chosen_ation = ACTION_SPACE.get("Weapon")     
-                    
-                elif agent.getGold() >= 30 and agent.getTech() >= 5:
+                
+                elif agent.getGold() >= FACTORIES_GOLD_COST and agent.getTech() >= FACTORIES_TECH_COST:
                     if not agent.getAgentUpgrades().isUpgradeAvailable():
-                        # Si no tiene mejoras disponibles crear una lógica para que en función de unas variables cambie de funcionamiento 
+                        # Si no tiene mejoras disponibles actuaran en funcion de su comportamiento 
                         if agent.getBehaviour() == "Chaser":
+                            # Se pone a perseguir al enemigo más cercano para luchar con él
                             list_enemies = self.getAllPlayersPos()
                             try:
                                 _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_enemies)
                                 chosen_ation = chosen_move
                             except:
-                                chosen_ation = self.random.choices(POSSIBLE_ACTIONS)[0]
-                            #Se pone a perseguir al enemigo más cercano para luchar con él
-                            print("Persigue al enemigo")
+                                # Si está en la misma posición que el enemigo la accion elegida será o un movimiento o crear una fabrica
+                                chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:9])[0]
+                            
                         elif agent.getBehaviour() == "Explorer":    
                         # Se pone a buscar planetas cercanos sin explorar
-                            print("Busca planeta sin explorar")
                             list_uninhabited_planets = self.getAllPlanetPos()
-                            try:
-                                _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_uninhabited_planets)
-                                chosen_ation = chosen_move
-                            except:
-                                chosen_ation = self.random.choices(POSSIBLE_ACTIONS)[0]
+                            # Si la lista de planetas sin habitar es vacia el agente realizara un movmiento o creara una fabrica
+                            if len(list_uninhabited_planets) == 0:
+                                chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:9])[0]
+                            else:
+                                try:
+                                    _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_uninhabited_planets)
+                                    chosen_ation = chosen_move
+                                except:
+                                    chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:9])[0]
+
                         elif agent.getBehaviour() == "Farmer":
-                            # o se ponga a fabricar fabricas intecalando con movimientos
+                            # Creara una fabrica en los turnos pares y en los impares se movera
                             if self.step_count % 2 == 0:
-                                # Creara una fabrica en los turnos pares y en los impares se movera
                                 chosen_ation = ACTION_SPACE.get("Factory")
                             else:
                                 chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
                     else:
-                        # Crear una fabrica para poder conseguir recursos y sobrevivir
+                        # Si tiene mejoras disponibles crea una fabrica para poder conseguir recursos y sobrevivir
                         chosen_ation = ACTION_SPACE.get("Factory")
                 else:
                     chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
@@ -270,9 +272,17 @@ class Game(mesa.Model):
         self.addStellarPoints()
 
 # Forma de modificar los atributos en ejecucion mediante los metodos exec, parecido a poner una condicion y ejecutarlo directamente
-        # if self.step_count == 10: 
-        #     new_atribute = input("Introduzca el nuevo valor de un atributo para uno de los agentes. ")
-        #     self.list_agents[0].setGold(int(new_atribute))
+        if self.step_count % 100 == 0:
+            for agent in self.list_agents:
+                agent.changeBehaviour()
+            for planet in self.list_planets:
+                planet.resetPlanet()
+        #     last_score = float("inf")
+        #     for agent in self.list_agents:  
+        #         if agent.getStellarPoints() < last_score:
+        #             last_score = agent.getStellarPoints()
+        #             agent.behaviour = "Farmer" 
+                
         #self.datacollector.collect(self)
 
     # Método para comprobar rápidamente el funcionamiento del juego sin tener que ejecutar el servidor
