@@ -10,10 +10,10 @@
 [ ] 4. Modificar los agentes para poder introducir comportamientos en cada uno de los agentes 
 - [✔] 4.1 Deshacer estatico añadiendo la opcion de aparecer random de los agentes y de los planetas
 - [✔] 4.2 Quitar todas las variables creadas únicamente para el Q-learning y limpiar todas las variables innutilizadas 
-- [] 4.3 Crear las condiciones para que cada agente no decida aleatorio y lo haga basandose en una lógica 
+- [✔] 4.3 Crear las condiciones para que cada agente no decida aleatorio y lo haga basandose en una lógica 
 
 
 [ ] 5. Ver como poder introducir codigo de manera dinamica para poder crear nuevas funcionalidades (alianzas)
-- [] 5.1 Introducir una nueva funcionalidad en el step 50 para cambiar el funcionamiento del agente (sin método)
+- [✔] 5.1 Introducir una nueva funcionalidad en el step 50 para cambiar el funcionamiento del agente (sin método)
 - [] 5.2 Crear un método de manera dinámica para poder cambiar el funcionamiento del agente a partir de los 50 steps 
 
