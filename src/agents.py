@@ -42,7 +42,7 @@ class Player(mesa.Agent):
         self.movement_radius = 1
         self.increase_factories_resources = 1
         # Permite saber el tipo de comportamiento del agente, por defecto serán exploradores
-        self.behaviour = self.random.choice(POSSIBLE_BEHAVIOURS)
+        self.behaviour = ""
 
     # Funciones para modificar los planetas del agente 
     def addPlanetResources(self, tech, gold, populated=False):
@@ -174,7 +174,10 @@ class Player(mesa.Agent):
         return self.damage_increase
 
     def increaseDamage(self):
-        self.damage_increase = 5
+        if self.behaviour == "Chaser":
+            self.damage_increase = 10
+        else:    
+            self.damage_increase = 5
 
     def doubleMovementRadius(self):
         self.movement_radius = 2
@@ -190,7 +193,17 @@ class Player(mesa.Agent):
     
     def getBehaviour(self):
         return self.behaviour
-    
+
+    def setBehaviour(self, new_behaviour):
+        if new_behaviour in POSSIBLE_BEHAVIOURS:
+            self.behaviour = new_behaviour
+
+    # Cambiará al siguiente comportamiento de la lista, si llega al último elemento de la lista empezará de nuevo 
+    def changeBehaviour(self):
+        index = POSSIBLE_BEHAVIOURS.index(self.behaviour)
+        new_index = (index+1)%(len(POSSIBLE_BEHAVIOURS))
+        self.behaviour = POSSIBLE_BEHAVIOURS[new_index]
+
     def getResources(self):
         return {"Tech": self.tech, "Gold": self.gold, "Planets": self.num_planets, "Factories": self.num_factories}
 
@@ -304,6 +317,12 @@ class Planet(mesa.Agent):
     def getResources(self):
         return f"Tech: {self.tech} Gold: {self.gold}" 
     
+    def resetPlanet(self):
+        if self.populated:
+            self.player.removePlanet()
+            self.player = None
+            self.populated = False
+    
     # Funcion para representar cada turno de los planetas
     def step(self):
         """
@@ -322,9 +341,7 @@ class Planet(mesa.Agent):
                 player_selected.addPlanetResources(self.tech, self.gold)
         # Si el jugador elegido para controlar el planeta se queda sin dinero se borrara el planeta al jugador y el propio jugador del planeta pasando a no estar habitado
         elif self.player.getGold() <= 0:
-            self.player.removePlanet()
-            self.player = None
-            self.populated = False
+            self.resetPlanet()
         else:
             self.player.addPlanetResources(1, 10, True)
         
