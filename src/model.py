@@ -167,15 +167,21 @@ class Game(mesa.Model):
             if target_position == my_position:
                 continue
             dist = self._distance(my_position, target_position)
+            # Si se encuentra en la casilla del al lado que haga una acción aleatoria para evitar que se superponga en todas las situaciones
+            if dist == 1:
+                minimum_tuple = target_position
+                chosen_move = self.random.choices(POSSIBLE_ACTIONS[0:9])[0]
+                return minimum_tuple, chosen_move 
+            # Si la distancia es menor que el valor anterior se guarda la distancia y la tupla 
             if dist < minimun_distance:
                 minimun_distance = dist
                 minimum_tuple = target_position
-        
+        # Calculo la diferencia en el eje x y en el y para poder calcular el movimiento necesario para acercarse
         difference_x = minimum_tuple[0] - my_position[0]
         difference_y = minimum_tuple[1] - my_position[1]
         move_x =  int(difference_x / abs(difference_x)) if difference_x != 0 else 0
         move_y = int(difference_y / abs(difference_y)) if difference_y != 0 else 0
-        
+        # Creo la tupla con el movmiento necesario y se lo paso al diccionario para saber la accion que realizar
         move = (move_x, move_y)
         chosen_move = ACTION_SPACE.get(move)
         return minimum_tuple, chosen_move
@@ -274,7 +280,12 @@ class Game(mesa.Model):
 # Forma de modificar los atributos en ejecucion mediante los metodos exec, parecido a poner una condicion y ejecutarlo directamente
         if self.step_count % 100 == 0:
             for agent in self.list_agents:
+                # Resetear el damage increase para que el que sea chaser adquiera los 10 de daño y el anterior los pierda
+                agent.resetDamegeIncrease()
                 agent.changeBehaviour()
+                # Si es chaser y tenia los 5 de daño (tiene la mejora de daño) se le añade 10
+                if agent.getBehaviour() == "Chaser" and agent.getDamageIncrease() == 5:
+                    agent.setDamageIncrease(10)
             for planet in self.list_planets:
                 planet.resetPlanet()
         #     last_score = float("inf")
