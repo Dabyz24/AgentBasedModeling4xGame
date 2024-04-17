@@ -173,6 +173,15 @@ class Player(mesa.Agent):
     def getDamageIncrease(self):
         return self.damage_increase
 
+    def setDamageIncrease(self, new_value):
+        self.damage_increase = new_value
+
+    def resetDamegeIncrease(self):
+        if self.agent_upgrades.isDamageUpgraded():
+            self.damage_increase = 5
+        else:
+            self.damage_increase = 0
+    
     def increaseDamage(self):
         if self.behaviour == "Chaser":
             self.damage_increase = 10
