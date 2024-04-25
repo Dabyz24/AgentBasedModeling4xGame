@@ -63,13 +63,13 @@ class Game(mesa.Model):
             self.schedule.add(player)
         
         # Creacion de los planetas 
-        for _ in range(self.num_planets):
+        for i in range(self.num_planets):
             location_found = False
             while not location_found:
                 location = self.checkSpace(MOORE_PLANET)
                 location_found = location[0]
             pos = location[1]
-            planet = Planet(self.next_id(), self, pos ,self.random.randrange(0, self.tech_planet),
+            planet = Planet(i, self, pos ,self.random.randrange(0, self.tech_planet),
                             self.random.randrange(0, self.gold_planet), self.taxes_planet, moore=MOORE_PLANET)
             self.list_planets.append(planet)
             self.grid.place_agent(planet, pos)
@@ -279,6 +279,23 @@ class Game(mesa.Model):
 
 # Forma de modificar los atributos en ejecucion mediante los metodos exec, parecido a poner una condicion y ejecutarlo directamente
         if self.step_count % 100 == 0:
+            # Primer boceto para incluir agentes de manera dináminca 
+            location_found = False
+            while not location_found:
+                location = self.checkSpace(MOORE_PLAYER)
+                location_found = location[0]
+            pos = location[1]
+            player = Player(self.next_id(), self, pos, moore=MOORE_PLAYER)
+            player.setBehaviour(self.random.choice(POSSIBLE_BEHAVIOURS))
+            try:
+                chosen_color = self.list_agents_colors.pop(self.random.randrange(0, len(self.list_agents_colors)))
+                player.setAgentColor(chosen_color)
+            except:
+                chosen_color = "black"
+            self.list_agents.append(player)
+            self.grid.place_agent(player, pos)
+            self.schedule.add(player)
+            
             for agent in self.list_agents:
                 # Resetear el damage increase para que el que sea chaser adquiera los 10 de daño y el anterior los pierda
                 agent.resetDamegeIncrease()
@@ -307,7 +324,7 @@ class Game(mesa.Model):
                 if type(agent) == Player:
                     print(f"Player {agent.getAgentPos(verbose=True)}")
                     print(f"Resources: {agent.getAgentInfo(verbose=True)}")
-                    if agent.getStellarPoints() >= 100:
+                    if agent.getStellarPoints() >= 1000:
                         done = True
             i += 1
             print("------")
