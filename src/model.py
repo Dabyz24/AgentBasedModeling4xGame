@@ -277,8 +277,19 @@ class Game(mesa.Model):
         # Al final de cada turno compruebo quien es el agente que mas planetas y fabricas tiene para asignarle los puntos estelares
         self.addStellarPoints()
 
-# Forma de modificar los atributos en ejecucion mediante los metodos exec, parecido a poner una condicion y ejecutarlo directamente
+# Cada X turnos se revisa el número de stellar points que han ganado los agentes y si es infrerior se eliminan y se crea uno nuevo
         if self.step_count % 100 == 0:
+            
+            for agent in self.list_agents:
+                print(f"El agente {agent.getId()} tiene un balance de {agent.getBalance()}")
+                if agent.getBalance() <= 0:
+                    agent.resetPlayer()
+                    self.list_agents.remove(agent)
+                    self.grid.remove_agent(agent)
+                    self.schedule.remove(agent)
+                else:
+                    agent.resetBalance()
+
             # Primer boceto para incluir agentes de manera dináminca 
             location_found = False
             while not location_found:
@@ -291,20 +302,21 @@ class Game(mesa.Model):
                 chosen_color = self.list_agents_colors.pop(self.random.randrange(0, len(self.list_agents_colors)))
                 player.setAgentColor(chosen_color)
             except:
-                chosen_color = "black"
+                chosen_color = "#" + "".join([self.random.choice("0123456789ABCDEF") for j in range(6)])
+                player.setAgentColor(chosen_color)
             self.list_agents.append(player)
             self.grid.place_agent(player, pos)
             self.schedule.add(player)
-            
-            for agent in self.list_agents:
-                # Resetear el damage increase para que el que sea chaser adquiera los 10 de daño y el anterior los pierda
-                agent.resetDamegeIncrease()
-                agent.changeBehaviour()
-                # Si es chaser y tenia los 5 de daño (tiene la mejora de daño) se le añade 10
-                if agent.getBehaviour() == "Chaser" and agent.getDamageIncrease() == 5:
-                    agent.setDamageIncrease(10)
-            for planet in self.list_planets:
-                planet.resetPlanet()
+    # Por ahora no reseteare los planetas y los comportamientos en el turno 100 solo intertaré eliminar un agente y meter otro 
+            # for agent in self.list_agents:
+            #     # Resetear el damage increase para que el que sea chaser adquiera los 10 de daño y el anterior los pierda
+            #     agent.resetDamegeIncrease()
+            #     agent.changeBehaviour()
+            #     # Si es chaser y tenia los 5 de daño (tiene la mejora de daño) se le añade 10
+            #     if agent.getBehaviour() == "Chaser" and agent.getDamageIncrease() == 5:
+            #         agent.setDamageIncrease(10)
+            # for planet in self.list_planets:
+            #     planet.resetPlanet()
         #     last_score = float("inf")
         #     for agent in self.list_agents:  
         #         if agent.getStellarPoints() < last_score:
