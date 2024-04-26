@@ -24,6 +24,8 @@ class Player(mesa.Agent):
         self.num_factories = num_factories
         self.stellar_points = stellar_points
         self.moore = moore
+        # Lista para tener controlados los planetas habitados por el agente
+        self.list_planets = []
         # El color del agente por defecto será negro, pero en la creacion en el modelo se le atribuira otro color
         self.color = "black"
         # Permite saber el arma actual del agente
@@ -43,16 +45,20 @@ class Player(mesa.Agent):
         self.increase_factories_resources = 1
         # Permite saber el tipo de comportamiento del agente, por defecto serán exploradores
         self.behaviour = ""
+        # Para saber cuantos puntos pierde o gana en el total de rondas que especifique en el modelo
+        self.balance = 0
 
     # Funciones para modificar los planetas del agente 
-    def addPlanetResources(self, tech, gold, populated=False):
+    def addPlanetResources(self, tech, gold, populated=False, planet=None):
         self.tech += tech
         self.gold += gold
-        if not populated:
+        if not populated and planet:
             self.num_planets += 1
+            self.list_planets.append(planet)
     
-    def removePlanet(self):
-        self.num_planets -= 1 
+    def removePlanet(self, planet):
+        self.num_planets -= 1
+        self.list_planets.remove(planet) 
 
     # Funciones para modificar las fabricas del agente 
     def createFactory(self):
@@ -84,6 +90,10 @@ class Player(mesa.Agent):
                 self.addPoint()
                 self.addBattleWon()
                 self.addBattleResources(player_selected)
+                player_selected.lossPoint()
+                if len(player_selected.list_planets) >= 1:
+                    planet_selected = self.random.choice(player_selected.list_planets)
+                    planet_selected.resetPlanet()
             else:
                 player_value = self.getPlayerWeapon()[1] * self.random.randint(1,20) + self.damage_increase
                 enemy_value = enemy_weapon[1] * self.random.randint(1,20) + player_selected.getDamageIncrease()
@@ -96,11 +106,19 @@ class Player(mesa.Agent):
                         self.addPoint()
                         self.addBattleWon()
                         self.addBattleResources(player_selected)
+                        player_selected.lossPoint()
+                        if len(player_selected.list_planets) >= 1:
+                            planet_selected = self.random.choice(player_selected.list_planets)
+                            planet_selected.resetPlanet()
                     else:
                         #print(f"Punto ganado por {player_selected.getId()}")
                         player_selected.addPoint()
                         player_selected.addBattleWon()
                         player_selected.addBattleResources(self)
+                        self.lossPoint()
+                        if len(self.list_planets) >= 1:
+                            planet_selected = self.random.choice(self.list_planets)
+                            planet_selected.resetPlanet()
                             
     # Funciones para comprobar y restar los recursos de los jugadores
     def enoughResources(self, tech, gold):
@@ -124,6 +142,11 @@ class Player(mesa.Agent):
         if point_planet:
             self.win_planet_point = True
         self.stellar_points += 1
+        self.balance += 1
+
+    def lossPoint(self):
+        self.stellar_points -= 1
+        self.balance -= 1
 
     def addBattleWon(self):
         self.battles_won += 1
@@ -207,6 +230,12 @@ class Player(mesa.Agent):
         if new_behaviour in POSSIBLE_BEHAVIOURS:
             self.behaviour = new_behaviour
 
+    def getBalance(self):
+        return self.balance
+
+    def resetBalance(self):
+        self.balance = 0
+
     # Cambiará al siguiente comportamiento de la lista, si llega al último elemento de la lista empezará de nuevo 
     def changeBehaviour(self):
         index = POSSIBLE_BEHAVIOURS.index(self.behaviour)
@@ -272,6 +301,10 @@ class Player(mesa.Agent):
             self.maybeFight()
         self.payTaxes()
 
+    def resetPlayer(self):
+        for planet in self.list_planets:
+            planet.resetPlanet()
+        
 
 
 class Planet(mesa.Agent):
@@ -328,7 +361,7 @@ class Planet(mesa.Agent):
     
     def resetPlanet(self):
         if self.populated:
-            self.player.removePlanet()
+            self.player.removePlanet(self)
             self.player = None
             self.populated = False
     
@@ -347,7 +380,7 @@ class Planet(mesa.Agent):
                 self.populated = True
                 # pasa a ser habitado por el agente seleccionado
                 self.player = player_selected
-                player_selected.addPlanetResources(self.tech, self.gold)
+                player_selected.addPlanetResources(self.tech, self.gold, False, self)
         # Si el jugador elegido para controlar el planeta se queda sin dinero se borrara el planeta al jugador y el propio jugador del planeta pasando a no estar habitado
         elif self.player.getGold() <= 0:
             self.resetPlanet()
