@@ -268,23 +268,25 @@ class Player(mesa.Agent):
         if chosen_ation == 8 and self.enoughResources(FACTORIES_TECH_COST, FACTORIES_GOLD_COST):
             self.createFactory()
         
-        if chosen_ation == 9 and self.enoughResources(WEAPON_TECH_COST, WEAPON_GOLD_COST):
+        # Comprobar si el agente tiene mas mejoras disponibles
+        if chosen_ation == 9 and self.agent_upgrades.isUpgradeAvailable():
+            if len(self.upgrade_options) == 1:
+                random_choice = 0
+            else:
+                random_choice = self.random.randint(0,len(self.upgrade_options)-1)
+            choose_upgrade = self.upgrade_options[random_choice]
+            if choose_upgrade == "Damage" and self.enoughResources(UPGRADE_DAMAGE_TECH_COST, UPGRADE_DAMAGE_GOLD_COST):
+                self.agent_upgrades.upgradeDamage()
+                self.increaseDamage()               
+            elif choose_upgrade == "Factory" and self.enoughResources(UPGRADE_FACTORIES_TECH_COST, UPGRADE_FACTORIES_GOLD_COST):
+                self.agent_upgrades.upgradeFactories()
+                self.doubleFactoriesResources()
+
+        if chosen_ation == 10 and self.enoughResources(WEAPON_TECH_COST, WEAPON_GOLD_COST):
             # las tres primeras veces que se ejecute solo se mejorara el arma
             if self.player_weapon.getNumUpgrades() < 3:
                 self.player_weapon.upgradeWeapon()
-            # Comprobar si el agente tiene mas mejoras disponibles
-            elif self.agent_upgrades.isUpgradeAvailable():
-                if len(self.upgrade_options) == 1:
-                    random_choice = 0
-                else:
-                    random_choice = self.random.randint(0,len(self.upgrade_options)-1)
-                choose_upgrade = self.upgrade_options[random_choice]
-                if choose_upgrade == "Damage" and self.enoughResources(UPGRADE_DAMAGE_TECH_COST, UPGRADE_DAMAGE_GOLD_COST):
-                    self.agent_upgrades.upgradeDamage()
-                    self.increaseDamage()               
-                elif choose_upgrade == "Factory" and self.enoughResources(UPGRADE_FACTORIES_TECH_COST, UPGRADE_FACTORIES_GOLD_COST):
-                    self.agent_upgrades.upgradeFactories()
-                    self.doubleFactoriesResources()
+
 
     # Funcion para representar cada turno del jugador
     def step(self, action):
