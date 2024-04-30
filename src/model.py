@@ -224,7 +224,7 @@ class Game(mesa.Model):
                     # Tengo que comprobar si puedo hacer mejoras de los recursos de fabricas o la mejora de daño
                         if agent.getAgentUpgrades().isUpgradeAvailable() and (agent.getGold() > UPGRADE_FACTORIES_GOLD_COST and agent.getTech() > UPGRADE_FACTORIES_TECH_COST):
                             # Seleccionar algun valor de la lista de opciones de mejoras y hacer las mejoras
-                            chosen_ation = ACTION_SPACE.get("Weapon")
+                            chosen_ation = ACTION_SPACE.get("Upgrade")
                         else:
                             # Si no tengo recursos sufciente realizo una accion aleatoria quitando la opción de desarrollar un arma/mejora
                             chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:9])[0]
@@ -334,12 +334,17 @@ class Game(mesa.Model):
             self.step()
             for agent in self.schedule.agents:
                 if type(agent) == Player:
-                    print(f"Player {agent.getAgentPos(verbose=True)}")
-                    print(f"Resources: {agent.getAgentInfo(verbose=True)}")
-                    if agent.getStellarPoints() >= 1000:
+                    if agent.getStellarPoints() >= 20000:
                         done = True
             i += 1
-            print("------")
+            print("--------------------")
+        if done: 
+            print("Final de la ejecución")
+            for agent in self.schedule.agents:
+                if type(agent) == Player:
+                    print(f"-> Player con id : {agent.getId()} en la pos {agent.getAgentPos(verbose=True)} comportandose como {agent.getBehaviour()}")
+                    print(f"\tResources: {agent.getAgentInfo(verbose=True)}")
+            print("--------------------")
 
     # Método para añadir de manera dinámica atributos al modelo o al agente
     def _addAttribute(self, class_name, attribute_name, new_type, value, id=None):
