@@ -1,3 +1,4 @@
+import random
 
 # Objeto encargado de generalizar todos los comportamientos y permitir la creacion de nuevos comportamientos de una manera sencilla
 
@@ -19,8 +20,77 @@ class Behaviour():
 
     """
     def __init__(self):
-        POSSIBLE_BEHAVIOURS = ["Explorer", "Chaser", "Farmer"]
-        pass
+        self.actual_behaviour = ""
+        self.initial_behaviours = ["Explorer", "Chaser", "Farmer"]
+        self.list_actions = ["Move", "Factory", "Weapon", "Upgrade"]
+        self.list_priorities = []
+        # Servira para comprobar que al establecer una nueva prioridad se pongan los numeros correctos
+        self._valid_numbers_priority = ["1","2","3","4"]
+    
+    def setPriorities(self, behaviour, random_flag=False):
+        if behaviour in self.initial_behaviours:
+            if behaviour == "Explorer":
+                self.list_priorities = ["Move", "Factory", "Upgrade", "Weapon"]
+            if behaviour == "Chaser":
+                self.list_priorities = ["Weapon", "Move", "Upgrade", "Factory"]
+            if behaviour == "Farmer":
+                self.list_priorities = ["Factory", "Upgrade", "Move", "Weapon"]
+
+        elif random_flag:
+            random.shuffle(self.list_actions)
+            for action in self.list_actions:
+                self.list_priorities.append(action)
+        else:
+            different_priorities = self.checker_priorities()
+            
+            for priority in different_priorities:
+                # Se resta uno en la priority para que coincida con el indice de list_actions
+                self.list_priorities.append(self.list_actions[int(priority)-1])
+
+    def checker_priorities(self):
+        while True:  
+                str_priority = input("Select from highest to lowest priority (1 = Move, 2 = Factory, 3 = Weapon, 4 = Upgrade) using comma as separator. Ex: 1,2,3,4\n")
+                different_priorities = str_priority.split(",")
+                if all(number in self._valid_numbers_priority for number in different_priorities) and len(different_priorities) == len(self.list_actions):
+                        return different_priorities
+                else:
+                    print(f"This are the only valid numbers: {self._valid_numbers_priority}")
+
+
+    def getListPriorities(self):
+        aux_str = ""
+        for i in range(0, len(self.list_priorities)):
+            if i+1 == len(self.list_priorities):
+                aux_str += self.list_priorities[i]
+            else:
+                aux_str += self.list_priorities[i] + " -> "    
+        return aux_str
+    
+
+    def new_behaviour(self, new, flag=False):
+        """
+        Crear un nuevo comportamiento  
+        """
+        self.list_priorities = []
+        self.actual_behaviour = new
+        if flag:
+            self.setPriorities(new, random_flag=True)
+        else:
+            self.setPriorities(new)
+
+# Para poder comprobar el funcionamiento de la clase 
+if __name__ == "__main__":
+    comportamiento = Behaviour()
+    comportamiento.new_behaviour("Chaser")
+    print(comportamiento.actual_behaviour)
+    print(comportamiento.getListPriorities())
+    comportamiento.new_behaviour("new2")
+    print(comportamiento.actual_behaviour)
+    print(comportamiento.getListPriorities())
+    comportamiento.new_behaviour("random", flag=True)
+    print(comportamiento.actual_behaviour)
+    print(comportamiento.getListPriorities())
+
 
     # Tengo que abstraer todo lo que hace importante a un comportamiento 
     """
@@ -36,34 +106,3 @@ class Behaviour():
     
     """ 
                 
-
-# Comportamientos del agente
-# if agent.getBehaviour() == "Chaser":
-#                             # Se pone a perseguir al enemigo más cercano para luchar con él
-#                             list_enemies = self.getAllPlayersPos()
-#                             try:
-#                                 _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_enemies)
-#                                 chosen_ation = chosen_move
-#                             except:
-#                                 # Si está en la misma posición que el enemigo la accion elegida será o un movimiento o crear una fabrica
-#                                 chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:9])[0]
-                            
-#                         elif agent.getBehaviour() == "Explorer":    
-#                         # Se pone a buscar planetas cercanos sin explorar
-#                             list_uninhabited_planets = self.getAllPlanetPos()
-#                             # Si la lista de planetas sin habitar es vacia el agente realizara un movmiento o creara una fabrica
-#                             if len(list_uninhabited_planets) == 0:
-#                                 chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:9])[0]
-#                             else:
-#                                 try:
-#                                     _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_uninhabited_planets)
-#                                     chosen_ation = chosen_move
-#                                 except:
-#                                     chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:9])[0]
-
-#                         elif agent.getBehaviour() == "Farmer":
-#                             # Creara una fabrica en los turnos pares y en los impares se movera
-#                             if self.step_count % 2 == 0:
-#                                 chosen_ation = ACTION_SPACE.get("Factory")
-#                             else:
-#                                 chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
