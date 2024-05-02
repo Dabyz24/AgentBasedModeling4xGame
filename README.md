@@ -15,7 +15,7 @@
 [✔] 5. Ver como poder introducir codigo de manera dinamica para poder crear nuevas funcionalidades (alianzas)
 - [✔] 5.1 Introducir una nueva funcionalidad en el step 50 para cambiar el funcionamiento del agente (sin método)
 
-[ ] 6 Introducción y eliminación de manera dinámica de agentes 
+[✔] 6 Introducción y eliminación de manera dinámica de agentes 
 - [✔] 6.1 Añadir de manera dinámica agentes a la ejecución
 - [✔] 6.2 Posibilidad de perder planetas si se da cierta condición (Si pierden un combate y tienen un planeta se resetea un planeta aleatorio de su propiedad)
 - [✔] 6.3 Eliminar agentes que bajen de un umbral ciertos puntos (si no consigue cierta media de puntos en un número de turnos lo elimino)
