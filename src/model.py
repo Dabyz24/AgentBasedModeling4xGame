@@ -198,7 +198,6 @@ class Game(mesa.Model):
                 list_priorities, behaviour_moves, behaviour_upgrades = agent.getListPriorities()
                 
                 for action in list_priorities:
-                    print(action)
                     if action == "Move":
                         if (agent.getGold() >= SPACE_SHIP_GOLD_COST and agent.getTech() >= SPACE_SHIP_TECH_COST) or agent.isShipCreated():
                             if len(behaviour_moves) == 1:
@@ -256,7 +255,6 @@ class Game(mesa.Model):
                             # Si no cumplo alguna de las restricciones anteriores paso a la siguiente accion de la lista de prioridad
                             continue
                     elif action == "Upgrade":
-                        print("Entrando en upgrade")
                         if len(behaviour_upgrades) > 0 or agent.getAgentUpgrades().isUpgradeAvailable():
                             # Si la opcion es mejorar la fabrica y no la tiene mejorado
                             if "Factory" in behaviour_upgrades and not agent.getAgentUpgrades().isFactoryUpgraded():
@@ -307,7 +305,7 @@ class Game(mesa.Model):
                 location_found = location[0]
             pos = location[1]
             player = Player(self.next_id(), self, pos, moore=MOORE_PLAYER)
-            player.setBehaviour(self.random.choice(POSSIBLE_BEHAVIOURS))
+            player.setBehaviour("Random"+str(self.next_id()), random_flag=True)
             try:
                 chosen_color = self.list_agents_colors.pop(self.random.randrange(0, len(self.list_agents_colors)))
                 player.setAgentColor(chosen_color)
