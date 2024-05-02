@@ -20,9 +20,9 @@
 - [✔] 6.2 Posibilidad de perder planetas si se da cierta condición (Si pierden un combate y tienen un planeta se resetea un planeta aleatorio de su propiedad)
 - [✔] 6.3 Eliminar agentes que bajen de un umbral ciertos puntos (si no consigue cierta media de puntos en un número de turnos lo elimino)
 
-[ ] 7. Cambiar los comportamientos a algo más genérico (Objeto) para no tener que ponerlo tan estricto en el condicional 
-- [] 7.1 Cambiar la lógica de los comportamientos para no hacerlo en el step tan estricto
-- [] 7.2 Añadir una lista de prioridades para los comportamientos (meter las upgrades ahí)
+[✔] 7. Cambiar los comportamientos a algo más genérico (Objeto) para no tener que ponerlo tan estricto en el condicional 
+- [✔] 7.1 Cambiar la lógica de los comportamientos para no hacerlo en el step tan estricto
+- [✔] 7.2 Añadir una lista de prioridades para los comportamientos (meter las upgrades ahí)
 
 [ ] 8. Guardar la semilla de una ejecución para poder generarla 
 - [] 8.1 Poder volver a la acción anterior en la simulación (Guardar registro de ejecución en un fichero)
