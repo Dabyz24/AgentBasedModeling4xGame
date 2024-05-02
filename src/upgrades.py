@@ -36,6 +36,9 @@ class Upgrades():
     def isDamageUpgraded(self):
         return self.damage_upgrade
     
+    def isFactoryUpgraded(self):
+        return self.factories_upgrade
+    
     def getNumUpgrades(self):
         return self.num_upgrades
     
