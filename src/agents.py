@@ -1,6 +1,7 @@
 import mesa
 from weapons import Weapon
 from upgrades import Upgrades
+from behaviours import Behaviour
 from global_constants import *
 
 class Player(mesa.Agent):
@@ -38,13 +39,13 @@ class Player(mesa.Agent):
         self.move = False
         # Permite saber las mejoras que tienen 
         self.agent_upgrades = Upgrades()
+        # Permite saber el tipo de comportamiento del agente, por defecto serán exploradores
+        self.behaviour = Behaviour()
         # Modificaciones de las mejoras
-        self.upgrade_options = self.agent_upgrades.getListUpgrades()
+        self.chosen_upgrade = ""
         self.damage_increase = 0
         self.movement_radius = 1
         self.increase_factories_resources = 1
-        # Permite saber el tipo de comportamiento del agente, por defecto serán exploradores
-        self.behaviour = ""
         # Para saber cuantos puntos pierde o gana en el total de rondas que especifique en el modelo
         self.balance = 0
 
@@ -187,11 +188,17 @@ class Player(mesa.Agent):
     def getBattlesWon(self):
         return self.battles_won
     
+    def isShipCreated(self):
+        return self.move
+
     def getAgentColor(self):
         return self.color
     
     def setAgentColor(self, new_color):
         self.color = new_color
+
+    def setChosenUpgrade(self, new_value):
+        self.chosen_upgrade = new_value
 
     def getDamageIncrease(self):
         return self.damage_increase
@@ -224,23 +231,32 @@ class Player(mesa.Agent):
         return self.stellar_points
     
     def getBehaviour(self):
-        return self.behaviour
+        return self.behaviour.getActualBehaviour()
 
-    def setBehaviour(self, new_behaviour):
-        if new_behaviour in POSSIBLE_BEHAVIOURS:
-            self.behaviour = new_behaviour
+    def setBehaviour(self, new_behaviour, random_flag=False):
+        # random_flag serivra para identificar si el nuevo comportamiento quiere que sea totalmente random
+        self.behaviour.newBehaviour(new_behaviour, random_flag)
+
+    def getListPriorities(self):
+        return self.behaviour.getPriorities()
+
+    def getAgentPriority(self):
+        return self.behaviour.getPriorities()[0]
+    
+    def getAgentMoveDirection(self):
+        return self.behaviour.getPriorities()[1]
+    
+    def getAgentPossibleUpgrades(self):
+        return self.behaviour.getPriorities()[2]
+    
+    def getStrBehaviour(self):
+        return self.behaviour.getPrioritiesStr()
 
     def getBalance(self):
         return self.balance
 
     def resetBalance(self):
         self.balance = 0
-
-    # Cambiará al siguiente comportamiento de la lista, si llega al último elemento de la lista empezará de nuevo 
-    def changeBehaviour(self):
-        index = POSSIBLE_BEHAVIOURS.index(self.behaviour)
-        new_index = (index+1)%(len(POSSIBLE_BEHAVIOURS))
-        self.behaviour = POSSIBLE_BEHAVIOURS[new_index]
 
     def getResources(self):
         return {"Tech": self.tech, "Gold": self.gold, "Planets": self.num_planets, "Factories": self.num_factories}
@@ -270,18 +286,14 @@ class Player(mesa.Agent):
         
         # Comprobar si el agente tiene mas mejoras disponibles
         if chosen_ation == 9 and self.agent_upgrades.isUpgradeAvailable():
-            if len(self.upgrade_options) == 1:
-                random_choice = 0
-            else:
-                random_choice = self.random.randint(0,len(self.upgrade_options)-1)
-            choose_upgrade = self.upgrade_options[random_choice]
-            if choose_upgrade == "Damage" and self.enoughResources(UPGRADE_DAMAGE_TECH_COST, UPGRADE_DAMAGE_GOLD_COST):
+            # Quitar para que no se haga random y lo haga en funcion de la lista de mejoras de las upgrades
+            if self.chosen_upgrade == "Damage" and self.enoughResources(UPGRADE_DAMAGE_TECH_COST, UPGRADE_DAMAGE_GOLD_COST):
                 self.agent_upgrades.upgradeDamage()
-                self.increaseDamage()               
-            elif choose_upgrade == "Factory" and self.enoughResources(UPGRADE_FACTORIES_TECH_COST, UPGRADE_FACTORIES_GOLD_COST):
+                self.increaseDamage()            
+            elif self.chosen_upgrade == "Factory" and self.enoughResources(UPGRADE_FACTORIES_TECH_COST, UPGRADE_FACTORIES_GOLD_COST):
                 self.agent_upgrades.upgradeFactories()
                 self.doubleFactoriesResources()
-
+                         
         if chosen_ation == 10 and self.enoughResources(WEAPON_TECH_COST, WEAPON_GOLD_COST):
             # las tres primeras veces que se ejecute solo se mejorara el arma
             if self.player_weapon.getNumUpgrades() < 3:
