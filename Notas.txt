@@ -172,3 +172,11 @@ Formas de modificar un atributo desde un input.
 #             exec(code)
 #             self.allies = True
 #             print(self.allies)
+
+
+            if behaviour == "Explorer":
+                self.list_priorities = {"Move": {"To_Planet": True, "To_Player":False}, "Factory": 0, "Upgrade": {"Damage": False, "Factory":False}, "Weapon": 0}
+            if behaviour == "Chaser":
+                self.list_priorities = {"Weapon": 0, "Move": {"To_Planet": False, "To_Player":True}, "Upgrade": {"Damage": True, "Factory":False} , "Factory": 0}
+            if behaviour == "Farmer":
+                self.list_priorities = {"Factory": 0, "Upgrade": {"Damage": False, "Factory":True}, "Move":{"To_Planet": True, "To_Player":False} , "Weapon":0}
