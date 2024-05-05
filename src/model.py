@@ -192,6 +192,7 @@ class Game(mesa.Model):
         for agent in self.list_agents:
             # Si el valor aletorio es menor que EPSILON (0.1) realizará una accion aleatoria, esto permite que no todos los agentes tengan el mismo comportamiento
             if self.random.uniform(0, 1) < EPSILON:
+                print(f"Accion random para el agente {agent.getId()}")
                 # El agente cogera un valor de la lista de posibles acciones del modelo. [0] es porque devolvera una lista y necesito el elemento
                 chosen_ation = self.random.choices(POSSIBLE_ACTIONS)[0]
             else:
@@ -240,7 +241,8 @@ class Game(mesa.Model):
                     # Si la accion más prioritaria es Fabrica se dedicará a aconstruir fabricas
                     elif action == "Factory":
                         # Comprobar si se puede fabricar
-                        if (agent.getGold() >= FACTORIES_GOLD_COST and agent.getTech() >= FACTORIES_TECH_COST):
+                        price_increase = round(INCREASE_FACTOR ** agent.getFactories())
+                        if (agent.getGold() >= (FACTORIES_GOLD_COST * price_increase)  and agent.getTech() >= (FACTORIES_TECH_COST * price_increase)):
                             chosen_ation = ACTION_SPACE.get("Factory")
                             break
                         else:
@@ -342,7 +344,7 @@ class Game(mesa.Model):
             self.step()
             for agent in self.schedule.agents:
                 if type(agent) == Player:
-                    if agent.getStellarPoints() >= 20000:
+                    if agent.getStellarPoints() >= 50000:
                         done = True
             i += 1
             print("--------------------")
