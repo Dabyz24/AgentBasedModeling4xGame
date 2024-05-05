@@ -71,11 +71,15 @@ class Player(mesa.Agent):
 
     # Funciones para gestionar las luchas entre agentes y las recompensas de los mismos 
     def addBattleResources(self, enemy):
-        enemy_tech = round(enemy.getTech() * TECH_BATTLES_PERCENTAGE)
-        enemy_gold = round(enemy.getGold() * GOLD_BATTLES_PERCENTAGE)
-        self.tech += enemy_tech
-        self.gold += enemy_gold
-        enemy.takeAgentResources(enemy_tech, enemy_gold)
+        if enemy.getGold() > 0:
+            enemy_tech = round(enemy.getTech() * TECH_BATTLES_PERCENTAGE)
+            enemy_gold = round(enemy.getGold() * GOLD_BATTLES_PERCENTAGE)
+            self.tech += enemy_tech
+            self.gold += enemy_gold
+            enemy.takeAgentResources(enemy_tech, enemy_gold)
+        else:
+            self.tech += TECH_FROM_POOR_ENEMIES
+            self.gold += GOLD_FROM_POOR_ENEMIES
 
     def maybeFight(self):
     # Si hay algún jugador presente lucharé contra el 
@@ -281,12 +285,22 @@ class Player(mesa.Agent):
                 self.do_move(chosen_ation)
                 self.move = True
 
-        if chosen_ation == 8 and self.enoughResources(FACTORIES_TECH_COST, FACTORIES_GOLD_COST):
-            self.createFactory()
+        if chosen_ation == 8:
+            price_increase = round(INCREASE_FACTOR ** self.getFactories())
+            if self.enoughResources(FACTORIES_TECH_COST * price_increase, FACTORIES_GOLD_COST * price_increase):
+                self.createFactory()
         
         # Comprobar si el agente tiene mas mejoras disponibles
         if chosen_ation == 9 and self.agent_upgrades.isUpgradeAvailable():
-            # Quitar para que no se haga random y lo haga en funcion de la lista de mejoras de las upgrades
+            if self.chosen_upgrade == "":
+                list_possible_upgrades = self.getAgentPossibleUpgrades()
+                if len(list_possible_upgrades) == 0:
+                    print(f"El agente {self.unique_id} no puede realizar upgrades porque no tiene ninguna en su comportamiento")
+                elif len(list_possible_upgrades) == 1:
+                    self.chosen_upgrade == list_possible_upgrades[0]
+                else:
+                    self.chosen_upgrade = self.random.choice(list_possible_upgrades)
+
             if self.chosen_upgrade == "Damage" and self.enoughResources(UPGRADE_DAMAGE_TECH_COST, UPGRADE_DAMAGE_GOLD_COST):
                 self.agent_upgrades.upgradeDamage()
                 self.increaseDamage()            
