@@ -31,7 +31,7 @@ class Behaviour():
             if behaviour == "Chaser":
                 self.dict_actions["Move"]["To_Player"] = True
                 self.dict_actions["Upgrade"]["Damage"] = True
-                self.list_priorities = ["Weapon", "Move", "Upgrade", "Factory"]
+                self.list_priorities = ["Weapon", "Upgrade", "Move", "Factory"]
             if behaviour == "Farmer":
                 self.dict_actions["Upgrade"]["Factory"] = True
                 self.list_priorities = ["Factory", "Upgrade", "Move", "Weapon"]
