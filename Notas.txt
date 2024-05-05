@@ -180,3 +180,11 @@ Formas de modificar un atributo desde un input.
                 self.list_priorities = {"Weapon": 0, "Move": {"To_Planet": False, "To_Player":True}, "Upgrade": {"Damage": True, "Factory":False} , "Factory": 0}
             if behaviour == "Farmer":
                 self.list_priorities = {"Factory": 0, "Upgrade": {"Damage": False, "Factory":True}, "Move":{"To_Planet": True, "To_Player":False} , "Weapon":0}
+
+Ahora mismo el mas fuerte es el farmer, porque siempre es el que mas fabricas tiene y el que mas puntos estelares gana, he intentado nerfearle subiendole los precios de crear fabricas para que sean exponenciales
+El chaser he conseguido balancearle haciendo que si lucha con alguien con economia negativa gene dinero y tecnologia y no haga un porcentaje negativo y le salga ganancia negativa de la lucha 
+
+Tengo quer crear una mejora que sea para que no te afecten las taxes de los planetas, el problema es que nunca va a tener dinero suficiente como para desarrollarla 
+El explorer ha pasado a ser el mas flojo porque no pueden mantener los planetas y siempre tienen balance de oro negativo y solo se pueedn mover y no tienen arma construida
+
+Hay un bug que ocurre cuando un planeta se resetea y se borra, a veces no se resetea correctamente y todavia no he onseguido sacar porque 
