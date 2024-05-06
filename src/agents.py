@@ -217,10 +217,7 @@ class Player(mesa.Agent):
             self.damage_increase = 0
     
     def increaseDamage(self):
-        if self.behaviour == "Chaser":
-            self.damage_increase = 10
-        else:    
-            self.damage_increase = 5
+        self.damage_increase = 15
 
     def doubleMovementRadius(self):
         self.movement_radius = 2
@@ -413,6 +410,11 @@ class Planet(mesa.Agent):
         elif self.player.getGold() <= 0:
             self.resetPlanet()
         else:
-            self.player.addPlanetResources(1, 10, True)
+            # Para solucionar un bug que salia cuando eliminaba un agente que tenia planetas, a veces no se resetaba bien.
+            # Si el agente no esta en la lista de jugadores del modelo se resetea el planeta 
+            if self.player not in self.model.list_agents:
+                self.resetPlanet()
+            else:
+                self.player.addPlanetResources(1, 10, True)
         
 
