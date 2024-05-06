@@ -306,8 +306,9 @@ class Game(mesa.Model):
                 location = self.checkSpace(MOORE_PLAYER)
                 location_found = location[0]
             pos = location[1]
-            player = Player(self.next_id(), self, pos, moore=MOORE_PLAYER)
-            player.setBehaviour("Random"+str(self.next_id()), random_flag=True)
+            next_id = self.next_id()
+            player = Player(next_id, self, pos, moore=MOORE_PLAYER)
+            player.setBehaviour("Random"+str(next_id), random_flag=True)
             try:
                 chosen_color = self.list_agents_colors.pop(self.random.randrange(0, len(self.list_agents_colors)))
                 player.setAgentColor(chosen_color)
@@ -352,7 +353,7 @@ class Game(mesa.Model):
             print("Final de la ejecución")
             for agent in self.schedule.agents:
                 if type(agent) == Player:
-                    print(f"-> Player con id : {agent.getId()} en la pos {agent.getAgentPos(verbose=True)} comportandose como {agent.getBehaviour()}")
+                    print(f"-> Player con id : {agent.getId()} en la pos {agent.getAgentPos(verbose=True)} comportandose como {agent.getBehaviour()} {agent.getListPriorities()}")
                     print(f"\tResources: {agent.getAgentInfo(verbose=True)}")
             print("--------------------")
 
