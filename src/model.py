@@ -1,9 +1,9 @@
 import re
+import os
 import mesa 
 import math
 
 from agents import Player, Planet
-from scheduler import RandomActivationByTypeFiltered
 from global_constants import * 
 
 
@@ -32,7 +32,7 @@ class Game(mesa.Model):
         self.list_planets = []
         self.list_agents_colors = ["Aqua","Green","Pink","Gray","Purple","Yellow"]
         # Se moverán uno cada vez, es decir el primer turno se movera primero el agente 1 y el siguiente el agente 2 primero
-        self.schedule = RandomActivationByTypeFiltered(self)
+        self.schedule = mesa.time.RandomActivationByType(self)
         # Creacion de la matriz Torus=True significa que si el agente se encuentra en la izquierda del todo y sigue a la izquierda aparecera en la derecha 
         self.grid = mesa.space.MultiGrid(self.width, self.height, torus=True)
         # Tener un control sobre el numero de turnos del modelo
@@ -374,7 +374,31 @@ class Game(mesa.Model):
             agent_selected = self.list_agents[int(id)]
             setattr(agent_selected, attribute_name, value)
             print(agent_selected.__getattribute__(attribute_name))
+
+    def getAllAgentsInfo(self):
+        players_dict = {}
+        planet_dict = {}
+        for agent in self.schedule.agents:
+            if type(agent) == Player:
+                players_dict[agent.getId()] = [agent.getAgentPos(), agent.getAgentInfo(), agent.getBattlesWon(), agent.getAgentUpgrades().getUpgrades(), agent.getBehaviour(), agent.getListPriorities()]
+            elif type(agent) == Planet:
+                planet_dict[agent.getPlanetId()] = [agent.getPlanetPos(), agent.getPlanetTech(), agent.getPlanetGold(), agent.getPlayer()]
+        return players_dict, planet_dict
                     
 if __name__ == "__main__":
-    model = Game()
-    model.run_model()
+    for i in range(0,10):
+        model = Game()
+        model.run_model()
+        players, planets = model.getAllAgentsInfo()
+        dir_name = os.getcwd()
+        file_name = f"run_{i}.txt"
+        path = os.path.join(dir_name, "saves", file_name)
+        with open(path, "w+", encoding="utf-8") as my_file:
+            my_file.write("Los jugadores son: \n")
+            for k, v in players.items():
+                my_file.write(f"Agent id {k} {v}\n")    
+            my_file.write("Los planetas son: \n")
+            for k, v in planets.items():
+                my_file.write(f"Planet id {k} {v}\n")
+
+            
