@@ -221,16 +221,25 @@ class Game(mesa.Model):
                                         # Si está en la misma posición que el enemigo la accion elegida será un movimiento aleatorio
                                         chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
                             else:
-                                if agent.getGold() <= 0:
-                                    # Si el agente tiene oro negativo y no tiene determinado a quien seguir, buscara algun planeta para poder ganar recursos
-                                    list_uninhabited_planets = self.getAllPlanetPos()
-                                    try:
-                                        _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_uninhabited_planets)
-                                        chosen_ation = chosen_move
-                                    except:
-                                        # Si no hay ninguno planeta sin explorar hará un movimiento aleatorio
-                                        chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
-
+                                if agent.getGold() <= 0: 
+                                    if agent.getPlayerWeapon()[0] == "N":
+                                        # Si el agente tiene oro negativo y no tiene determinado a quien seguir y no tiene arma, buscara algun planeta para poder ganar recursos
+                                        list_uninhabited_planets = self.getAllPlanetPos()
+                                        try:
+                                            _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_uninhabited_planets)
+                                            chosen_ation = chosen_move
+                                        except:
+                                            # Si no hay ninguno planeta sin explorar hará un movimiento aleatorio
+                                            chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
+                                    else: 
+                                        # Si tiene oro negativo pero tiene un arma perseguira al agente mas cercano para poder luchar y ganar recursos
+                                        list_enemies = self.getAllPlayersPos()
+                                        try:
+                                            _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_enemies)
+                                            chosen_ation = chosen_move
+                                        except:
+                                            # Si está en la misma posición que el enemigo la accion elegida será un movimiento aleatorio
+                                            chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
                                 else:
                                     # Si el agente no tiene especificado a quien quiere perseguir hará una acción aleatoria
                                     chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
