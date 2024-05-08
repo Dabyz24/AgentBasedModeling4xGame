@@ -188,3 +188,40 @@ Tengo quer crear una mejora que sea para que no te afecten las taxes de los plan
 El explorer ha pasado a ser el mas flojo porque no pueden mantener los planetas y siempre tienen balance de oro negativo y solo se pueedn mover y no tienen arma construida
 
 Hay un bug que ocurre cuando un planeta se resetea y se borra, a veces no se resetea correctamente y todavia no he onseguido sacar porque 
+
+
+Metodo que utilizaba para agregar atributos 
+    # Método para añadir de manera dinámica atributos al modelo o al agente
+    def _addAttribute(self, class_name, attribute_name, new_type, value, id=None):
+        if new_type == "int":
+            value = int(value)
+        elif new_type == "float":
+            value = float(value)
+        elif new_type == "bool":
+            if value == "true":
+                value = True
+            elif value == "false":
+                value = False
+        if class_name == "m":
+            setattr(self, attribute_name, value)
+        elif class_name == "a":
+            agent_selected = self.list_agents[int(id)]
+            setattr(agent_selected, attribute_name, value)
+            print(agent_selected.__getattribute__(attribute_name))
+
+            
+Con este metodo puedo establecer de manera dinamica todos los comportamientos como quiera
+
+    # Metodo para establecer los comportamientos de los agentes
+    def setPlayerBehaviour(self):
+        name_behaviour = input("Choose a name for the behaviour: ").lower()
+        name_behaviour = name_behaviour.capitalize()
+        if name_behaviour not in POSSIBLE_BEHAVIOURS:
+            is_random = input("Do you want a random behaviour?. (y/n): ").lower()
+            if is_random == "y":
+                self.setBehaviour(name_behaviour, random_flag=True)
+            else:
+                self.setBehaviour(name_behaviour)
+        else:
+            self.setBehaviour(name_behaviour)
+
