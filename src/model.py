@@ -357,24 +357,6 @@ class Game(mesa.Model):
                     print(f"\tResources: {agent.getAgentInfo(verbose=True)}")
             print("--------------------")
 
-    # Método para añadir de manera dinámica atributos al modelo o al agente
-    def _addAttribute(self, class_name, attribute_name, new_type, value, id=None):
-        if new_type == "int":
-            value = int(value)
-        elif new_type == "float":
-            value = float(value)
-        elif new_type == "bool":
-            if value == "true":
-                value = True
-            elif value == "false":
-                value = False
-        if class_name == "m":
-            setattr(self, attribute_name, value)
-        elif class_name == "a":
-            agent_selected = self.list_agents[int(id)]
-            setattr(agent_selected, attribute_name, value)
-            print(agent_selected.__getattribute__(attribute_name))
-
     def getAllAgentsInfo(self):
         players_dict = {}
         planet_dict = {}
