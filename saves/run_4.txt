@@ -1,0 +1,16 @@
+Los jugadores son: 
+Agent id 119 [(16, 8), [46527, 76447, 5, 55, <weapons.Weapon object at 0x0000025762176720>, 50000], 5108, 'D ↑ F ↑ ', 'Random119', (['Factory', 'Weapon', 'Upgrade', 'Move'], ['To_Planet'], ['Damage', 'Factory'])]
+Agent id 393 [(18, 9), [29120, 57773, 1, 45, <weapons.Weapon object at 0x0000025762269040>, 298], 594, 'D ↑ ', 'Random393', (['Weapon', 'Upgrade', 'Factory', 'Move'], ['To_Player'], ['Damage'])]
+Agent id 402 [(15, 9), [11197, 29552, 1, 1, <weapons.Weapon object at 0x0000025762269C40>, -55], 15, 'None', 'Random402', (['Move', 'Upgrade', 'Factory', 'Weapon'], ['To_Planet'], ['Factory'])]
+Agent id 403 [(17, 10), [10, 13, 0, 0, <weapons.Weapon object at 0x0000025762269D60>, -27], 0, 'None', 'Random403', (['Upgrade', 'Move', 'Weapon', 'Factory'], ['To_Player'], [])]
+Los planetas son: 
+Planet id 0 [(15, 10), 12, 10, <agents.Player object at 0x0000025762269C70>]
+Planet id 1 [(8, 15), 14, 3, <agents.Player object at 0x00000257621767B0>]
+Planet id 2 [(8, 6), 15, 25, <agents.Player object at 0x00000257621767B0>]
+Planet id 3 [(14, 6), 0, 25, None]
+Planet id 4 [(1, 19), 8, 8, <agents.Player object at 0x00000257621767B0>]
+Planet id 5 [(18, 3), 16, 29, <agents.Player object at 0x00000257621767B0>]
+Planet id 6 [(11, 0), 6, 17, None]
+Planet id 7 [(19, 10), 7, 23, <agents.Player object at 0x0000025762269070>]
+Planet id 8 [(8, 2), 1, 2, <agents.Player object at 0x00000257621767B0>]
+Planet id 9 [(4, 6), 13, 6, None]
