@@ -391,6 +391,13 @@ if __name__ == "__main__":
         model.run_model()
         players, planets = model.getAllAgentsInfo()
         dir_name = os.getcwd()
+        path = os.path.join(dir_name, "saves")
+        # Trato de crear el directorio para las saves
+        try: 
+            os.mkdir(path)
+        except:
+            # Si el directorio ya existe no hago nada 
+            pass
         file_name = f"run_{i}.txt"
         path = os.path.join(dir_name, "saves", file_name)
         with open(path, "w+", encoding="utf-8") as my_file:
