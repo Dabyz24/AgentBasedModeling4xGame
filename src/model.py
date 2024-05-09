@@ -76,6 +76,11 @@ class Game(mesa.Model):
             self.schedule.add(planet)
         self.running = True
         #self.datacollector.collect(self)
+        # Confirmacion para saber si quieres los comportamientos estandar o quieres establecer comportamientos personalizados
+        random_behaviours = input("Do you want standard behaviours? (y/n): ").lower()
+        if random_behaviours != "y":
+            for agent in self.list_agents:
+                agent.setCustomBehaviour()
 
     # Método que comprueba que exista un espacio de dos casillas entre los jugadores y los planetas
     def checkSpace(self, moore):
@@ -189,12 +194,13 @@ class Game(mesa.Model):
     # El step representa cada turno del juego
     def step(self):
         self.step_count += 1
+        chosen_action = ""
         for agent in self.list_agents:
             # Si el valor aletorio es menor que EPSILON (0.1) realizará una accion aleatoria, esto permite que no todos los agentes tengan el mismo comportamiento
             if self.random.uniform(0, 1) < EPSILON:
                 print(f"Accion random para el agente {agent.getId()}")
                 # El agente cogera un valor de la lista de posibles acciones del modelo. [0] es porque devolvera una lista y necesito el elemento
-                chosen_ation = self.random.choices(POSSIBLE_ACTIONS)[0]
+                chosen_action = self.random.choices(POSSIBLE_ACTIONS)[0]
             else:
                 list_priorities, behaviour_moves, behaviour_upgrades = agent.getListPriorities()
                 
@@ -207,19 +213,19 @@ class Game(mesa.Model):
                                     list_uninhabited_planets = self.getAllPlanetPos()
                                     try:
                                         _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_uninhabited_planets)
-                                        chosen_ation = chosen_move
+                                        chosen_action = chosen_move
                                     except:
-                                        # Si no hay ninguno planeta sin explorar hará un movimiento aleatorio
-                                        chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
+                                        # Si no hay ninguno planeta sin explorar pasará a la siguiente accion
+                                        continue
                                 elif behaviour_moves[0] == "To_Player":
                                     # Se pone a perseguir al enemigo más cercano para luchar con él
                                     list_enemies = self.getAllPlayersPos()
                                     try:
                                         _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_enemies)
-                                        chosen_ation = chosen_move
+                                        chosen_action = chosen_move
                                     except:
-                                        # Si está en la misma posición que el enemigo la accion elegida será un movimiento aleatorio
-                                        chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
+                                        # Si está en la misma posición que el enemigo la accion elegida será pasar a la siguiente accion
+                                        continue
                             else:
                                 if agent.getGold() <= 0: 
                                     if agent.getPlayerWeapon()[0] == "N":
@@ -227,22 +233,22 @@ class Game(mesa.Model):
                                         list_uninhabited_planets = self.getAllPlanetPos()
                                         try:
                                             _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_uninhabited_planets)
-                                            chosen_ation = chosen_move
+                                            chosen_action = chosen_move
                                         except:
                                             # Si no hay ninguno planeta sin explorar hará un movimiento aleatorio
-                                            chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
+                                            chosen_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
                                     else: 
                                         # Si tiene oro negativo pero tiene un arma perseguira al agente mas cercano para poder luchar y ganar recursos
                                         list_enemies = self.getAllPlayersPos()
                                         try:
                                             _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_enemies)
-                                            chosen_ation = chosen_move
+                                            chosen_action = chosen_move
                                         except:
                                             # Si está en la misma posición que el enemigo la accion elegida será un movimiento aleatorio
-                                            chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
+                                            chosen_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
                                 else:
                                     # Si el agente no tiene especificado a quien quiere perseguir hará una acción aleatoria
-                                    chosen_ation = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
+                                    chosen_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
                             # Si tengo la accion seleccionada corto la ejecucion del bucle con break
                             break
                         else:
@@ -252,7 +258,7 @@ class Game(mesa.Model):
                         # Comprobar si se puede fabricar
                         price_increase = round(INCREASE_FACTOR ** agent.getFactories())
                         if (agent.getGold() >= (FACTORIES_GOLD_COST * price_increase)  and agent.getTech() >= (FACTORIES_TECH_COST * price_increase)):
-                            chosen_ation = ACTION_SPACE.get("Factory")
+                            chosen_action = ACTION_SPACE.get("Factory")
                             break
                         else:
                             # Si no cumplo alguna de las restricciones anteriores paso a la siguiente accion de la lista de prioridad
@@ -260,7 +266,7 @@ class Game(mesa.Model):
                     elif action == "Weapon":
                         if agent.getGold() > WEAPON_GOLD_COST and agent.getTech() > WEAPON_TECH_COST and agent.getNumPlayerWeapon() < 3:
                             # Si tengo suficientes recursos para crear el arma y no tengo el numero maximo de armas la creo
-                            chosen_ation = ACTION_SPACE.get("Weapon")
+                            chosen_action = ACTION_SPACE.get("Weapon")
                             break   
                         else:
                             # Si no cumplo alguna de las restricciones anteriores paso a la siguiente accion de la lista de prioridad
@@ -272,14 +278,14 @@ class Game(mesa.Model):
                                 if (agent.getGold() > UPGRADE_FACTORIES_GOLD_COST and agent.getTech() > UPGRADE_FACTORIES_TECH_COST):
                                     # Modificar el codigo para que pueda hacer la upgrade que yo quiera
                                     agent.setChosenUpgrade("Factory")
-                                    chosen_ation = ACTION_SPACE.get("Upgrade")
+                                    chosen_action = ACTION_SPACE.get("Upgrade")
                                     break
                         
                             if "Damage" in behaviour_upgrades and not agent.getAgentUpgrades().isDamageUpgraded():
                                 if (agent.getGold() > UPGRADE_DAMAGE_GOLD_COST and agent.getTech() > UPGRADE_DAMAGE_TECH_COST):
                                     # Upgradear el daño
                                     agent.setChosenUpgrade("Damage")
-                                    chosen_ation = ACTION_SPACE.get("Upgrade")
+                                    chosen_action = ACTION_SPACE.get("Upgrade")
                                     break
 
                             # Si no puede entrar en ninguna accion pasa a la siguiente opcion en la lista de prioridad
@@ -288,9 +294,14 @@ class Game(mesa.Model):
                             # Si no tiene ninguna upgrade no puede hacer nada, asi que pasa a la siguiente prioridad de la lista
                             continue
 
+            # Si no ha podido realizar ninguna acción se moverá aleatoriamente
+            if chosen_action == "":
+                print(f"El agente {agent.getId()} no ha podido realizar otra accion y elige un movimiento aleatorio")
+                chosen_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
+
             # Tengo que pensar alguna forma para poder moverme y que no se tiren quietos todo el rato, porque es muy poco dinámico y no hay casi exploración 
-            print(f"agent: {agent.getId()} elige el movimiento {chosen_ation}")
-            agent.step(chosen_ation)
+            print(f"agent: {agent.getId()} elige el movimiento {chosen_action}")
+            agent.step(chosen_action)
         for planet in self.list_planets:
             planet.step()
         # Al final de cada turno compruebo quien es el agente que mas planetas y fabricas tiene para asignarle los puntos estelares
@@ -375,7 +386,10 @@ class Game(mesa.Model):
             elif type(agent) == Planet:
                 planet_dict[agent.getPlanetId()] = [agent.getPlanetPos(), agent.getPlanetTech(), agent.getPlanetGold(), agent.getPlayer()]
         return players_dict, planet_dict
-                    
+    
+    def getListPlayers(self):
+        return self.list_agents
+
 if __name__ == "__main__":
     for i in range(0,10):
         model = Game()
