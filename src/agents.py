@@ -238,6 +238,19 @@ class Player(mesa.Agent):
         # random_flag serivra para identificar si el nuevo comportamiento quiere que sea totalmente random
         self.behaviour.newBehaviour(new_behaviour, random_flag)
 
+        # Metodo para establecer los comportamientos de los agentes
+    def setCustomBehaviour(self):
+        name_behaviour = input("Choose a name for the behaviour: ").lower()
+        name_behaviour = name_behaviour.capitalize()
+        if name_behaviour not in POSSIBLE_BEHAVIOURS:
+            is_random = input("Do you want a random behaviour?. (y/n): ").lower()
+            if is_random == "y":
+                self.setBehaviour(name_behaviour, random_flag=True)
+            else:
+                self.setBehaviour(name_behaviour)
+        else:
+            self.setBehaviour(name_behaviour)
+
     def getListPriorities(self):
         return self.behaviour.getPriorities()
 
