@@ -225,3 +225,9 @@ Con este metodo puedo establecer de manera dinamica todos los comportamientos co
         else:
             self.setBehaviour(name_behaviour)
 
+
+
+Tendrá que tener más comportamietos se pueden añadir aleatorios o estableciendo la funcionalidad que se quiera,
+
+****como por ejemplo un CIENTIFICO (tendrá menos coste al efectuar mejoras y tendrá nuevas opciones como moverse más de una casilla)
+****Otro puede ser el PACIFISTA que evite el uso de armas y huya del combate siempre que pueda
