@@ -8,12 +8,6 @@ class Behaviour():
     --> Chaser: Su objetivo será perseguir al agente y luchar contra el 
     --> Explorer: Su objetivo será buscar los plaentas que no estén habitados y conquistarlos
     --> Farmer: Su objetivo será construir fábricas para obtener más recursos
-
-    Tendrá que tener más comportamietos se pueden añadir aleatorios o estableciendo la funcionalidad que se quiera,
-    
-    ****como por ejemplo un CIENTIFICO (tendrá menos coste al efectuar mejoras y tendrá nuevas opciones como moverse más de una casilla)
-    ****Otro puede ser el PACIFISTA que evite el uso de armas y huya del combate siempre que pueda
-
     """
     def __init__(self):
         self.actual_behaviour = ""
@@ -23,7 +17,9 @@ class Behaviour():
         # Servira para comprobar que al establecer una nueva prioridad se pongan los numeros correctos
         self._valid_numbers_priority = ["1","2","3","4"]
     
+    # Metodo para establecer las prioridades de los comportamientos creados
     def setPriorities(self, behaviour, random_flag=False):
+        # Si se trata de un comportamiento preestablecido se crearan las prioridades y las acciones especiales directamente
         if behaviour in self.initial_behaviours:
             if behaviour == "Explorer":
                 self.dict_actions["Move"]["To_Planet"] = True
@@ -35,7 +31,7 @@ class Behaviour():
             if behaviour == "Farmer":
                 self.dict_actions["Upgrade"]["Factory"] = True
                 self.list_priorities = ["Factory", "Upgrade", "Move", "Weapon"]
-
+        # Si la flag random está en True se establecerán las prioridades de manera aleatoria 
         elif random_flag:
             list_actions = list(self.dict_actions.keys())
             random.shuffle(list_actions)
@@ -46,6 +42,7 @@ class Behaviour():
                     self.getRandomSpecialActions(action)
                 self.list_priorities.append(action)
         else:
+            # Si el nombre no está en la lista de preestablecidos se preguntará la direccion del movimiento y las mejoras disponibles
             different_priorities = self.inputPriorities()
             str_special_moves = input("Type the letter if you want to chase an Agent (A) a Planet (P) or None (N). ").upper()
             if str_special_moves == "A":
@@ -65,16 +62,18 @@ class Behaviour():
                 self.dict_actions["Upgrade"]["Factory"] = True
             else:
                 print("No upgrades for your agent")
-
+            # Se crea una lista para poder acceder de manera más simple a las claves del diccionario
             list_actions = list(self.dict_actions.keys())
             for priority in different_priorities:
                 # Se resta uno en la priority para que coincida con el indice de dict_actions
                 self.list_priorities.append(list_actions[int(priority)-1])
 
     def inputPriorities(self):
+        # Mientras no cumpla la condicion para establecer la lista de prioridades se repetirá el input 
         while True:  
                 str_priority = input("Select from highest to lowest priority (1 = Move, 2 = Factory, 3 = Weapon, 4 = Upgrade) using comma as separator. Ex: 1,2,3,4\n")
                 different_priorities = str_priority.split(",")
+                # Si todos los numeros introducidos estan dentro de la lista de numeros validos 
                 if all(number in self._valid_numbers_priority for number in different_priorities) and len(different_priorities) == len(self.dict_actions):
                         return different_priorities
                 else:
@@ -82,6 +81,7 @@ class Behaviour():
 
 
     def getPrioritiesStr(self):
+        # Método para presentar de una manera mas visual la lista de prioridades
         aux_str = ""
         for i in range(0, len(self.list_priorities)):
             if i+1 == len(self.list_priorities):
@@ -91,6 +91,7 @@ class Behaviour():
         return aux_str
     
     def getPriorities(self):
+        # Devuelve la lista de prioridades, la lista de direccion de movimiento y la lista de mejoras
         list_special_move = []
         list_special_upgrade = []
         for action in self.list_priorities:
@@ -109,7 +110,7 @@ class Behaviour():
     
     def newBehaviour(self, new, flag=False):
         """
-        Crear un nuevo comportamiento  
+        Crear un nuevo comportamiento, reseteando los atributos principales y llamando al metodo setPriorities()
         """
         self.list_priorities = []
         self.resetDictActions()
@@ -123,6 +124,7 @@ class Behaviour():
         self.dict_actions = {"Move": {"To_Planet": False, "To_Player":False}, "Factory": 0, "Weapon": 0, "Upgrade": {"Damage": False, "Factory":False}}
 
     def getRandomSpecialActions(self, action):
+        # Método para establecer de manera aleatoria la direccion del movimiento y el comportamiento
         if action == "Move" or action == "Upgrade":
             for item in self.dict_actions[action]:
                 coin = random.randint(0,1)
