@@ -21,8 +21,8 @@
 - [✔] 6.3 Eliminar agentes que bajen de un umbral ciertos puntos (si no consigue cierta media de puntos en un número de turnos lo elimino)
 
 [ ] 7. Probar cual es el factor limitante en la simulación (Porque solo aparecen 4 agentes en 50000 ejecuciones)
-- [] 7.1 Hacer que las fabricas no den puntos estelares
-- [] 7.2 Hacer que los planetas den puntos estelares en funcion del numero de planetas que tengas
+- [✔] 7.1 Hacer que las fabricas no den puntos estelares
+- [✔] 7.2 Hacer que los planetas den puntos estelares en funcion del numero de planetas que tengas
 - [] 7.3 Probar que dependiendo de quien gane los combates den mas o menos puntos estelares
 - [] 7.4 Si lo anterior no es el factor limitante, hacer algo para que los nuevos agentes puedean competir en igualdad de condiciones (Energía y que tenga que tener algún cd o algo) 
 
