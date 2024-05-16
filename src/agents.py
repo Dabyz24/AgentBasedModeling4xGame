@@ -141,13 +141,13 @@ class Player(mesa.Agent):
         self.gold -= taxes * self.num_planets
 
     # Funciones para añadir puntos estelares y para añadir batallas ganadas
-    def addPoint(self, point_factory=False, point_planet=False):
-        if point_factory:
-            self.win_factory_point = True
-        if point_planet:
-            self.win_planet_point = True
-        self.stellar_points += 1
-        self.balance += 1
+    def addPoint(self, number_planets=0):
+        if number_planets > 0:
+            self.stellar_points += number_planets
+            self.balance += number_planets
+        else:
+            self.stellar_points += 1
+            self.balance += 1
 
     def lossPoint(self):
         self.stellar_points -= 1
