@@ -49,7 +49,7 @@ class Game(mesa.Model):
         for i in range(self.num_players):
             location_found = False
             while not location_found:
-                location = self.checkSpace(MOORE_PLAYER)
+                location = self.checkSpace(moore=False)
                 location_found = location[0]
             pos = location[1]
             player = Player(self.next_id(), self, pos, moore=MOORE_PLAYER)
@@ -66,7 +66,8 @@ class Game(mesa.Model):
         for i in range(self.num_planets):
             location_found = False
             while not location_found:
-                location = self.checkSpace(MOORE_PLANET)
+                # Quiero que la distancia entre planetas sea de al menos 3 en cada direccion, para que no aparezcan muy juntos
+                location = self.checkSpace(MOORE_PLANET, custom_radius=3)
                 location_found = location[0]
             pos = location[1]
             planet = Planet(i, self, pos ,self.random.randrange(0, self.tech_planet),
@@ -83,9 +84,9 @@ class Game(mesa.Model):
                 agent.setCustomBehaviour()
 
     # Método que comprueba que exista un espacio de dos casillas entre los jugadores y los planetas
-    def checkSpace(self, moore):
+    def checkSpace(self, moore, custom_radius=1):
         pos = (self.random.randrange(self.width), self.random.randrange(self.height))
-        neighbors = self.grid.get_neighbors(pos, moore, include_center=True, radius=2)
+        neighbors = self.grid.get_neighbors(pos, moore, include_center=True, radius=custom_radius)
         # Añado a la lista los vecinos que sean del tipo player o planet para saber si tiene otros planetas o jugadores alrededor 
         list_agents = [obj for obj in neighbors if (isinstance(obj, Player) or isinstance(obj, Planet))]
         if len(list_agents) > 0:
@@ -109,39 +110,42 @@ class Game(mesa.Model):
     # Método para añadir un punto estelar en funcion de si el agente tiene mas planetas o fabricas que el resto
     def addStellarPoints(self):
         dict_values = self.checkAgentsValues()
-        agent_more_factories = ""
-        agent_more_planets = ""
-        initial_factories = 0
-        initial_planets = 0
-        check_factories_list = []
-        check_planets_list = []
+        #agent_more_factories = ""
+        # agent_more_planets = ""
+        #initial_factories = 0
+        # initial_planets = 0
+        # check_factories_list = []
+        # check_planets_list = []
         for player, resources in dict_values.items():
             # Comparar los valores de num fabricas y num de planetas y ver cual es el mas alto 
             for key, value in resources.items():
                 if key == "Planets":
+                    if value > 0: 
+                        player.addPoint(value)
+                
                 # Si el valor de los planetas es mayor al numero inicial se guarda el jugador y se guarda el valor en la lista
-                    if initial_planets < value:
-                        agent_more_planets = player
-                        initial_planets = value
-                        check_planets_list = [value]
+                    # if initial_planets < value:
+                        # agent_more_planets = player
+                        # initial_planets = value
+                        # check_planets_list = [value]
                     # Si otro agente tiene el mismo valor se guarda en la lista 
-                    elif initial_planets == value:
-                        check_planets_list.append(value)
-                if key == "Factories":
-                    if initial_factories < value:
-                        agent_more_factories = player
-                        initial_factories = value
-                        check_factories_list = [value]
-                    elif initial_factories == value:
-                        check_factories_list.append(value) 
+                    # elif initial_planets == value:
+                        # check_planets_list.append(value)
+                # if key == "Factories":
+                #     if initial_factories < value:
+                #         agent_more_factories = player
+                #         initial_factories = value
+                #         check_factories_list = [value]
+                #     elif initial_factories == value:
+                #         check_factories_list.append(value) 
         # Si solo hay un valor significa que es el que mas planetas tiene por lo que se le recompensará con un punto estelar
-        if len(check_planets_list) == 1:
+        # if len(check_planets_list) == 1:
             #print(f"El agente con más planetas es {agent_more_planets.getId()}")
-            agent_more_planets.addPoint()
+            # agent_more_planets.addPoint()
         # El mismo funcionamiento con el numero de fabricas
-        if len(check_factories_list) == 1:
+        # if len(check_factories_list) == 1:
             #print(f"El agente con más fabricas es {agent_more_factories.getId()}")
-            agent_more_factories.addPoint()
+            # agent_more_factories.addPoint()
 
     # Devuelve una lista con las tuplas de posiciones de los jugadores
     def getAllPlayersPos(self):
@@ -320,7 +324,7 @@ class Game(mesa.Model):
                 else:
                     agent.resetBalance()
 
-            # Primer boceto para incluir agentes de manera dináminca 
+            # Primer boceto para incluir agentes de manera dináminca
             location_found = False
             while not location_found:
                 location = self.checkSpace(MOORE_PLAYER)
