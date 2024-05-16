@@ -226,6 +226,8 @@ Con este metodo puedo establecer de manera dinamica todos los comportamientos co
             self.setBehaviour(name_behaviour)
 
 
+Tengo que ver como evitrar que si no hay espacio en el tablero siga añadiendo, con los valores de ahora mismo el limite está en 300 agentes en la simulación hasta 
+que se quede dentro de un bucle infinito buscando espacio para los nuevos agentes 
 
 Tendrá que tener más comportamietos se pueden añadir aleatorios o estableciendo la funcionalidad que se quiera,
 
