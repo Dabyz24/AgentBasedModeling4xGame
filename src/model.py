@@ -67,7 +67,7 @@ class Game(mesa.Model):
             location_found = False
             while not location_found:
                 # Quiero que la distancia entre planetas sea de al menos 3 en cada direccion, para que no aparezcan muy juntos
-                location = self.checkSpace(MOORE_PLANET, custom_radius=3)
+                location = self.checkSpace(MOORE_PLANET, custom_radius=2)
                 location_found = location[0]
             pos = location[1]
             planet = Planet(i, self, pos ,self.random.randrange(0, self.tech_planet),
@@ -327,7 +327,7 @@ class Game(mesa.Model):
             # Primer boceto para incluir agentes de manera dináminca
             location_found = False
             while not location_found:
-                location = self.checkSpace(MOORE_PLAYER)
+                location = self.checkSpace(MOORE_PLAYER, 0)
                 location_found = location[0]
             pos = location[1]
             next_id = self.next_id()
