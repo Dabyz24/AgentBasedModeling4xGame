@@ -8,11 +8,19 @@ class Behaviour():
     --> Chaser: Su objetivo será perseguir al agente y luchar contra el 
     --> Explorer: Su objetivo será buscar los plaentas que no estén habitados y conquistarlos
     --> Farmer: Su objetivo será construir fábricas para obtener más recursos
+    
+    Tengo que abstraer lo importante de un comportamiento y luego en cada clase personalizar las acciones que hagan que será por ejemplo la acción que eligirá en cada momento
+    Un comportamiento tiene que tener un nombre, una lista de prioridades y tengo que saber la dirección de movimiento preferida y las mejoras que podrá realizar.
+    Aunque tengo que dar libertad para que en función de las necesidades pueda modificar su comportamiento de manera dinámica, que coloque su lista de prioridades como quiera
+    
     """
     def __init__(self):
+        # Nombre del comportamiento
         self.actual_behaviour = ""
         self.initial_behaviours = ["Explorer", "Chaser", "Farmer"]
+        # Diccionario con las acciones posibles y direccion de movimiento
         self.dict_actions = {"Move": {"To_Planet": False, "To_Player":False}, "Factory": 0, "Weapon": 0, "Upgrade": {"Damage": False, "Factory":False}}
+        # Lista que servirá para tener las prioridades
         self.list_priorities = []
         # Servira para comprobar que al establecer una nueva prioridad se pongan los numeros correctos
         self._valid_numbers_priority = ["1","2","3","4"]
@@ -137,10 +145,21 @@ class Behaviour():
         return self.actual_behaviour
     
 
+class Explorer(Behaviour):
+
+    def __init__(self):
+        super().__init__()
+        self.actual_behaviour = self.__class__.__name__
+        self.dict_actions["Move"]["To_Planet"] = True
+        self.list_priorities = ["Move", "Factory", "Upgrade", "Weapon"]
+
+    def act():
+        # Metodo para determinar como actuarán los exploradores
+        pass
+
 # Para poder comprobar el funcionamiento de la clase 
 if __name__ == "__main__":
-    comportamiento = Behaviour()
-    comportamiento.newBehaviour("Explorer")
+    comportamiento = Explorer()
     print(comportamiento.actual_behaviour)
     print(comportamiento.getPrioritiesStr())
     print(comportamiento.getPriorities())
