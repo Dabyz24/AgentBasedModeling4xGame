@@ -233,3 +233,17 @@ Tendrá que tener más comportamietos se pueden añadir aleatorios o establecien
 
 ****como por ejemplo un CIENTIFICO (tendrá menos coste al efectuar mejoras y tendrá nuevas opciones como moverse más de una casilla)
 ****Otro puede ser el PACIFISTA que evite el uso de armas y huya del combate siempre que pueda
+
+    # Comportamientos preestablecidos para los tres comportamientos iniciales
+            if behaviour == "Explorer":
+                self.dict_actions["Move"]["To_Planet"] = True
+                self.list_priorities = ["Move", "Factory", "Upgrade", "Weapon"]
+            if behaviour == "Chaser":
+                self.dict_actions["Move"]["To_Player"] = True
+                self.dict_actions["Upgrade"]["Damage"] = True
+                self.list_priorities = ["Weapon", "Upgrade", "Move", "Factory"]
+            if behaviour == "Farmer":
+                self.dict_actions["Upgrade"]["Factory"] = True
+                self.list_priorities = ["Factory", "Upgrade", "Move", "Weapon"]
+
+Tengo que poder implementar el polimorfismo con la clase behaviours para poder crear de una manera simple los comportamientos 
