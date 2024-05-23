@@ -246,9 +246,19 @@ Tendrá que tener más comportamietos se pueden añadir aleatorios o establecien
                 self.dict_actions["Upgrade"]["Factory"] = True
                 self.list_priorities = ["Factory", "Upgrade", "Move", "Weapon"]
 
+ 
+ Comentario en la clase de behaviours en el metodo act       
+    """
+        Tendría que determinar cual es la acción que va a realizar de su lista de prioridades y devolver el primer valor, pero si no puedo realizarlo tendría que devolver el siguiente
+        Así en la clase principal solo tendría el bucle para los agentes y un while hasta que se complete la acción mientras que no haya aceptado la acción no sale del bucle
+        pero tendría que hacer las comprobaciones igualemnte por lo que no soluciono nada y encima añado un bucle a la ejecució, a no ser que la comprobación la haga desde este metodo
+        Para ello tengo que acceder a la información del agente... 
+        """
+
 Tengo que poder implementar el polimorfismo con la clase behaviours para poder crear de una manera simple los comportamientos 
 Tengo que hacer que el agente dependiendo de su comportamiento elija una acción, el problema es que tiene que tener en cuenta su entorno, por lo que debo pasarle informacion del modelo o hacerlo desde el modelo
 
 Puedo hacer que los agentes siempre se muevan hacia los planetas más cercanos o hacía los que más recurosos tienen y si ese planeta lo ha habitado otro agente ir a por el agente que tiene ese planeta 
 
+Cambios 23/05 para poder revertirlos si algo sale mal
 Crear un método para obtener la información más importante del entorno (Ganador(el que mas stellarPoints), el que tenga la peor arma, mas oro, mas tecnologia, el que mas planetas tenga)
