@@ -1,7 +1,7 @@
 import mesa
 from weapons import Weapon
 from upgrades import Upgrades
-from behaviours import Behaviour
+from behaviours import Behaviour, Explorer, Chaser, Farmer, CustomBehaviour
 from global_constants import *
 
 class Player(mesa.Agent):
@@ -39,8 +39,8 @@ class Player(mesa.Agent):
         self.move = False
         # Permite saber las mejoras que tienen 
         self.agent_upgrades = Upgrades()
-        # Permite saber el tipo de comportamiento del agente, por defecto serán exploradores
-        self.behaviour = Behaviour()
+        # Permite saber el tipo de comportamiento del agente
+        self.behaviour = None
         # Modificaciones de las mejoras
         self.chosen_upgrade = ""
         self.damage_increase = 0
@@ -236,9 +236,22 @@ class Player(mesa.Agent):
 
     def setBehaviour(self, new_behaviour, random_flag=False):
         # random_flag serivra para identificar si el nuevo comportamiento quiere que sea totalmente random
-        self.behaviour.newBehaviour(new_behaviour, random_flag)
+        if random_flag:
+            self.behaviour = Behaviour()
+            self.behaviour.setBehaviourName(new_behaviour)
+        else:
+            if new_behaviour in POSSIBLE_BEHAVIOURS:
+                if new_behaviour == "Explorer":
+                    self.behaviour = Explorer()
+                elif new_behaviour == "Chaser":
+                    self.behaviour = Chaser()
+                elif new_behaviour == "Farmer":
+                    self.behaviour = Farmer()
+            else:
+                self.behaviour = CustomBehaviour(new_behaviour)
 
-        # Metodo para establecer los comportamientos de los agentes
+
+    # Metodo para establecer los comportamientos de los agentes
     def setCustomBehaviour(self):
         name_behaviour = input("Choose a name for the behaviour: ").lower()
         name_behaviour = name_behaviour.capitalize()
@@ -285,23 +298,23 @@ class Player(mesa.Agent):
         next_move = next_moves[action]                 
         self.model.grid.move_agent(self, next_move)
 
-    def do_action(self, chosen_ation):
+    def do_action(self, chosen_action):
         
-        if chosen_ation >= 0 and chosen_ation <= 7:
+        if chosen_action >= 0 and chosen_action <= 7:
             # Determinara si ya ha creado una nave espacial para moverse antes o no 
             if self.move:
-                self.do_move(chosen_ation)
+                self.do_move(chosen_action)
             elif self.enoughResources(SPACE_SHIP_TECH_COST, SPACE_SHIP_GOLD_COST): 
-                self.do_move(chosen_ation)
+                self.do_move(chosen_action)
                 self.move = True
 
-        if chosen_ation == 8:
+        if chosen_action == 8:
             price_increase = round(INCREASE_FACTOR ** self.getFactories())
             if self.enoughResources(FACTORIES_TECH_COST * price_increase, FACTORIES_GOLD_COST * price_increase):
                 self.createFactory()
         
         # Comprobar si el agente tiene mas mejoras disponibles
-        if chosen_ation == 9 and self.agent_upgrades.isUpgradeAvailable():
+        if chosen_action == 9 and self.agent_upgrades.isUpgradeAvailable():
             if self.chosen_upgrade == "":
                 list_possible_upgrades = self.getAgentPossibleUpgrades()
                 if len(list_possible_upgrades) == 0:
@@ -318,7 +331,7 @@ class Player(mesa.Agent):
                 self.agent_upgrades.upgradeFactories()
                 self.doubleFactoriesResources()
                          
-        if chosen_ation == 10 and self.enoughResources(WEAPON_TECH_COST, WEAPON_GOLD_COST):
+        if chosen_action == 10 and self.enoughResources(WEAPON_TECH_COST, WEAPON_GOLD_COST):
             # las tres primeras veces que se ejecute solo se mejorara el arma
             if self.player_weapon.getNumUpgrades() < 3:
                 self.player_weapon.upgradeWeapon()
