@@ -195,10 +195,68 @@ class Game(mesa.Model):
         chosen_move = ACTION_SPACE.get(move)
         return minimum_tuple, chosen_move
 
+    # Método para obtener contexto del entorno y saber quien es el agente que más puntos tiene, el que peor arma tiene, el que mas planetas tiene y el que mas oro tiene
+    def getContext(self):
+        points_winner = float("-inf")
+        worst_weapon = float("inf")
+        most_planets = 0 
+        most_resources = 0
+        points_winner_agent: Player = None
+        worst_weapon_agent: Player = None
+        agent_more_planets: Player = None
+        most_resources_agent: Player = None
+        # Recorro la lista de todos los agentes para poder guardar los agentes destacados
+        for agent in self.list_agents:
+            if agent.getStellarPoints() > points_winner:
+                points_winner = agent.getStellarPoints()
+                points_winner_agent = agent
+            try:
+                if agent.getPlayerWeapon()[1] < worst_weapon:
+                    worst_weapon = agent.getPlayerWeapon()[1]
+                    worst_weapon_agent = agent
+            except:
+                # Si entra en el except es porque no tiene ningun arma y está comparando un float con el string None, por lo que es el agente con peor arma
+                worst_weapon = agent.getPlayerWeapon()[1]
+                worst_weapon_agent = agent
+            if agent.getPlanets() > most_planets:
+                most_planets = agent.getPlanets()
+                agent_more_planets = agent
+            if agent.getGold() > most_resources:
+                most_resources = agent.getGold()
+                most_resources_agent = agent
+
+        return points_winner_agent, worst_weapon_agent, agent_more_planets, most_resources_agent
+
+    def selectBestOption(self, agent: Player):
+        # Si el balance es negativo buscará la mejor opción que hacer
+        if agent.getBalance() < 0:
+            # Coger información del entorno
+            points_winner_agent, worst_weapon_agent, agent_more_planets, most_resources_agent = self.getContext()
+            # Necesita mejorar balance, para ello necesito ganar puntos estelares, que puede ser con una batalla o conquistando un planeta
+            if agent.getPlayerWeapon()[0] != "N": 
+                # perseguir al agente con peor arma worst_weapon_agent
+                list_positions = [agent.getAgentPos(), worst_weapon_agent.getAgentPos()]
+                try:
+                    _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_positions)
+                    chosen_action = chosen_move
+                except: 
+                    chosen_action = -1
+            else:
+                if agent.getGold() <= 0: 
+                    pass
+            # Si el agente tiene una mejora de daño o mejor arma que alguno de la simulación ir a por el 
+            # Si no buscar un planeta para conquistar
+            # Si no tiene dinero para mantenerlo tiene que buscar como obtener dinero que puede ser con una pelea o esperando a que las fabricas produzcan recursos para poder tenr un arma 
+        return chosen_action
+
+
     # El step representa cada turno del juego
     def step(self):
         self.step_count += 1
         chosen_action = ""
+        # obtengo información importante del entorno para que los agentes tengan acceso a esta información
+        points_winner_agent, worst_weapon_agent, agent_more_planets, most_resources_agent = self.getContext()
+        # print(f"Mas puntos: {points_winner_agent.getId()} Peor arma: {worst_weapon_agent.getId()}, Mas planetas: {agent_more_planets}, Mas recursos: {most_resources_agent.getId()}")
         for agent in self.list_agents:
             # Si el valor aletorio es menor que EPSILON (0.1) realizará una accion aleatoria, esto permite que no todos los agentes tengan el mismo comportamiento
             if self.random.uniform(0, 1) < EPSILON:
@@ -207,7 +265,9 @@ class Game(mesa.Model):
                 chosen_action = self.random.choices(POSSIBLE_ACTIONS)[0]
             else:
                 list_priorities, behaviour_moves, behaviour_upgrades = agent.getListPriorities()
-                
+                # Tengo que hacer que el agente vea su entorno y entienda si necesita puntos o necesita seguir con su lista de prioridades 
+                # Si el balance es negativo lo que tiene que hacer es dependiendo de sus recursos (arma, oro...) perseguir a un agente con peor arma o ir a por un planeta con recursos
+                # Si no simplemente recorrerá su lista de prioridades y eligirá la acción que pueda hacer
                 for action in list_priorities:
                     if action == "Move":
                         if (agent.getGold() >= SPACE_SHIP_GOLD_COST and agent.getTech() >= SPACE_SHIP_TECH_COST) or agent.isShipCreated():
