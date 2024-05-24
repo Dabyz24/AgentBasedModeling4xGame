@@ -26,9 +26,9 @@
 - [] 7.3 Probar que dependiendo de quien gane los combates den mas o menos puntos estelares
 - [] 7.4 Si lo anterior no es el factor limitante, hacer algo para que los nuevos agentes puedean competir en igualdad de condiciones (Energía y que tenga que tener algún cd o algo) 
 
-[ ] 8. Cambiar los comportamientos a algo más genérico (Objeto) para no tener que ponerlo tan estricto en el condicional 
-- [] 8.1 Cambiar la lógica de los comportamientos para no hacerlo en el step tan estricto, con polimorfismos y tecnicas mas avanzadas de POO
-- [] 8.2 Añadir una lista de prioridades para los comportamientos (meter las upgrades ahí)
+[✔] 8. Cambiar los comportamientos a algo más genérico (Objeto) para no tener que ponerlo tan estricto en el condicional 
+- [✔] 8.1 Cambiar la lógica de los comportamientos para no hacerlo en el step tan estricto, con polimorfismos y tecnicas mas avanzadas de POO
+- [✔] 8.2 Añadir una lista de prioridades para los comportamientos (meter las upgrades ahí)
 
 [ ] 9. Que el agente sea capaz de interactuar con su entorno
 - [] 9.1 Que el agente sepa quien es el ganador y los recursos de cada agente
