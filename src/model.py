@@ -227,26 +227,25 @@ class Game(mesa.Model):
 
         return points_winner_agent, worst_weapon_agent, agent_more_planets, most_resources_agent
 
-    def selectBestOption(self, agent: Player):
-        # Si el balance es negativo buscará la mejor opción que hacer
-        if agent.getBalance() < 0:
-            # Coger información del entorno
-            points_winner_agent, worst_weapon_agent, agent_more_planets, most_resources_agent = self.getContext()
-            # Necesita mejorar balance, para ello necesito ganar puntos estelares, que puede ser con una batalla o conquistando un planeta
-            if agent.getPlayerWeapon()[0] != "N": 
-                # perseguir al agente con peor arma worst_weapon_agent
-                list_positions = [agent.getAgentPos(), worst_weapon_agent.getAgentPos()]
-                try:
-                    _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_positions)
-                    chosen_action = chosen_move
-                except: 
-                    chosen_action = -1
-            else:
-                if agent.getGold() <= 0: 
-                    pass
-            # Si el agente tiene una mejora de daño o mejor arma que alguno de la simulación ir a por el 
-            # Si no buscar un planeta para conquistar
-            # Si no tiene dinero para mantenerlo tiene que buscar como obtener dinero que puede ser con una pelea o esperando a que las fabricas produzcan recursos para poder tenr un arma 
+    def selectBestAction(self, agent: Player):
+        # Coger información del entorno
+        points_winner_agent, worst_weapon_agent, agent_more_planets, most_resources_agent = self.getContext()
+        # print(f"Mas puntos: {points_winner_agent.getId()} Peor arma: {worst_weapon_agent.getId()}, Mas planetas: {agent_more_planets}, Mas recursos: {most_resources_agent.getId()}")
+        # Necesita mejorar balance, para ello necesito ganar puntos estelares, que puede ser con una batalla o conquistando un planeta
+        if agent.getPlayerWeapon()[0] != "N": 
+            # perseguir al agente con peor arma worst_weapon_agent
+            list_positions = [agent.getAgentPos(), worst_weapon_agent.getAgentPos()]
+            try:
+                _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_positions)
+                chosen_action = chosen_move
+            except: 
+                chosen_action = -1
+        else:
+            if agent.getGold() <= 0: 
+                pass
+        # Si el agente tiene una mejora de daño o mejor arma que alguno de la simulación ir a por el 
+        # Si no buscar un planeta para conquistar
+        # Si no tiene dinero para mantenerlo tiene que buscar como obtener dinero que puede ser con una pelea o esperando a que las fabricas produzcan recursos para poder tenr un arma 
         return chosen_action
 
 
@@ -254,117 +253,57 @@ class Game(mesa.Model):
     def step(self):
         self.step_count += 1
         chosen_action = ""
-        # obtengo información importante del entorno para que los agentes tengan acceso a esta información
-        points_winner_agent, worst_weapon_agent, agent_more_planets, most_resources_agent = self.getContext()
-        # print(f"Mas puntos: {points_winner_agent.getId()} Peor arma: {worst_weapon_agent.getId()}, Mas planetas: {agent_more_planets}, Mas recursos: {most_resources_agent.getId()}")
         for agent in self.list_agents:
             # Si el valor aletorio es menor que EPSILON (0.1) realizará una accion aleatoria, esto permite que no todos los agentes tengan el mismo comportamiento
             if self.random.uniform(0, 1) < EPSILON:
                 print(f"Accion random para el agente {agent.getId()}")
                 # El agente cogera un valor de la lista de posibles acciones del modelo. [0] es porque devolvera una lista y necesito el elemento
                 chosen_action = self.random.choices(POSSIBLE_ACTIONS)[0]
+                action = "Random"
             else:
                 list_priorities, behaviour_moves, behaviour_upgrades = agent.getListPriorities()
-                # Tengo que hacer que el agente vea su entorno y entienda si necesita puntos o necesita seguir con su lista de prioridades 
                 # Si el balance es negativo lo que tiene que hacer es dependiendo de sus recursos (arma, oro...) perseguir a un agente con peor arma o ir a por un planeta con recursos
                 # Si no simplemente recorrerá su lista de prioridades y eligirá la acción que pueda hacer
-                for action in list_priorities:
-                    if action == "Move":
-                        if (agent.getGold() >= SPACE_SHIP_GOLD_COST and agent.getTech() >= SPACE_SHIP_TECH_COST) or agent.isShipCreated():
-                            if len(behaviour_moves) == 1:
-                                if behaviour_moves[0] == "To_Planet":
-                                    # Buscar un planeta cercano inhabitado
-                                    list_uninhabited_planets = self.getAllPlanetPos()
-                                    try:
-                                        _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_uninhabited_planets)
-                                        chosen_action = chosen_move
-                                    except:
-                                        # Si no hay ninguno planeta sin explorar pasará a la siguiente accion
-                                        continue
-                                elif behaviour_moves[0] == "To_Player":
-                                    # Se pone a perseguir al enemigo más cercano para luchar con él
-                                    list_enemies = self.getAllPlayersPos()
-                                    try:
-                                        _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_enemies)
-                                        chosen_action = chosen_move
-                                    except:
-                                        # Si está en la misma posición que el enemigo la accion elegida será pasar a la siguiente accion
-                                        continue
-                            else:
-                                if agent.getGold() <= 0: 
-                                    if agent.getPlayerWeapon()[0] == "N":
-                                        # Si el agente tiene oro negativo y no tiene determinado a quien seguir y no tiene arma, buscara algun planeta para poder ganar recursos
-                                        list_uninhabited_planets = self.getAllPlanetPos()
-                                        try:
-                                            _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_uninhabited_planets)
-                                            chosen_action = chosen_move
-                                        except:
-                                            # Si no hay ninguno planeta sin explorar hará un movimiento aleatorio
-                                            chosen_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
-                                    else: 
-                                        # Si tiene oro negativo pero tiene un arma perseguira al agente mas cercano para poder luchar y ganar recursos
-                                        list_enemies = self.getAllPlayersPos()
-                                        try:
-                                            _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_enemies)
-                                            chosen_action = chosen_move
-                                        except:
-                                            # Si está en la misma posición que el enemigo la accion elegida será un movimiento aleatorio
-                                            chosen_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
-                                else:
-                                    # Si el agente no tiene especificado a quien quiere perseguir hará una acción aleatoria
-                                    chosen_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
-                            # Si tengo la accion seleccionada corto la ejecucion del bucle con break
-                            break
-                        else:
-                            continue
-                    # Si la accion más prioritaria es Fabrica se dedicará a aconstruir fabricas
-                    elif action == "Factory":
-                        # Comprobar si se puede fabricar
-                        price_increase = round(INCREASE_FACTOR ** agent.getFactories())
-                        if (agent.getGold() >= (FACTORIES_GOLD_COST * price_increase)  and agent.getTech() >= (FACTORIES_TECH_COST * price_increase)):
-                            chosen_action = ACTION_SPACE.get("Factory")
-                            break
-                        else:
-                            # Si no cumplo alguna de las restricciones anteriores paso a la siguiente accion de la lista de prioridad
-                            continue
-                    elif action == "Weapon":
-                        if agent.getGold() > WEAPON_GOLD_COST and agent.getTech() > WEAPON_TECH_COST and agent.getNumPlayerWeapon() < 3:
-                            # Si tengo suficientes recursos para crear el arma y no tengo el numero maximo de armas la creo
-                            chosen_action = ACTION_SPACE.get("Weapon")
-                            break   
-                        else:
-                            # Si no cumplo alguna de las restricciones anteriores paso a la siguiente accion de la lista de prioridad
-                            continue
-                    elif action == "Upgrade":
-                        if len(behaviour_upgrades) > 0 or agent.getAgentUpgrades().isUpgradeAvailable():
-                            # Si la opcion es mejorar la fabrica y no la tiene mejorado
-                            if "Factory" in behaviour_upgrades and not agent.getAgentUpgrades().isFactoryUpgraded():
-                                if (agent.getGold() > UPGRADE_FACTORIES_GOLD_COST and agent.getTech() > UPGRADE_FACTORIES_TECH_COST):
-                                    # Modificar el codigo para que pueda hacer la upgrade que yo quiera
-                                    agent.setChosenUpgrade("Factory")
-                                    chosen_action = ACTION_SPACE.get("Upgrade")
-                                    break
-                        
-                            if "Damage" in behaviour_upgrades and not agent.getAgentUpgrades().isDamageUpgraded():
-                                if (agent.getGold() > UPGRADE_DAMAGE_GOLD_COST and agent.getTech() > UPGRADE_DAMAGE_TECH_COST):
-                                    # Upgradear el daño
-                                    agent.setChosenUpgrade("Damage")
-                                    chosen_action = ACTION_SPACE.get("Upgrade")
-                                    break
+                # if agent.getBalance() < 0:
+                #     action = self.selectBestAction()
+                # else:
+                    # Recorre toda la lista de prioridades y comprueba si puede hacer la acción 
+                action = agent.selectAction()
+                if action == "Move":
+                    if len(behaviour_moves) == 1:
+                        if behaviour_moves[0] == "To_Planet":
+                            list_directions = self.getAllPlanetPos()
+                            # Si todos los planetas están ocupados, se moveran hacia un agente cercano para luchar y hacer que algun planeta se quede libre
+                            if len(list_directions) == 0:
+                                list_directions = self.getAllPlayersPos()
+                        elif behaviour_moves[0] == "To_Player":
+                            list_directions = self.getAllPlayersPos()
+                        try:
+                            _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_directions)
+                            chosen_action = chosen_move
+                        except:
+                            # Si no se puede mover donde el agente no realizará ninguna acción 
+                            chosen_action = -1
+                    else:
+                        chosen_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
 
-                            # Si no puede entrar en ninguna accion pasa a la siguiente opcion en la lista de prioridad
-                            continue
-                        else:
-                            # Si no tiene ninguna upgrade no puede hacer nada, asi que pasa a la siguiente prioridad de la lista
-                            continue
-
-            # Si no ha podido realizar ninguna acción se moverá aleatoriamente
-            if chosen_action == "":
-                print(f"El agente {agent.getId()} no ha podido realizar otra accion y elige un movimiento aleatorio")
-                chosen_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
-
-            # Tengo que pensar alguna forma para poder moverme y que no se tiren quietos todo el rato, porque es muy poco dinámico y no hay casi exploración 
-            print(f"agent: {agent.getId()} elige el movimiento {chosen_action}")
+                elif action[0] == "Upgrade":
+                    if action[1] == "Factory":
+                            agent.setChosenUpgrade("Factory")
+                            chosen_action = ACTION_SPACE.get("Upgrade")
+                    
+                    if action[1] == "Damage":
+                            agent.setChosenUpgrade(action[1])
+                            chosen_action = ACTION_SPACE.get(action[0])
+                # Por si los agentes no pueden realizar ninguna acción             
+                elif action == "Wait":
+                    # Si no consigue realizar ninguna acción por alguna mala inversión y se da el caso de que no se puede mover, tendrá que esperar
+                    chosen_action = -1
+                # En el caso que la accion sea weapon o fabrica simplemente elijira esa accion
+                else:
+                    chosen_action = ACTION_SPACE.get(action)
+            # # Tengo que pensar alguna forma para poder moverme y que no se tiren quietos todo el rato, porque es muy poco dinámico y no hay casi exploración 
+            # print(f"agent: {agent.getId()} elige el movimiento {action, chosen_action}")
             agent.step(chosen_action)
         for planet in self.list_planets:
             planet.step()
