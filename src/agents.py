@@ -293,6 +293,11 @@ class Player(mesa.Agent):
             return "T: " + str(self.tech) + " G: " + str(self.gold) + " P: " +str(self.num_planets) + " F: "+str(self.num_factories) + " <strong>Stellar Points: " + str(self.stellar_points)+"</strong>"
         return [self.tech, self.gold, self.num_planets, self.num_factories, self.player_weapon, self.stellar_points]
     
+    # Método para poder elegir la acción de la lista de prioridades de su comportamiento
+    def selectAction(self):
+        action = self.behaviour.act(self.gold, self.tech, self.num_factories, self.player_weapon, self.agent_upgrades, self.move)
+        return action
+
     def do_move(self, action):
         next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, include_center=False, radius=self.movement_radius)
         next_move = next_moves[action]                 
