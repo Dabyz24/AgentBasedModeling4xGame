@@ -1,5 +1,5 @@
 import random
-
+from global_constants import *
 # Objeto encargado de generalizar todos los comportamientos y permitir la creacion de nuevos comportamientos de una manera sencilla
 
 class Behaviour():
@@ -25,9 +25,32 @@ class Behaviour():
         # Inicializaré una clase de comportamiento con todo aleatorio
         self.setRandomPriorities()
     
-    def act(self):
-        # Metodo que determinará el comportamiento de la clase Behaviour
-        pass
+    # Metodo que determinará el comportamiento de la clase Behaviour
+    def act(self, agent_gold, agent_tech, agent_factories, agent_weapon, agent_upgrades, is_ship_created):
+        for action in self.list_priorities:
+            if action == "Move":
+                if (agent_gold >= SPACE_SHIP_GOLD_COST and agent_tech >= SPACE_SHIP_TECH_COST) or is_ship_created:
+                    return action
+            elif action == "Factory":
+                price_increase = round(INCREASE_FACTOR ** agent_factories)
+                if (agent_gold >= (FACTORIES_GOLD_COST * price_increase)  and agent_tech >= (FACTORIES_TECH_COST * price_increase)):
+                    return action
+            elif action == "Weapon":
+                if agent_gold > WEAPON_GOLD_COST and agent_tech > WEAPON_TECH_COST and agent_weapon.getNumUpgrades() < MAX_NUM_WEAPONS:
+                    return action
+            elif action == "Upgrade":
+                list_special_upgrade = self.getPriorities()[2]
+                if agent_upgrades.isUpgradeAvailable() and len(list_special_upgrade) > 0:
+                    if "Factory" in list_special_upgrade and not agent_upgrades.isFactoryUpgraded():
+                        if (agent_gold > UPGRADE_FACTORIES_GOLD_COST and agent_tech > UPGRADE_FACTORIES_TECH_COST):
+                            print("Entro en mejora de fabrica")
+                            return action, "Factory"
+                    if "Damage" in list_special_upgrade and not agent_upgrades.isDamageUpgraded():
+                        if (agent_gold > UPGRADE_DAMAGE_GOLD_COST and agent_tech > UPGRADE_DAMAGE_TECH_COST):
+                            print("Entro en mejora de daño")
+                            return action, "Damage"
+        return "Wait"
+
 
     # Metodo para establecer las prioridades aleatorias del comportamiento
     def setRandomPriorities(self):
@@ -115,9 +138,6 @@ class Explorer(Behaviour):
         self.dict_actions["Move"]["To_Planet"] = True
         self.list_priorities = ["Move", "Factory", "Upgrade", "Weapon"]
 
-    def act():
-        # Metodo para determinar como actuarán los exploradores
-        pass
 
 class Chaser(Behaviour):
 
@@ -129,9 +149,6 @@ class Chaser(Behaviour):
         self.dict_actions["Upgrade"]["Damage"] = True
         self.list_priorities = ["Weapon", "Upgrade", "Move", "Factory"]
 
-    def act():
-        # Metodo para determinar como actuarán los chasers
-        pass
 
 class Farmer(Behaviour):
 
@@ -141,10 +158,6 @@ class Farmer(Behaviour):
         self.setBehaviourName(self.__class__.__name__)
         self.dict_actions["Upgrade"]["Factory"] = True
         self.list_priorities = ["Factory", "Upgrade", "Move", "Weapon"]
-
-    def act():
-        # Metodo para determinar como actuarán los farmers
-        pass
 
 class CustomBehaviour(Behaviour):
 
@@ -194,9 +207,6 @@ class CustomBehaviour(Behaviour):
                 else:
                     print(f"This are the only valid numbers: {self._valid_numbers_priority}")
 
-    def act():
-        # Metodo para determinar como actuarán los que tengan un comportamiento personalizado 
-        pass
 
 
 # Para poder comprobar el funcionamiento de la clase 
