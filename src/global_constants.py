@@ -42,6 +42,8 @@ TECH_FROM_POOR_ENEMIES = 5
 GOLD_FROM_POOR_ENEMIES = 10
 # Factor de aumento exponencial para el coste de construccion de fabricas 
 INCREASE_FACTOR = 1.2
+# Numero máximo de armas disponibles en el juego
+MAX_NUM_WEAPONS = 3
 
 # Conjunto de acciones posibles por el agente
 ACTION_SPACE = {(-1,-1): 0 , (-1,0): 1, (-1,1): 2, (0,-1): 3, (0,1): 4, (1,-1): 5, (1,0): 6, (1,1): 7, "Factory": 8, "Upgrade":9, "Weapon":10}
