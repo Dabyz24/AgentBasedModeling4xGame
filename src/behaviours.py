@@ -29,25 +29,33 @@ class Behaviour():
     def act(self, agent_gold, agent_tech, agent_factories, agent_weapon, agent_upgrades, is_ship_created):
         for action in self.list_priorities:
             if action == "Move":
+                list_move_direction = self.getPriorities()[1]
                 if (agent_gold >= SPACE_SHIP_GOLD_COST and agent_tech >= SPACE_SHIP_TECH_COST) or is_ship_created:
-                    return action
+                    if len(list_move_direction) == 1:
+                        # Si la lista de direccion tiene solo una devolvere la accion y la direccion 
+                        return action, list_move_direction[0]
+                    else:
+                        # Si la lista tiene mas de una direccion o ninguna devolvere la accion y "None"
+                        return action, "None"
+                
             elif action == "Factory":
                 price_increase = round(INCREASE_FACTOR ** agent_factories)
                 if (agent_gold >= (FACTORIES_GOLD_COST * price_increase)  and agent_tech >= (FACTORIES_TECH_COST * price_increase)):
                     return action
+            
             elif action == "Weapon":
                 if agent_gold > WEAPON_GOLD_COST and agent_tech > WEAPON_TECH_COST and agent_weapon.getNumUpgrades() < MAX_NUM_WEAPONS:
                     return action
+            
             elif action == "Upgrade":
                 list_special_upgrade = self.getPriorities()[2]
                 if agent_upgrades.isUpgradeAvailable() and len(list_special_upgrade) > 0:
                     if "Factory" in list_special_upgrade and not agent_upgrades.isFactoryUpgraded():
                         if (agent_gold > UPGRADE_FACTORIES_GOLD_COST and agent_tech > UPGRADE_FACTORIES_TECH_COST):
-                            print("Entro en mejora de fabrica")
                             return action, "Factory"
+                    
                     if "Damage" in list_special_upgrade and not agent_upgrades.isDamageUpgraded():
                         if (agent_gold > UPGRADE_DAMAGE_GOLD_COST and agent_tech > UPGRADE_DAMAGE_TECH_COST):
-                            print("Entro en mejora de daño")
                             return action, "Damage"
         return "Wait"
 
