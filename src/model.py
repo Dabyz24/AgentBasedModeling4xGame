@@ -193,10 +193,10 @@ class Game(mesa.Model):
         # Creo la tupla con el movmiento necesario y se lo paso al diccionario para saber la accion que realizar
         move = (move_x, move_y)
         chosen_move = ACTION_SPACE.get(move)
-        return minimum_tuple, chosen_move
+        return move, chosen_move
 
     # Método para obtener contexto del entorno y saber quien es el agente que más puntos tiene, el que peor arma tiene, el que mas planetas tiene y el que mas oro tiene
-    def getContext(self):
+    def getContext(self, player):
         points_winner = float("-inf")
         worst_weapon = float("inf")
         most_planets = 0 
@@ -205,8 +205,19 @@ class Game(mesa.Model):
         worst_weapon_agent: Player = None
         agent_more_planets: Player = None
         most_resources_agent: Player = None
-        # Recorro la lista de todos los agentes para poder guardar los agentes destacados
-        for agent in self.list_agents:
+        # Creo una copia sin el agente para poder comprobar sin tenerle a el en cuenta
+        copy_list_agents = self.list_agents.copy()
+        copy_list_agents.remove(player)
+
+        if len(copy_list_agents) == 0: 
+            points_winner_agent = player
+            worst_weapon_agent = player
+            agent_more_planets = player
+            most_resources_agent = player
+            return points_winner_agent, worst_weapon_agent, agent_more_planets, most_resources_agent
+        
+        # Recorro la lista de todos los agentes restantes para poder guardar los agentes destacados
+        for agent in copy_list_agents:
             if agent.getStellarPoints() > points_winner:
                 points_winner = agent.getStellarPoints()
                 points_winner_agent = agent
@@ -228,8 +239,8 @@ class Game(mesa.Model):
         return points_winner_agent, worst_weapon_agent, agent_more_planets, most_resources_agent
 
     def selectBestAction(self, agent: Player):
-        # Coger información del entorno
-        points_winner_agent, worst_weapon_agent, agent_more_planets, most_resources_agent = self.getContext()
+        # Coger información del entorno para ese agente
+        points_winner_agent, worst_weapon_agent, agent_more_planets, most_resources_agent = self.getContext(agent)
         # print(f"Mas puntos: {points_winner_agent.getId()} Peor arma: {worst_weapon_agent.getId()}, Mas planetas: {agent_more_planets}, Mas recursos: {most_resources_agent.getId()}")
         # Necesita mejorar balance, para ello necesito ganar puntos estelares, que puede ser con una batalla o conquistando un planeta
         if agent.getPlayerWeapon()[0] != "N": 
@@ -248,6 +259,46 @@ class Game(mesa.Model):
         # Si no tiene dinero para mantenerlo tiene que buscar como obtener dinero que puede ser con una pelea o esperando a que las fabricas produzcan recursos para poder tenr un arma 
         return chosen_action
 
+    # Método para realizar la acción y establecer la accion elegida 
+    def chooseAction(self, agent, action):
+        if action[0] == "Move":
+            if action[1] == "None":
+                chosen_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
+                return chosen_action
+            
+            if action[1] == "To_Planet":
+                list_directions = self.getAllPlanetPos()
+                # Si todos los planetas están ocupados, se moveran hacia un agente cercano para luchar y hacer que algun planeta se quede libre
+                if len(list_directions) == 0:
+                    list_directions = self.getAllPlayersPos()
+            
+            elif action[1] == "To_Player":
+                list_directions = self.getAllPlayersPos()
+            
+            try:
+                _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_directions)
+                chosen_action = chosen_move
+            except:
+                # Si no se puede mover donde el agente no realizará ninguna acción 
+                chosen_action = -1
+
+        elif action[0] == "Upgrade":
+            if action[1] == "Factory":
+                    agent.setChosenUpgrade(action[1])
+                    chosen_action = ACTION_SPACE.get(action[0])
+            
+            if action[1] == "Damage":
+                    agent.setChosenUpgrade(action[1])
+                    chosen_action = ACTION_SPACE.get(action[0])
+        # Por si los agentes no pueden realizar ninguna acción             
+        elif action == "Wait":
+            # Si no consigue realizar ninguna acción por alguna mala inversión y se da el caso de que no se puede mover, tendrá que esperar
+            chosen_action = -1
+        # En el caso que la accion sea weapon o fabrica simplemente elijira esa accion
+        else:
+            chosen_action = ACTION_SPACE.get(action)
+
+        return chosen_action
 
     # El step representa cada turno del juego
     def step(self):
@@ -258,52 +309,21 @@ class Game(mesa.Model):
             if self.random.uniform(0, 1) < EPSILON:
                 print(f"Accion random para el agente {agent.getId()}")
                 # El agente cogera un valor de la lista de posibles acciones del modelo. [0] es porque devolvera una lista y necesito el elemento
-                chosen_action = self.random.choices(POSSIBLE_ACTIONS)[0]
                 action = "Random"
+                chosen_action = self.random.choices(POSSIBLE_ACTIONS)[0]
             else:
-                list_priorities, behaviour_moves, behaviour_upgrades = agent.getListPriorities()
                 # Si el balance es negativo lo que tiene que hacer es dependiendo de sus recursos (arma, oro...) perseguir a un agente con peor arma o ir a por un planeta con recursos
                 # Si no simplemente recorrerá su lista de prioridades y eligirá la acción que pueda hacer
                 # if agent.getBalance() < 0:
                 #     action = self.selectBestAction()
                 # else:
-                    # Recorre toda la lista de prioridades y comprueba si puede hacer la acción 
+                # Elijo la primera accion posible de su lista de prioridades
+                # a = self.selectBestAction(agent)
                 action = agent.selectAction()
-                if action == "Move":
-                    if len(behaviour_moves) == 1:
-                        if behaviour_moves[0] == "To_Planet":
-                            list_directions = self.getAllPlanetPos()
-                            # Si todos los planetas están ocupados, se moveran hacia un agente cercano para luchar y hacer que algun planeta se quede libre
-                            if len(list_directions) == 0:
-                                list_directions = self.getAllPlayersPos()
-                        elif behaviour_moves[0] == "To_Player":
-                            list_directions = self.getAllPlayersPos()
-                        try:
-                            _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_directions)
-                            chosen_action = chosen_move
-                        except:
-                            # Si no se puede mover donde el agente no realizará ninguna acción 
-                            chosen_action = -1
-                    else:
-                        chosen_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
-
-                elif action[0] == "Upgrade":
-                    if action[1] == "Factory":
-                            agent.setChosenUpgrade("Factory")
-                            chosen_action = ACTION_SPACE.get("Upgrade")
-                    
-                    if action[1] == "Damage":
-                            agent.setChosenUpgrade(action[1])
-                            chosen_action = ACTION_SPACE.get(action[0])
-                # Por si los agentes no pueden realizar ninguna acción             
-                elif action == "Wait":
-                    # Si no consigue realizar ninguna acción por alguna mala inversión y se da el caso de que no se puede mover, tendrá que esperar
-                    chosen_action = -1
-                # En el caso que la accion sea weapon o fabrica simplemente elijira esa accion
-                else:
-                    chosen_action = ACTION_SPACE.get(action)
+                # Establezco la accion a realizar por el agente
+                chosen_action = self.chooseAction(agent,action)
             # # Tengo que pensar alguna forma para poder moverme y que no se tiren quietos todo el rato, porque es muy poco dinámico y no hay casi exploración 
-            # print(f"agent: {agent.getId()} elige el movimiento {action, chosen_action}")
+            print(f"agent: {agent.getId()} elige el movimiento {action, chosen_action}")
             agent.step(chosen_action)
         for planet in self.list_planets:
             planet.step()
@@ -312,14 +332,19 @@ class Game(mesa.Model):
 
 # Cada X turnos se revisa el número de stellar points que han ganado los agentes y si es infrerior se eliminan y se crea uno nuevo
         if self.step_count % 100 == 0:
-            
+            # Elimino al agente mas antiguo con balance negativo
+            agent_removed = False
             for agent in self.list_agents:
                 print(f"El agente {agent.getId()} tiene un balance de {agent.getBalance()}")
-                if agent.getBalance() <= 0:
+                if agent.getBalance() <= 0 and not agent_removed:
+                    print(f"Agente {agent.getId()} eliminado de la simulacion")
+                    # Reseteo todos los planetas que tuviera el agente para evitar que sigan habitado por un agente no existente
                     agent.resetPlayer()
+                    # Elimino a el agente de la simulación
                     self.list_agents.remove(agent)
                     self.grid.remove_agent(agent)
                     self.schedule.remove(agent)
+                    agent_removed = True
                 else:
                     agent.resetBalance()
 
@@ -341,21 +366,6 @@ class Game(mesa.Model):
             self.list_agents.append(player)
             self.grid.place_agent(player, pos)
             self.schedule.add(player)
-    # Por ahora no reseteare los planetas y los comportamientos en el turno 100 solo intertaré eliminar un agente y meter otro 
-            # for agent in self.list_agents:
-            #     # Resetear el damage increase para que el que sea chaser adquiera los 10 de daño y el anterior los pierda
-            #     agent.resetDamegeIncrease()
-            #     agent.changeBehaviour()
-            #     # Si es chaser y tenia los 5 de daño (tiene la mejora de daño) se le añade 10
-            #     if agent.getBehaviour() == "Chaser" and agent.getDamageIncrease() == 5:
-            #         agent.setDamageIncrease(10)
-            # for planet in self.list_planets:
-            #     planet.resetPlanet()
-        #     last_score = float("inf")
-        #     for agent in self.list_agents:  
-        #         if agent.getStellarPoints() < last_score:
-        #             last_score = agent.getStellarPoints()
-        #             agent.behaviour = "Farmer" 
                 
         #self.datacollector.collect(self)
 
