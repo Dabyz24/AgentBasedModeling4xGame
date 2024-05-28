@@ -137,7 +137,7 @@ class Player(mesa.Agent):
         self.tech -= tech
         self.gold -= gold
 
-    def payTaxes(self, taxes=20):
+    def payTaxes(self, taxes=TAXES_PLANET):
         self.gold -= taxes * self.num_planets
 
     # Funciones para añadir puntos estelares y para añadir batallas ganadas
@@ -291,7 +291,7 @@ class Player(mesa.Agent):
     def getAgentInfo(self, verbose=False):
         if verbose:
             return "T: " + str(self.tech) + " G: " + str(self.gold) + " P: " +str(self.num_planets) + " F: "+str(self.num_factories) + " <strong>Stellar Points: " + str(self.stellar_points)+"</strong>"
-        return [self.tech, self.gold, self.num_planets, self.num_factories, self.player_weapon, self.stellar_points]
+        return [self.pos, self.tech, self.gold, self.num_planets, self.num_factories, self.player_weapon, self.stellar_points]
     
     # Método para poder elegir la acción de la lista de prioridades de su comportamiento
     def selectAction(self):
@@ -415,6 +415,9 @@ class Planet(mesa.Agent):
     def getResources(self):
         return f"Tech: {self.tech} Gold: {self.gold}" 
     
+    def getPlanetInfo(self):
+        return [self.pos, self.tech, self.gold, self.populated]
+
     def resetPlanet(self):
         if self.populated:
             self.player.removePlanet(self)
