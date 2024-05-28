@@ -68,7 +68,7 @@ model_params = {
         "title": mesa.visualization.StaticText("Parameters:"),
         "num_players": mesa.visualization.Slider("Number of players", NUM_PLAYERS, 1, 6),
         "num_planets": mesa.visualization.Slider("Number of planets", NUM_PLANETS, 2, 20),
-        "taxes_planet": mesa.visualization.Slider("Taxes apply to planets", TAXES_PLANET, 10, 100, 10),
+        "taxes_planet": mesa.visualization.Slider("Taxes apply to planets", TAXES_PLANET, 10, 100, 5),
 
 }
 
