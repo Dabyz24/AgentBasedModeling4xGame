@@ -262,3 +262,21 @@ Puedo hacer que los agentes siempre se muevan hacia los planetas más cercanos o
 
 Cambios 23/05 para poder revertirlos si algo sale mal
 Crear un método para obtener la información más importante del entorno (Ganador(el que mas stellarPoints), el que tenga la peor arma, mas oro, mas tecnologia, el que mas planetas tenga)
+
+Metodo para que el agente desde su propia clase pueda obtener la lista con el contexto de todso los agentes y no hacerlo desde el modelo
+    # Método para que el agente consiga todo el contexto sobre los agentes y los planetas en la simulacion 
+    def getContext(self):
+        agent_set = self.model.get_agents_of_type(Player)
+        list_agent_attributes = []
+        list_planet_attributes = []
+        for agent in agent_set:
+            if agent == self:
+                # Si el agente es el mismo no guardo sus variables porque ya las se 
+                continue
+            agent_attributes = agent.getAgentInfo()
+            list_agent_attributes.append(agent_attributes)
+        for planet in self.model.get_agents_of_type(Planet):
+            planet_attributes = planet.getPlanetInfo()
+            list_planet_attributes.append(planet_attributes)
+
+        return list_agent_attributes, list_planet_attributes
