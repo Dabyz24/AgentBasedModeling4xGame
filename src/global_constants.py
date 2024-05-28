@@ -5,7 +5,7 @@ NUM_PLAYERS = 3
 NUM_PLANETS = 10
 TECH_PLANETS = 20
 GOLD_PLANETS = 30
-TAXES_PLANET = 50
+TAXES_PLANET = 25
 
 # Tendrá en cuenta las diagonales
 MOORE_PLAYER = True
