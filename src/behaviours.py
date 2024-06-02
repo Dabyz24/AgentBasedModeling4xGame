@@ -1,19 +1,10 @@
 import random
 from global_constants import *
-# Objeto encargado de generalizar todos los comportamientos y permitir la creacion de nuevos comportamientos de una manera sencilla
+
 
 class Behaviour():
-    """
-    Diferentes comportamientos que están preestablecidos:
-    --> Chaser: Su objetivo será perseguir al agente y luchar contra el 
-    --> Explorer: Su objetivo será buscar los plaentas que no estén habitados y conquistarlos
-    --> Farmer: Su objetivo será construir fábricas para obtener más recursos
+    # Objeto encargado de generalizar todos los comportamientos y permitir la creacion de nuevos comportamientos de una manera sencilla
     
-    Tengo que abstraer lo importante de un comportamiento y luego en cada clase personalizar las acciones que hagan que será por ejemplo la acción que eligirá en cada momento
-    Un comportamiento tiene que tener un nombre, una lista de prioridades y tengo que saber la dirección de movimiento preferida y las mejoras que podrá realizar.
-    Aunque tengo que dar libertad para que en función de las necesidades pueda modificar su comportamiento de manera dinámica, que coloque su lista de prioridades como quiera
-    
-    """
     def __init__(self):
         # Nombre del comportamiento
         self.actual_behaviour = ""
@@ -21,10 +12,7 @@ class Behaviour():
         self.dict_actions = {"Move": {"To_Planet": False, "To_Player":False}, "Factory": 0, "Weapon": 0, "Upgrade": {"Damage": False, "Factory":False}}
         # Lista que servirá para tener las prioridades
         self.list_priorities = []
-        self.setBehaviourName("Random")
-        # Inicializaré una clase de comportamiento con todo aleatorio
-        self.setRandomPriorities()
-    
+
     # Metodo que determinará el comportamiento de la clase Behaviour
     def act(self, agent_gold, agent_tech, agent_factories, agent_weapon, agent_upgrades, is_ship_created):
         for action in self.list_priorities:
@@ -59,32 +47,6 @@ class Behaviour():
                             return action, "Damage"
         return "Wait"
 
-
-    # Metodo para establecer las prioridades aleatorias del comportamiento
-    def setRandomPriorities(self):
-        # Paso a una lista todas las claves del diccionario de acciones para poder recorrerla
-        list_actions = list(self.dict_actions.keys())
-        # Los ordeno de forma aleatoria para tener una lista aleatoria con los comportamientos
-        random.shuffle(list_actions)
-        # Recorro la lista para determinar una direccion al movimiento y las mejoras que tendrá
-        for action in list_actions:
-            if action == "Move":
-                self.getRandomSpecialActions(action)
-            elif action == "Upgrade":
-                self.getRandomSpecialActions(action)
-            # Por último guardo la lista de prioridad en la variable correspondiente
-            self.list_priorities.append(action)
-
-    # Método para establecer de manera aleatoria la direccion del movimiento y el comportamiento
-    def getRandomSpecialActions(self, action):
-        if action == "Move" or action == "Upgrade":
-            for item in self.dict_actions[action]:
-                coin = random.randint(0,1)
-                if coin == 0:
-                    self.dict_actions[action][item] = False
-                else:
-                    self.dict_actions[action][item] = True
-
     # Método para presentar de una manera mas visual la lista de prioridades
     def getPrioritiesStr(self):
         aux_str = ""
@@ -112,19 +74,7 @@ class Behaviour():
                         list_special_upgrade.append(key)
                 
         return self.list_priorities, list_special_move, list_special_upgrade
-    
-    # def newBehaviour(self, new, flag=False):
-    #     """
-    #     Crear un nuevo comportamiento, reseteando los atributos principales y llamando al metodo setPriorities()
-    #     """
-    #     self.list_priorities = []
-    #     self.resetDictActions()
-    #     self.actual_behaviour = new
-    #     if flag:
-    #         self.setPriorities(new, random_flag=True)
-    #     else:
-    #         self.setPriorities(new)
-
+  
     def resetBehaviour(self):
         self.dict_actions = {"Move": {"To_Planet": False, "To_Player":False}, "Factory": 0, "Weapon": 0, "Upgrade": {"Damage": False, "Factory":False}}
         self.list_priorities = []
@@ -140,7 +90,6 @@ class Explorer(Behaviour):
 
     def __init__(self):
         super().__init__()
-        self.resetBehaviour()
         self.setBehaviourName(self.__class__.__name__)
         self.actual_behaviour = self.__class__.__name__
         self.dict_actions["Move"]["To_Planet"] = True
@@ -151,7 +100,6 @@ class Chaser(Behaviour):
 
     def __init__(self):
         super().__init__()
-        self.resetBehaviour()
         self.setBehaviourName(self.__class__.__name__)
         self.dict_actions["Move"]["To_Player"] = True
         self.dict_actions["Upgrade"]["Damage"] = True
@@ -162,7 +110,6 @@ class Farmer(Behaviour):
 
     def __init__(self):
         super().__init__()
-        self.resetBehaviour()
         self.setBehaviourName(self.__class__.__name__)
         self.dict_actions["Upgrade"]["Factory"] = True
         self.list_priorities = ["Factory", "Upgrade", "Move", "Weapon"]
@@ -174,7 +121,6 @@ class CustomBehaviour(Behaviour):
         self.setBehaviourName(behaviour_name)
         # Servira para comprobar que al establecer una nueva prioridad se pongan los numeros correctos
         self._valid_numbers_priority = ["1","2","3","4"]
-        self.resetBehaviour()
         self.setPriorities()
         
     def setPriorities(self):
@@ -210,27 +156,59 @@ class CustomBehaviour(Behaviour):
                 str_priority = input("Select from highest to lowest priority (1 = Move, 2 = Factory, 3 = Weapon, 4 = Upgrade) using comma as separator. Ex: 1,2,3,4\n")
                 different_priorities = str_priority.split(",")
                 # Si todos los numeros introducidos estan dentro de la lista de numeros validos 
-                if all(number in self._valid_numbers_priority for number in different_priorities) and len(set(different_priorities)) == len(self.dict_actions):
+                if all(number in self._valid_numbers_priority for number in different_priorities) and len(set(different_priorities)) == len(self.dict_actions) == len(different_priorities):
                         return different_priorities
                 else:
                     print(f"This are the only valid numbers: {self._valid_numbers_priority}")
 
 
+class RandomBehaviour(Behaviour):
+    def __init__(self, behaviour_name):
+        super().__init__()
+        self.setBehaviourName(behaviour_name)
+        # Inicializaré una clase de comportamiento con todo aleatorio
+        self.setRandomPriorities()
+
+    # Metodo para establecer las prioridades aleatorias del comportamiento
+    def setRandomPriorities(self):
+        # Paso a una lista todas las claves del diccionario de acciones para poder recorrerla
+        list_actions = list(self.dict_actions.keys())
+        # Los ordeno de forma aleatoria para tener una lista aleatoria con los comportamientos
+        random.shuffle(list_actions)
+        # Recorro la lista para determinar una direccion al movimiento y las mejoras que tendrá
+        for action in list_actions:
+            if action == "Move":
+                self.getRandomSpecialActions(action)
+            elif action == "Upgrade":
+                self.getRandomSpecialActions(action)
+            # Por último guardo la lista de prioridad en la variable correspondiente
+            self.list_priorities.append(action)
+
+    # Método para establecer de manera aleatoria la direccion del movimiento y el comportamiento
+    def getRandomSpecialActions(self, action):
+        if action == "Move" or action == "Upgrade":
+            for item in self.dict_actions[action]:
+                coin = random.randint(0,1)
+                if coin == 0:
+                    self.dict_actions[action][item] = False
+                else:
+                    self.dict_actions[action][item] = True
+
 
 # Para poder comprobar el funcionamiento de la clase 
 if __name__ == "__main__":
-    comportamiento = Behaviour()
+    comportamiento = RandomBehaviour("Random")
     explorador = Explorer()
     perseguidor = Chaser()
     granjero = Farmer()
     custom = CustomBehaviour("nombre")
     
-    print(f"nombre de comporamiento de Clase Behaviour -> {comportamiento.actual_behaviour}")
+    print(f"nombre de comporamiento de Clase RandomBehaviour -> {comportamiento.actual_behaviour}")
     print(f"nombre de comporamiento de Clase Explorer -> {explorador.actual_behaviour}")
     print(f"nombre de comporamiento de Clase Chaser -> {perseguidor.actual_behaviour}")
     print(f"nombre de comporamiento de Clase Farmer -> {granjero.actual_behaviour}")
     print(f"nombre de comporamiento de Clase Personalizada -> {custom.actual_behaviour}")
-    print("Clase Behaviour")
+    print("Clase RandomBehaviour")
     print(comportamiento.getPrioritiesStr())
     print(comportamiento.getPriorities())
     print("Clase Explorador")
