@@ -247,7 +247,19 @@ Tendrá que tener más comportamietos se pueden añadir aleatorios o establecien
                 self.list_priorities = ["Factory", "Upgrade", "Move", "Weapon"]
 
  
- Comentario en la clase de behaviours en el metodo act       
+ Comentario en la clase de behaviours en el metodo act  
+ """
+    Diferentes comportamientos que están preestablecidos:
+    --> Chaser: Su objetivo será perseguir al agente y luchar contra el 
+    --> Explorer: Su objetivo será buscar los plaentas que no estén habitados y conquistarlos
+    --> Farmer: Su objetivo será construir fábricas para obtener más recursos
+            
+    """
+
+    Tengo que abstraer lo importante de un comportamiento y luego en cada clase personalizar las acciones que hagan que será por ejemplo la acción que eligirá en cada momento
+    Un comportamiento tiene que tener un nombre, una lista de prioridades y tengo que saber la dirección de movimiento preferida y las mejoras que podrá realizar.
+    Aunque tengo que dar libertad para que en función de las necesidades pueda modificar su comportamiento de manera dinámica, que coloque su lista de prioridades como quiera
+     
     """
         Tendría que determinar cual es la acción que va a realizar de su lista de prioridades y devolver el primer valor, pero si no puedo realizarlo tendría que devolver el siguiente
         Así en la clase principal solo tendría el bucle para los agentes y un while hasta que se complete la acción mientras que no haya aceptado la acción no sale del bucle
@@ -280,3 +292,4 @@ Metodo para que el agente desde su propia clase pueda obtener la lista con el co
             list_planet_attributes.append(planet_attributes)
 
         return list_agent_attributes, list_planet_attributes
+
