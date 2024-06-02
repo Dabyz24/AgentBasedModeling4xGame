@@ -202,7 +202,8 @@ class Game(mesa.Model):
             _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_positions)
             chosen_action = chosen_move
         except Exception as ex:
-            print("An exception occurred:", type(ex).__name__, "-", ex)
+            pass
+            # print("An exception occurred:", type(ex).__name__, "-", ex)
 
         return chosen_action
 
@@ -359,7 +360,7 @@ class Game(mesa.Model):
         self.step_count += 1
         chosen_action = ""
         for agent in self.list_agents:
-            # Si el valor aletorio es menor que EPSILON (0.1) realizará una accion aleatoria, esto permite que no todos los agentes tengan el mismo comportamiento
+            # Si el valor aletorio es menor que EPSILON (0.02) realizará una accion aleatoria, esto permite que no todos los agentes tengan el mismo comportamiento
             if self.random.uniform(0, 1) < EPSILON:
                 print(f"Accion random para el agente {agent.getId()}")
                 # El agente cogera un valor de la lista de posibles acciones del modelo. [0] es porque devolvera una lista y necesito el elemento
@@ -401,7 +402,7 @@ class Game(mesa.Model):
             self.step()
             for agent in self.schedule.agents:
                 if type(agent) == Player:
-                    if agent.getStellarPoints() >= 50000:
+                    if agent.getStellarPoints() >= 25000:
                         done = True
             i += 1
             print("--------------------")
@@ -442,6 +443,7 @@ if __name__ == "__main__":
         file_name = f"run_{i}.txt"
         path = os.path.join(dir_name, "saves", file_name)
         with open(path, "w+", encoding="utf-8") as my_file:
+            my_file.write(f"Ejecución terminada en {model.step_count} steps \n")
             my_file.write("Los jugadores son: \n")
             for k, v in players.items():
                 my_file.write(f"Agent id {k} {v}\n")    
