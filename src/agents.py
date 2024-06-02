@@ -1,7 +1,7 @@
 import mesa
 from weapons import Weapon
 from upgrades import Upgrades
-from behaviours import Behaviour, Explorer, Chaser, Farmer, CustomBehaviour
+from behaviours import Behaviour, Explorer, Chaser, Farmer, CustomBehaviour, RandomBehaviour
 from global_constants import *
 
 class Player(mesa.Agent):
@@ -237,8 +237,7 @@ class Player(mesa.Agent):
     def setBehaviour(self, new_behaviour, random_flag=False):
         # random_flag serivra para identificar si el nuevo comportamiento quiere que sea totalmente random
         if random_flag:
-            self.behaviour = Behaviour()
-            self.behaviour.setBehaviourName(new_behaviour)
+            self.behaviour = RandomBehaviour(new_behaviour)
         else:
             if new_behaviour in POSSIBLE_BEHAVIOURS:
                 if new_behaviour == "Explorer":
