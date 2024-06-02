@@ -12,7 +12,7 @@ MOORE_PLAYER = True
 MOORE_PLANET = True
 
 # Constante para permitir la exploración de acciones aleatorias por parte del agente 
-EPSILON = 0.05   # Permite la exploracion del agente si el valor es menor a EPSILON
+EPSILON = 0.02   # Permite la exploracion del agente si el valor es menor a EPSILON
 
 # Constantes iniciales del jugador
 INITIAL_PLAYER_TECH = 30
