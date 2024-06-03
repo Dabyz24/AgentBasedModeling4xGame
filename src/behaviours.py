@@ -178,9 +178,7 @@ class RandomBehaviour(Behaviour):
         random.shuffle(list_actions)
         # Recorro la lista para determinar una direccion al movimiento y las mejoras que tendrá
         for action in list_actions:
-            if action == "Move":
-                self.getRandomSpecialActions(action)
-            elif action == "Upgrade":
+            if isinstance(self.dict_actions.get(action), dict): 
                 self.getRandomSpecialActions(action)
             # Por último guardo la lista de prioridad en la variable correspondiente
             self.list_priorities.append(action)
@@ -202,7 +200,9 @@ if __name__ == "__main__":
     perseguidor = Chaser()
     granjero = Farmer()
     custom = CustomBehaviour("nombre")
-    
+    # for i in range(100):
+    #     print(RandomBehaviour(str(i)).getPriorities())
+
     print(f"nombre de comporamiento de Clase RandomBehaviour -> {comportamiento.actual_behaviour}")
     print(f"nombre de comporamiento de Clase Explorer -> {explorador.actual_behaviour}")
     print(f"nombre de comporamiento de Clase Chaser -> {perseguidor.actual_behaviour}")
