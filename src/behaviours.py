@@ -187,13 +187,12 @@ class RandomBehaviour(Behaviour):
 
     # Método para establecer de manera aleatoria la direccion del movimiento y el comportamiento
     def getRandomSpecialActions(self, action):
-        if action == "Move" or action == "Upgrade":
-            for item in self.dict_actions[action]:
-                coin = random.randint(0,1)
-                if coin == 0:
-                    self.dict_actions[action][item] = False
-                else:
-                    self.dict_actions[action][item] = True
+        for item in self.dict_actions[action]:
+            coin = random.randint(0,1)
+            if coin == 0:
+                self.dict_actions[action][item] = False
+            else:
+                self.dict_actions[action][item] = True
 
 
 # Para poder comprobar el funcionamiento de la clase 
