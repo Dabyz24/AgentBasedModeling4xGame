@@ -91,10 +91,11 @@ class Explorer(Behaviour):
     def __init__(self):
         super().__init__()
         self.setBehaviourName(self.__class__.__name__)
-        self.actual_behaviour = self.__class__.__name__
         self.dict_actions["Move"]["To_Planet"] = True
         self.list_priorities = ["Move", "Factory", "Upgrade", "Weapon"]
 
+    # def act():
+    #     pass
 
 class Chaser(Behaviour):
 
