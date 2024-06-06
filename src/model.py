@@ -337,14 +337,15 @@ class Game(mesa.Model):
 
     # Añadira un agente a la simulación 
     def addAgent(self):
-        location_found = False
-        while not location_found:
-            location = self.checkSpace(MOORE_PLAYER, 0)
-            location_found = location[0]
-        pos = location[1]
+        pos = (self.random.randrange(self.width), self.random.randrange(self.height))
         next_id = self.next_id()
+        list_behaviours = POSSIBLE_BEHAVIOURS + ["Random"]
         player = Player(next_id, self, pos, moore=MOORE_PLAYER)
-        player.setBehaviour("Random"+str(next_id), random_flag=True)
+        behaviour = self.random.choice(list_behaviours)
+        if behaviour == "Random":
+            player.setBehaviour(behaviour+str(next_id), random_flag=True)
+        else:
+            player.setBehaviour(behaviour)
         try:
             chosen_color = self.list_agents_colors.pop(self.random.randrange(0, len(self.list_agents_colors)))
             player.setAgentColor(chosen_color)
