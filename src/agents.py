@@ -290,10 +290,24 @@ class Player(mesa.Agent):
     def getAgentInfo(self, verbose=False):
         if verbose:
             return "T: " + str(self.tech) + " G: " + str(self.gold) + " P: " +str(self.num_planets) + " F: "+str(self.num_factories) + " <strong>Stellar Points: " + str(self.stellar_points)+"</strong>"
-        return [self.pos, self.tech, self.gold, self.num_planets, self.num_factories, self.player_weapon, self.stellar_points]
+        return [self.pos, self.tech, self.gold, self.num_planets, self.num_factories, self.getPlayerWeapon()[0], self.stellar_points]
+    
+    # Método para poder obtener la lista de todos los enemigos del jugador en la simulacion 
+    def getOtherPlayers(self):
+        list_players = []
+        for player in self.model.get_agents_of_type(Player):
+            if player is self:
+                continue
+            else:
+                list_players.append(player)
+        return list_players
     
     # Método para poder elegir la acción de la lista de prioridades de su comportamiento
     def selectAction(self):
+        # Tengo que ver el contexto del agente y en funcion de las acciones determinar una nueva lista de prioridades 
+        # other_players = self.getOtherPlayers()
+        # for enemy in other_players:
+        #     print(enemy.getAgentInfo())
         action = self.behaviour.act(self.gold, self.tech, self.num_factories, self.player_weapon, self.agent_upgrades, self.move)
         return action
 
