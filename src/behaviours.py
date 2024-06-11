@@ -47,9 +47,13 @@ class Behaviour():
                             return action, "Damage"
         return "Wait"
     
-    # Tengo que cambiar la lista de prioridades en funcion de las necesidades
+    # Método para cambiar la lista de prioridades de manera aleatoria
     def changeBehaviour(self):
-        pass
+        # Modifica el orden de la lista de forma aleatoria 
+        random.shuffle(self.list_priorities)
+        for action in list(self.dict_actions.keys()):
+            if isinstance(self.dict_actions.get(action), dict): 
+                self.getRandomSpecialActions(action)
 
     # Método para presentar de una manera mas visual la lista de prioridades
     def getPrioritiesStr(self):
@@ -88,6 +92,15 @@ class Behaviour():
     
     def setBehaviourName(self, new_name):
         self.actual_behaviour = new_name
+
+    # Método para establecer de manera aleatoria la direccion del movimiento y el comportamiento
+    def getRandomSpecialActions(self, action):
+        for item in self.dict_actions[action]:
+            coin = random.randint(0,1)
+            if coin == 0:
+                self.dict_actions[action][item] = False
+            else:
+                self.dict_actions[action][item] = True
     
 
 class Explorer(Behaviour):
@@ -100,6 +113,7 @@ class Explorer(Behaviour):
 
     # Hacer polimorfismo para cada comportamiento para poder cambiar los comportamientos en funcion de las necesidades
     def changeBehaviour(self):
+        # El explorer tendrá que buscar forma para poder generar fabrica y así poder mantener los planetas que conquiste 
         pass
 
 class Chaser(Behaviour):
@@ -188,14 +202,7 @@ class RandomBehaviour(Behaviour):
             # Por último guardo la lista de prioridad en la variable correspondiente
             self.list_priorities.append(action)
 
-    # Método para establecer de manera aleatoria la direccion del movimiento y el comportamiento
-    def getRandomSpecialActions(self, action):
-        for item in self.dict_actions[action]:
-            coin = random.randint(0,1)
-            if coin == 0:
-                self.dict_actions[action][item] = False
-            else:
-                self.dict_actions[action][item] = True
+
 
 
 # Para poder comprobar el funcionamiento de la clase 
@@ -216,6 +223,9 @@ if __name__ == "__main__":
     print("Clase RandomBehaviour")
     print(comportamiento.getPrioritiesStr())
     print(comportamiento.getPriorities())
+    for i in range(0,10):
+        comportamiento.changeBehaviour()
+        print(comportamiento.getPriorities())
     print("Clase Explorador")
     print(explorador.getPrioritiesStr())
     print(explorador.getPriorities())
