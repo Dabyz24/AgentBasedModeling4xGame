@@ -46,6 +46,10 @@ class Behaviour():
                         if (agent_gold > UPGRADE_DAMAGE_GOLD_COST and agent_tech > UPGRADE_DAMAGE_TECH_COST):
                             return action, "Damage"
         return "Wait"
+    
+    # Tengo que cambiar la lista de prioridades en funcion de las necesidades
+    def changeBehaviour(self):
+        pass
 
     # Método para presentar de una manera mas visual la lista de prioridades
     def getPrioritiesStr(self):
@@ -94,8 +98,9 @@ class Explorer(Behaviour):
         self.dict_actions["Move"]["To_Planet"] = True
         self.list_priorities = ["Move", "Factory", "Upgrade", "Weapon"]
 
-    # def act():
-    #     pass
+    # Hacer polimorfismo para cada comportamiento para poder cambiar los comportamientos en funcion de las necesidades
+    def changeBehaviour(self):
+        pass
 
 class Chaser(Behaviour):
 
