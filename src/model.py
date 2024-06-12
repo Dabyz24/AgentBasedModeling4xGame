@@ -363,7 +363,6 @@ class Game(mesa.Model):
         for agent in self.list_agents:
             # Si el valor aletorio es menor que EPSILON (0.02) realizará una accion aleatoria, esto permite que no todos los agentes tengan el mismo comportamiento
             if self.random.uniform(0, 1) < EPSILON:
-                print(f"Accion random para el agente {agent.getId()}")
                 # El agente cogera un valor de la lista de posibles acciones del modelo. [0] es porque devolvera una lista y necesito el elemento
                 action = "Random"
                 chosen_action = self.random.choices(POSSIBLE_ACTIONS)[0]
