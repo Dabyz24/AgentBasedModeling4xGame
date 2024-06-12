@@ -1,4 +1,5 @@
 import random
+import copy
 from global_constants import *
 
 
@@ -112,9 +113,13 @@ class Explorer(Behaviour):
         self.list_priorities = ["Move", "Factory", "Upgrade", "Weapon"]
 
     # Hacer polimorfismo para cada comportamiento para poder cambiar los comportamientos en funcion de las necesidades
-    def changeBehaviour(self):
-        # El explorer tendrá que buscar forma para poder generar fabrica y así poder mantener los planetas que conquiste 
-        pass
+    # def changeBehaviour(self):
+    #     # El explorer tendrá que buscar forma para poder generar fabrica y así poder mantener los planetas que conquiste 
+    #     pass
+
+    def resetBehaviour(self):
+        self.dict_actions = {"Move": {"To_Planet": True, "To_Player":False}, "Factory": 0, "Weapon": 0, "Upgrade": {"Damage": False, "Factory":False}}
+        self.list_priorities = ["Move", "Factory", "Upgrade", "Weapon"]
 
 class Chaser(Behaviour):
 
@@ -125,6 +130,9 @@ class Chaser(Behaviour):
         self.dict_actions["Upgrade"]["Damage"] = True
         self.list_priorities = ["Weapon", "Upgrade", "Move", "Factory"]
 
+    def resetBehaviour(self):
+        self.dict_actions = {"Move": {"To_Planet": False, "To_Player":True}, "Factory": 0, "Weapon": 0, "Upgrade": {"Damage": True, "Factory":False}}
+        self.list_priorities = ["Weapon", "Upgrade", "Move", "Factory"]
 
 class Farmer(Behaviour):
 
@@ -132,6 +140,10 @@ class Farmer(Behaviour):
         super().__init__()
         self.setBehaviourName(self.__class__.__name__)
         self.dict_actions["Upgrade"]["Factory"] = True
+        self.list_priorities = ["Factory", "Upgrade", "Move", "Weapon"]
+
+    def resetBehaviour(self):
+        self.dict_actions = {"Move": {"To_Planet": False, "To_Player":False}, "Factory": 0, "Weapon": 0, "Upgrade": {"Damage": False, "Factory":True}}
         self.list_priorities = ["Factory", "Upgrade", "Move", "Weapon"]
 
 class CustomBehaviour(Behaviour):
@@ -142,7 +154,9 @@ class CustomBehaviour(Behaviour):
         # Servira para comprobar que al establecer una nueva prioridad se pongan los numeros correctos
         self._valid_numbers_priority = ["1","2","3","4"]
         self.setPriorities()
-        
+        self.copy_dict_actions = copy.deepcopy(self.dict_actions)
+        self.copy_list_priorities = self.list_priorities.copy()
+
     def setPriorities(self):
         # Método para establecer de una manera personalizada la lista de prioridad, la direccion de movimiento y las mejoras disponibles 
         different_priorities = self.inputPriorities()
@@ -181,6 +195,9 @@ class CustomBehaviour(Behaviour):
                 else:
                     print(f"This are the only valid numbers: {self._valid_numbers_priority}")
 
+    def resetBehaviour(self):
+        self.dict_actions = copy.deepcopy(self.copy_dict_actions)
+        self.list_priorities = self.copy_list_priorities.copy()
 
 class RandomBehaviour(Behaviour):
     def __init__(self, behaviour_name):
@@ -188,6 +205,8 @@ class RandomBehaviour(Behaviour):
         self.setBehaviourName(behaviour_name)
         # Inicializaré una clase de comportamiento con todo aleatorio
         self.setRandomPriorities()
+        self.copy_dict_actions = copy.deepcopy(self.dict_actions)
+        self.copy_list_priorities = self.list_priorities.copy()
 
     # Metodo para establecer las prioridades aleatorias del comportamiento
     def setRandomPriorities(self):
@@ -202,8 +221,9 @@ class RandomBehaviour(Behaviour):
             # Por último guardo la lista de prioridad en la variable correspondiente
             self.list_priorities.append(action)
 
-
-
+    def resetBehaviour(self):
+        self.dict_actions = copy.deepcopy(self.copy_dict_actions)
+        self.list_priorities = self.copy_list_priorities.copy()
 
 # Para poder comprobar el funcionamiento de la clase 
 if __name__ == "__main__":
@@ -225,6 +245,9 @@ if __name__ == "__main__":
     print(comportamiento.getPriorities())
     for i in range(0,10):
         comportamiento.changeBehaviour()
+        print(comportamiento.getPriorities())
+        print("comportamiento resetado")
+        comportamiento.resetBehaviour()
         print(comportamiento.getPriorities())
     print("Clase Explorador")
     print(explorador.getPrioritiesStr())
