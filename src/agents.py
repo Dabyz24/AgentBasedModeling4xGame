@@ -1,7 +1,7 @@
 import mesa
 from weapons import Weapon
 from upgrades import Upgrades
-from behaviours import Behaviour, Explorer, Chaser, Farmer, CustomBehaviour, RandomBehaviour
+from behaviours import Explorer, Chaser, Farmer, CustomBehaviour, RandomBehaviour
 from global_constants import *
 
 class Player(mesa.Agent):
@@ -334,8 +334,15 @@ class Player(mesa.Agent):
     # Método para poder elegir la acción de la lista de prioridades de su comportamiento
     def selectAction(self):
         # Tengo que ver el contexto del agente y en funcion de las acciones determinar una nueva lista de prioridades 
-        dict_enemies = self.getOtherPlayers()
-        
+        #dict_enemies = self.getOtherPlayers()
+        context = self.model.grid.get_neighbors(self.pos, self.moore, include_center=False, radius=2)
+        # para saber si alguno de los agentes que tiene alrededor son uno de los de dict_enemies
+        # for enemie in context:
+        #     if enemie in dict_enemies.values():
+        #         for k, v in dict_enemies.items():
+        #             if enemie == v:
+        #                 print(print(k, v))
+        #self.behaviour.changeBehaviour(context)
         action = self.behaviour.act(self.gold, self.tech, self.num_factories, self.player_weapon, self.agent_upgrades, self.move)
         return action
 
