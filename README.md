@@ -31,8 +31,10 @@
 
 [ ] 9. Que el agente sea capaz de interactuar con su entorno
 - [✔] 9.1 Que el agente sepa quien es el ganador y los recursos de cada agente
-- [] 9.2 Que el agente pueda cambiar su lista de prioridades si se dan ciertas condiciones (Que pueda modificar su comportamiento en funcion de sus recursos)
+- [✔] 9.2 Que el agente pueda cambiar su lista de prioridades si se dan ciertas condiciones 
 - [] 9.3 El comportamiento del agente tiene que depender del entorno del agente para poder cambiar sus listas de prioridades
+  - [] 9.3.1 Establecer las listas de prioridades para cada tipo de situaciones que se pueden dar en la simulación, haciendo métodos polimorficos
+  - [] 9.3.2 Dependiendo de los elementos que tenga en su radio de movimiento, elegir una de las listas de prioridades o la otra
 - [] 9.4 Introducir alguna mecanica dinamicamente como si se le hubiese ocurrido al agente (como donar algunos recursos o poder comprar a agentes para que le protejan)
 
 [ ] 10. Guardar la semilla de una ejecución para poder generarla 
