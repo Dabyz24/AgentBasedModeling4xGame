@@ -14,7 +14,7 @@ class Behaviour():
         # Lista que servirá para tener las prioridades
         self.list_priorities = []
 
-    # Metodo que determinará el comportamiento de la clase Behaviour
+    # Metodo que recorre la lista de prioridades del agente y decide la acción que realizar en función de sus recursos
     def act(self, agent_gold, agent_tech, agent_factories, agent_weapon, agent_upgrades, is_ship_created):
         for action in self.list_priorities:
             if action == "Move":
@@ -48,13 +48,22 @@ class Behaviour():
                             return action, "Damage"
         return "Wait"
     
-    # Método para cambiar la lista de prioridades de manera aleatoria
-    def changeBehaviour(self):
-        # Modifica el orden de la lista de forma aleatoria 
-        random.shuffle(self.list_priorities)
-        for action in list(self.dict_actions.keys()):
-            if isinstance(self.dict_actions.get(action), dict): 
-                self.getRandomSpecialActions(action)
+    # Método para cambiar la lista de prioridades en función del entorno 
+    def changeBehaviour(self, context):
+        # Si el agente tiene algún vecino, ya sea otro jugador o planeta intentará identificar la situación para cambiar su comportamiento 
+        if len(context) > 0:
+            for neighbor in context:
+                # Forma de saber si el tipo es un planeta sin tener que importar Planet, para que no de error por import circular
+                if (str(type(neighbor))[15:21]) == "Planet":
+                    if neighbor.isInhabit():
+                        print("El vecino es un planeta no habitado")
+                        self.dict_actions = {"Move": {"To_Planet": True, "To_Player":False}, "Factory": 0, "Weapon": 0, "Upgrade": {"Damage": False, "Factory":False}}
+                        self.list_priorities = ["Move", "Factory", "Upgrade", "Weapon"]
+                        # Una vez cambiada la lista de acciones y la lista de prioridades haré un return para cortar la ejecución
+                        return 
+        else:
+            # Si no tiene ningún vecino alrededor, actuará como está preestablecido en su comportamiento
+            self.resetBehaviour()
 
     # Método para presentar de una manera mas visual la lista de prioridades
     def getPrioritiesStr(self):
@@ -220,6 +229,13 @@ class RandomBehaviour(Behaviour):
                 self.getRandomSpecialActions(action)
             # Por último guardo la lista de prioridad en la variable correspondiente
             self.list_priorities.append(action)
+
+    # def changeBehaviour(self, context=[]):
+    #     # Modifica el orden de la lista de forma aleatoria 
+    #     random.shuffle(self.list_priorities)
+    #     for action in list(self.dict_actions.keys()):
+    #         if isinstance(self.dict_actions.get(action), dict): 
+    #             self.getRandomSpecialActions(action)
 
     def resetBehaviour(self):
         self.dict_actions = copy.deepcopy(self.copy_dict_actions)
