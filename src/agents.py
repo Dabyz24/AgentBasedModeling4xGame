@@ -294,20 +294,48 @@ class Player(mesa.Agent):
     
     # Método para poder obtener la lista de todos los enemigos del jugador en la simulacion 
     def getOtherPlayers(self):
-        list_players = []
-        for player in self.model.get_agents_of_type(Player):
-            if player is self:
+        points_winner = float("-inf")
+        worst_weapon = float("inf")
+        most_planets = float("-inf") 
+        most_resources = 0
+        most_gold = 0
+        dict_enemies = {}
+        # Recorro la lista de todos los agentes restantes para poder guardar los agentes destacados
+        for agent in self.model.get_agents_of_type(Player):
+            if agent is self:
                 continue
-            else:
-                list_players.append(player)
-        return list_players
-    
+            if agent.getStellarPoints() > points_winner:
+                points_winner = agent.getStellarPoints()
+                dict_enemies["Points_Winner"] = agent
+            try:
+                if agent.getPlayerWeapon()[1] < worst_weapon:
+                    worst_weapon = agent.getPlayerWeapon()[1]
+                    dict_enemies["Worst_Weapon"] = agent
+            except:
+                # Si entra en el except es porque no tiene ningun arma y está comparando un float con el string None, por lo que es el agente con peor arma
+                worst_weapon = agent.getPlayerWeapon()[1]
+                dict_enemies["Worst_Weapon"] = agent
+                
+            if agent.getPlanets() > most_planets:
+                most_planets = agent.getPlanets()
+                dict_enemies["More_Planets"] = agent
+            if agent.getGold() > most_resources:
+                most_resources = agent.getGold()
+                dict_enemies["More_Resources"] = agent
+
+        for planet in self.model.get_agents_of_type(Planet):
+            # Buscar el planeta que mas oro tenga y si está inhabitado
+            if planet.getPlanetGold() > most_gold and not planet.isInhabit():
+                most_gold = planet.getPlanetGold()
+                dict_enemies["Best_Planet"] = planet
+                
+        return dict_enemies
+         
     # Método para poder elegir la acción de la lista de prioridades de su comportamiento
     def selectAction(self):
         # Tengo que ver el contexto del agente y en funcion de las acciones determinar una nueva lista de prioridades 
-        # other_players = self.getOtherPlayers()
-        # for enemy in other_players:
-        #     print(enemy.getAgentInfo())
+        dict_enemies = self.getOtherPlayers()
+        
         action = self.behaviour.act(self.gold, self.tech, self.num_factories, self.player_weapon, self.agent_upgrades, self.move)
         return action
 
