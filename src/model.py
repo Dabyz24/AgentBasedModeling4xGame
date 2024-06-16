@@ -71,7 +71,7 @@ class Game(mesa.Model):
                 location_found = location[0]
             pos = location[1]
             planet = Planet(i, self, pos ,self.random.randrange(0, self.tech_planet),
-                            self.random.randrange(0, self.gold_planet), self.taxes_planet, moore=MOORE_PLANET)
+                            self.random.randrange(10, self.gold_planet), self.taxes_planet, moore=MOORE_PLANET)
             self.list_planets.append(planet)
             self.grid.place_agent(planet, pos)
             self.schedule.add(planet)
@@ -289,16 +289,19 @@ class Game(mesa.Model):
             if action[1] == "None":
                 chosen_action = self.random.choices(POSSIBLE_ACTIONS[0:8])[0]
                 return chosen_action
-            
-            if action[1] == "To_Planet":
-                list_directions = self.getAllPlanetPos()
-                # Si todos los planetas están ocupados, se moveran hacia un agente cercano para luchar y hacer que algun planeta se quede libre
-                if len(list_directions) == 0:
+            # Si tiene una dirección definida se moverá hacia el 
+            if len(action[2]) == 1:
+                chosen_action = self._moveToTarget(agent, action[2])
+            else:
+                if action[1] == "To_Planet":
+                    list_directions = self.getAllPlanetPos()
+                    # Si todos los planetas están ocupados, se moveran hacia un agente cercano para luchar y hacer que algun planeta se quede libre
+                    if len(list_directions) == 0:
+                        list_directions = self.getAllPlayersPos()
+                
+                elif action[1] == "To_Player":
                     list_directions = self.getAllPlayersPos()
-            
-            elif action[1] == "To_Player":
-                list_directions = self.getAllPlayersPos()
-            chosen_action = self._moveToTarget(agent, list_directions)
+                chosen_action = self._moveToTarget(agent, list_directions)
 
         elif action[0] == "Upgrade":
             if action[1] == "Factory":
