@@ -13,7 +13,10 @@ class Behaviour():
         self.dict_actions = {"Move": {"To_Planet": False, "To_Player":False}, "Factory": 0, "Weapon": 0, "Upgrade": {"Damage": False, "Factory":False}}
         # Lista que servirá para tener las prioridades
         self.list_priorities = []
+        # Sirve para determinar el objetivo de la dirección
         self.special_target = []
+        # Sirve para determinar si el agente huira del objetivo o no 
+        self.run_away = False
 
     # Metodo que recorre la lista de prioridades del agente y decide la acción que realizar en función de sus recursos
     def act(self, agent_gold, agent_tech, agent_factories, agent_weapon, agent_upgrades, is_ship_created):
@@ -51,7 +54,7 @@ class Behaviour():
     
     # Método para cambiar la lista de prioridades en función del entorno 
     # Hacer polimorfismo para cada comportamiento para poder cambiar los comportamientos en funcion de las necesidades
-    def changeBehaviour(self, player, context, dict_enemies):
+    def changeBehaviour(self, player, context_players, context_planets, dict_enemies):
         pass
     
     # Método que me permite especificar la dirección de movimiento de los agentes, para obligarles a ir a una dirección especifica 
@@ -59,6 +62,9 @@ class Behaviour():
         if len(self.special_target) == 1:
             self.special_target.pop(0)
         self.special_target.append(target)
+
+    def getRunAway(self):
+        return self.run_away
 
     # Método para presentar de una manera mas visual la lista de prioridades
     def getPrioritiesStr(self):
@@ -116,67 +122,44 @@ class Explorer(Behaviour):
         self.dict_actions["Move"]["To_Planet"] = True
         self.list_priorities = ["Move", "Factory", "Weapon", "Upgrade"]
 
-    def changeBehaviour(self, player, context, dict_enemies):
-        # El explorer tendrá que buscar forma para poder generar fabrica y así poder mantener los planetas que conquiste 
+    # El explorer evitará las peleas, será como una especie de pacifista que solo se centrará en conquistar planetas 
+    def changeBehaviour(self, player, context_players, context_planets, dict_enemies):
+        # Reseteo el comportamiento para que vuelva a decidir la acción que hacer
+        self.resetBehaviour()
         # Si el agente tiene algún vecino, ya sea otro jugador o planeta intentará identificar la situación para cambiar su comportamiento 
-        if len(context) > 0:
-            # Significa que habrá al menos un vecino Planet y otro vecino Player
-            if len(set(context)) > 1:
-                pass
-            # Si no solo habrá un vecino Planet o Player
-            else:
-                # Si solo hay un miembro todos tendrán el mismo tipo, por lo que puedo comprobar el tipo del primer elemento de la lista 
-                # Forma de saber si el tipo es un planeta sin tener que importar Planet, para que no de error por import circular
-                if (str(type(context[0]))[15:21]) == "Planet":
+        # Si el vecino es un jugador el agente huira de el 
+        if len(context_players) > 0:
+            # Tengo que huir del player si tiene un arma
+            for enemie in context_players:
+                if enemie.getNumPlayerWeapon() > 0:
+                    self.run_away = True
+                    self.addSpecialTarget(enemie.getAgentPos())
+                    return
+            # Si ninguno de los jugadores tiene un arma del que huir actuo normal 
+            self.resetBehaviour()
+            return 
+        # Si no solo habrá vecinos Planet 
+        elif len(context_planets) > 0: 
+            # if all(planet.isInhabit() for planet in context_planets):
+            #         # Si todos los planetas están habitados 
+            #         print("El agente intentará construir una fabrica y luego moverse")
+            #         self.list_priorities = ["Factory", "Move", "Weapon", "Upgrade"]
+            #         return
+            # else:
                     # Si es un planeta actuará como siempre, aunque tendría que dar prioridad al planeta con oro que el jugador pueda mantener 
-                    print("El agente actuará como está preestablecido")
-                    # Reseteo el comportamiento para que vuelva al preestablecido y no haga la ultima lista de prioridades que se le haya 
                     self.resetBehaviour()
                     return 
-                # Si no es planeta, solo habrá vecinos players
-                else:
-                    # Buscar el que peor arma tenga y compararla con la mia, si tiene peor arma lo que hare será luchar con él, es decir, acercarme
-                    # Si tiene un arma mejor lo que haré será huir como maxima prioridad  
-                    worst_weapon = float("inf")
-                    if player.getNumPlayerWeapon() != 0:
-                        if player.getPlayerWeapon()[1] > dict_enemies["Worst_Weapon"].getPlayerWeapon()[1]:
-                            if dict_enemies["Worst_Weapon"] in context:
-                                print("Se encuentra aqui el agente con peor arma")
-                                # Ir hacia ese agente y luchar [Hacer algo para poder especificar la direccion del planeta o el jugador]
-                                self.addSpecialTarget(dict_enemies["Worst_Weapon"].getAgentPos())
-                                return 
-                            else:
-                                print("No se encuentra el agente con peor arma, buscare si en mi contexto hay uno con peor arma que el mio")
-                        # Si el jugador tiene un arma puedo buscar el que peor arma tenga para decidir si luchar con el o no 
-                                print("Busco el agente con peor arma")
-                                for neighbor in context:
-                                    try:
-                                        if neighbor.getPlayerWeapon()[1] < worst_weapon:
-                                            worst_weapon = neighbor.getPlayerWeapon()[1]
-                                    except:
-                                        # Si entra en el except es porque no tiene ningun arma y está comparando un float con el string None, por lo que es el agente con peor arma
-                                        worst_weapon = neighbor.getPlayerWeapon()[1]
-                                # Si tengo un arma mejor lucharé con el 
-                                if player.getPlayerWeapon()[1] > worst_weapon:
-                                    # Haré que se mueva hacia el jugador con peor arma
-                                    self.dict_actions["Move"]["To_Planet"] = False
-                                    self.dict_actions["Move"]["To_Player"] = True
-                                    return 
-                        else:
-                            # Huir
-                            self.resetBehaviour()
-                            return   
-                    else:
-                        # Huir hacia otro lado
-                        self.resetBehaviour()
-                        return 
         else:
-            # Si no tiene ningún vecino alrededor, actuará como está preestablecido en su comportamiento
-            self.resetBehaviour()
-
+            # Si no tiene ningún vecino alrededor, se comportará con el comportamiento estandar
+            print("El agente cambia su prioridad para construir una fabrica primero")
+            self.list_priorities = ["Factory", "Move", "Weapon", "Upgrade"]
+            return 
+                        
     def resetBehaviour(self):
+        self.run_away = False
         self.dict_actions = {"Move": {"To_Planet": True, "To_Player":False}, "Factory": 0, "Weapon": 0, "Upgrade": {"Damage": False, "Factory":False}}
         self.list_priorities = ["Move", "Factory", "Weapon", "Upgrade"]
+        self.special_target = []
 
 class Chaser(Behaviour):
 
@@ -187,9 +170,76 @@ class Chaser(Behaviour):
         self.dict_actions["Upgrade"]["Damage"] = True
         self.list_priorities = ["Weapon", "Upgrade", "Move", "Factory"]
 
+    # def changeBehaviour(self, player, context_players, context_planets, dict_enemies):
+    #     # Reseteo el comportamiento para que vuelva a decidir la acción que hacer
+    #     self.resetBehaviour()
+    #     # Si el agente tiene algún vecino, ya sea otro jugador o planeta intentará identificar la situación para cambiar su comportamiento 
+    #     if len(context_planets) > 0:
+    #         # Significa que habrá al menos un vecino Planet y otro vecino Player
+    #         if len(context_players) > 0:
+    #             # Tengo que huir del player 
+    #             self.run_away = True
+    #             self.addSpecialTarget(context_players[0])
+    #             return 
+    #         # Si no solo habrá vecinos Planet 
+    #         else:
+    #             # Si solo hay un miembro todos tendrán el mismo tipo, por lo que puedo comprobar el tipo del primer elemento de la lista 
+    #             if all(planet.isInhabit() for planet in context_planets):
+    #                     # Si todos los planetas están habitados 
+    #                     print("El agente intentará construir una fabrica y luego moverse")
+    #                     self.list_priorities = ["Factory", "Move", "Weapon", "Upgrade"]
+    #             else:
+    #                     # Si es un planeta actuará como siempre, aunque tendría que dar prioridad al planeta con oro que el jugador pueda mantener 
+    #                     self.resetBehaviour()
+    #                     return 
+    #     # Si no hay ningun planeta solo habrá jugadores alrededor
+    #     elif len(context_players) > 0:
+    #         # Buscar el que peor arma tenga y compararla con la mia, si tiene peor arma lo que hare será luchar con él, es decir, acercarme
+    #         # Si tiene un arma mejor lo que haré será huir como maxima prioridad  
+    #         worst_weapon = float("inf")
+    #         if player.getNumPlayerWeapon() != 0:
+    #             if player.getPlayerWeapon()[1] > dict_enemies["Worst_Weapon"].getPlayerWeapon()[1]:
+    #                 if dict_enemies["Worst_Weapon"] in context_players:
+    #                     print("Se encuentra aqui el agente con peor arma")
+    #                     # Perseguir a el agente con peor arma
+    #                     self.addSpecialTarget(dict_enemies["Worst_Weapon"].getAgentPos())
+    #                     return 
+    #                 else:
+    #                     print("No se encuentra el agente con peor arma, buscare si en mi contexto hay uno con peor arma que el mio")
+    #             # Si el jugador tiene un arma puedo buscar el que peor arma tenga para decidir si luchar con el o no 
+    #                     print("Busco el agente con peor arma")
+    #                     for neighbor in context_players:
+    #                         try:
+    #                             if neighbor.getPlayerWeapon()[1] < worst_weapon:
+    #                                 worst_weapon = neighbor.getPlayerWeapon()[1]
+    #                         except:
+    #                             # Si entra en el except es porque no tiene ningun arma y está comparando un float con el string None, por lo que es el agente con peor arma
+    #                             worst_weapon = neighbor.getPlayerWeapon()[1]
+    #                     # Si tengo un arma mejor lucharé con el 
+    #                     if player.getPlayerWeapon()[1] > worst_weapon:
+    #                         # Haré que se mueva hacia el jugador con peor arma
+    #                         self.dict_actions["Move"]["To_Planet"] = False
+    #                         self.dict_actions["Move"]["To_Player"] = True
+    #                         return 
+    #             else:
+    #                 # Huir
+    #                 self.resetBehaviour()
+    #                 return   
+    #         else:
+    #             # Huir hacia otro lado
+    #             self.resetBehaviour()
+    #             return 
+    #     else:
+    #         # Si no tiene ningún vecino alrededor, se comportará con el comportamiento estandar
+    #         print("El agente cambia su prioridad para construir una fabrica primero")
+    #         self.list_priorities = ["Factory", "Move", "Weapon", "Upgrade"]
+    #         return 
+
     def resetBehaviour(self):
+        self.run_away = False
         self.dict_actions = {"Move": {"To_Planet": False, "To_Player":True}, "Factory": 0, "Weapon": 0, "Upgrade": {"Damage": True, "Factory":False}}
         self.list_priorities = ["Weapon", "Upgrade", "Move", "Factory"]
+        self.special_target = []
 
 class Farmer(Behaviour):
 
@@ -199,9 +249,12 @@ class Farmer(Behaviour):
         self.dict_actions["Upgrade"]["Factory"] = True
         self.list_priorities = ["Factory", "Upgrade", "Weapon", "Move"]
 
+
     def resetBehaviour(self):
+        self.run_away = False
         self.dict_actions = {"Move": {"To_Planet": False, "To_Player":False}, "Factory": 0, "Weapon": 0, "Upgrade": {"Damage": False, "Factory":True}}
         self.list_priorities = ["Factory", "Upgrade", "Weapon", "Move"]
+        self.special_target = []
 
 class CustomBehaviour(Behaviour):
 
@@ -253,8 +306,10 @@ class CustomBehaviour(Behaviour):
                     print(f"This are the only valid numbers: {self._valid_numbers_priority}")
 
     def resetBehaviour(self):
+        self.run_away = False
         self.dict_actions = copy.deepcopy(self.copy_dict_actions)
         self.list_priorities = self.copy_list_priorities.copy()
+        self.special_target = []
 
 class RandomBehaviour(Behaviour):
     def __init__(self, behaviour_name):
@@ -286,8 +341,10 @@ class RandomBehaviour(Behaviour):
     #             self.getRandomSpecialActions(action)
 
     def resetBehaviour(self):
+        self.run_away = False
         self.dict_actions = copy.deepcopy(self.copy_dict_actions)
         self.list_priorities = self.copy_list_priorities.copy()
+        self.special_target = []
 
 # Para poder comprobar el funcionamiento de la clase 
 if __name__ == "__main__":
