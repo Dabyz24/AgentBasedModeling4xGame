@@ -231,6 +231,9 @@ class Player(mesa.Agent):
     def getStellarPoints(self):
         return self.stellar_points
     
+    def getCompleteBehaviour(self):
+        return self.behaviour
+    
     def getBehaviour(self):
         return self.behaviour.getActualBehaviour()
 
@@ -331,18 +334,24 @@ class Player(mesa.Agent):
                 
         return dict_enemies
          
+    def separateAgentsByType(self, list_neighbors):
+        list_planets = []
+        list_players = []
+        for neighbor in list_neighbors:
+            if isinstance(neighbor, Planet):
+                list_planets.append(neighbor)
+            elif isinstance(neighbor, Player):
+                list_players.append(neighbor)
+        return list_players, list_planets
+
     # Método para poder elegir la acción de la lista de prioridades de su comportamiento
     def selectAction(self):
         # Tengo que ver el contexto del agente y en funcion de las acciones determinar una nueva lista de prioridades 
-        #dict_enemies = self.getOtherPlayers()
+        dict_enemies = self.getOtherPlayers()
         context = self.model.grid.get_neighbors(self.pos, self.moore, include_center=False, radius=2)
-        # para saber si alguno de los agentes que tiene alrededor son uno de los de dict_enemies
-        # for enemie in context:
-        #     if enemie in dict_enemies.values():
-        #         for k, v in dict_enemies.items():
-        #             if enemie == v:
-        #                 print(print(k, v))
-        #self.behaviour.changeBehaviour(context)
+        context_players, context_planets = self.separateAgentsByType(context)
+        # print(context_planets, context_players)
+        self.behaviour.changeBehaviour(self, context_players, context_planets, dict_enemies)
         action = self.behaviour.act(self.gold, self.tech, self.num_factories, self.player_weapon, self.agent_upgrades, self.move)
         return action
 
