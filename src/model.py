@@ -201,7 +201,7 @@ class Game(mesa.Model):
         try:
             move , chosen_move = self.closestTarget(agent.getAgentPos(), list_positions)
             # Si el agente tiene activo el run_away, entonces se movera en la dirección contraria para huir
-            if agent.getCompleteBehaviour().getRunAway() and (move[0] in [0, 1, -1] and move[1] in [0, 1, -1]):
+            if agent.getCompleteBehaviour().getRunAway() and (move[0] in [0, 1, -1] and move[1] in [0, 1, -1]) and not move == (0,0):
                 new_move = (move[0]*-1, move[1]*-1)
                 chosen_action = ACTION_SPACE.get(new_move)
             else:
