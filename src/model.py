@@ -199,8 +199,13 @@ class Game(mesa.Model):
     def _moveToTarget(self, agent, list_positions):
         chosen_action = -1
         try:
-            _ , chosen_move = self.closestTarget(agent.getAgentPos(), list_positions)
-            chosen_action = chosen_move
+            move , chosen_move = self.closestTarget(agent.getAgentPos(), list_positions)
+            # Si el agente tiene activo el run_away, entonces se movera en la dirección contraria para huir
+            if agent.getCompleteBehaviour().getRunAway() and (move[0] in [0, 1, -1] and move[1] in [0, 1, -1]):
+                new_move = (move[0]*-1, move[1]*-1)
+                chosen_action = ACTION_SPACE.get(new_move)
+            else:
+                chosen_action = chosen_move
         except Exception as ex:
             pass
             # print("An exception occurred:", type(ex).__name__, "-", ex)
