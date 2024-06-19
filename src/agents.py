@@ -316,7 +316,7 @@ class Player(mesa.Agent):
                     dict_enemies["Worst_Weapon"] = agent
             except:
                 # Si entra en el except es porque no tiene ningun arma y está comparando un float con el string None, por lo que es el agente con peor arma
-                worst_weapon = agent.getPlayerWeapon()[1]
+                worst_weapon = 0
                 dict_enemies["Worst_Weapon"] = agent
                 
             if agent.getPlanets() > most_planets:
@@ -338,7 +338,7 @@ class Player(mesa.Agent):
         list_planets = []
         list_players = []
         for neighbor in list_neighbors:
-            if isinstance(neighbor, Planet):
+            if isinstance(neighbor, Planet) and not neighbor.isInhabit():
                 list_planets.append(neighbor)
             elif isinstance(neighbor, Player):
                 list_players.append(neighbor)
