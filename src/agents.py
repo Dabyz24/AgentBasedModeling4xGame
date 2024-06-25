@@ -506,6 +506,6 @@ class Planet(mesa.Agent):
             if self.player not in self.model.list_agents:
                 self.resetPlanet()
             else:
-                self.player.addPlanetResources(1, 10, True)
+                self.player.addPlanetResources(self.tech, self.gold, True)
         
 
