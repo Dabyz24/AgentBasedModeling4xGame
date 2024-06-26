@@ -23,24 +23,24 @@
 [✔] 7. Probar cual es el factor limitante en la simulación (Porque solo aparecen 4 agentes en 50000 ejecuciones)
 - [✔] 7.1 Hacer que las fabricas no den puntos estelares
 - [✔] 7.2 Hacer que los planetas den puntos estelares en funcion del numero de planetas que tengas
-
+- [✔] 7.3. Guardar la semilla de una ejecución para poder estudiarla en un txt 
 
 [✔] 8. Cambiar los comportamientos a algo más genérico (Objeto) para no tener que ponerlo tan estricto en el condicional 
 - [✔] 8.1 Cambiar la lógica de los comportamientos para no hacerlo en el step tan estricto, con polimorfismos y tecnicas mas avanzadas de POO
 - [✔] 8.2 Añadir una lista de prioridades para los comportamientos (meter las upgrades ahí)
 
-[ ] 9. Que el agente sea capaz de interactuar con su entorno
+[✔] 9. Que el agente sea capaz de interactuar con su entorno
 - [✔] 9.1 Que el agente sepa quien es el ganador y los recursos de cada agente
 - [✔] 9.2 Que el agente pueda cambiar su lista de prioridades si se dan ciertas condiciones 
-- [] 9.3 El comportamiento del agente tiene que depender del entorno del agente para poder cambiar sus listas de prioridades
-  - [] 9.3.1 Establecer las listas de prioridades para cada tipo de situaciones que se pueden dar en la simulación, haciendo métodos polimorficos
-  - [] 9.3.2 Dependiendo de los elementos que tenga en su radio de movimiento, elegir una de las listas de prioridades o la otra
-- [] 9.4 Introducir alguna mecanica dinamicamente como si se le hubiese ocurrido al agente (como donar algunos recursos o poder comprar a agentes para que le protejan)
+- [✔] 9.3 El comportamiento del agente tiene que depender del entorno del agente para poder cambiar sus listas de prioridades
+  - [✔] 9.3.1 Establecer las listas de prioridades para cada tipo de situaciones que se pueden dar en la simulación, haciendo métodos polimorficos
+  - [✔] 9.3.2 Dependiendo de los elementos que tenga en su radio de movimiento, elegir una de las listas de prioridades o la otra
 
-[ ] 10. Guardar la semilla de una ejecución para poder generarla 
-- [] 10.1 Poder volver a la acción anterior en la simulación (Guardar registro de ejecución en un fichero)
+[ ] 10. Crear una manera para poder introducir de manera dinamica en ejecucion un agente cuando yo quiera (Boton o alguna manera de hacerlo) 
 
-[ ] 11. Buscar información para poder crear un modelo matemático de la herramienta
-- [] 11.1 Simplificar el juego para poder generear un modelo matemático
-- [] 11.2 Monitorizar todos los movimientos y crear una estadistica
-- [] 11.3. Si lo anterior no funciona generar un aprendizaje genético que a partir de una foto genere múltiples ejecuciones y vea el mejor comportamiento
+[] 11. Introducir alguna mecanica dinamicamente como si se le hubiese ocurrido al agente (como donar algunos recursos o poder comprar a agentes para que le protejan)
+- [] 11.1 Crear diferentes tipos de agentes con un comportamiento y unas mutaciones especificas
+- [] 11.2 Modificar el changeBehaviour de esos agentes "mutados" para que se comporten como yo quiera teniendo en cuenta su entorno
+
+[] 12. Estructurar la memoria de TFG
+- [] 12.1 Estudiar y comentar los resultados de los experimentos con agentes mutados para poder comprobar como sería el comportamiento si se introdujese un algoritmo genetico que modificara la estructura de los agentes 
