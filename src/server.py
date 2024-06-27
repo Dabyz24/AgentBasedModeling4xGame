@@ -58,11 +58,15 @@ def overviewAgents(model):
 
 canvas_element = mesa.visualization.CanvasGrid(game_portrayal, 20, 20, 500, 500)
 
-# chart_elemnt = mesa.visualization.ChartModule(
-#      [
-#           {"Label": "Num Estelar Points", "Color": "#AA0000"}
-#      ]
-# )
+chart_element = mesa.visualization.BarChartModule(
+     [
+          {"Label": "Explorers", "Color": "#AA0000"},
+          {"Label": "Chasers", "Color": "#666666"},
+          {"Label": "Farmers", "Color": "#00AA00"},
+          {"Label": "Specials", "Color": "#1591ea"}
+     ],
+     canvas_height=500, canvas_width=500
+)
 
 model_params = {
         "title": mesa.visualization.StaticText("Parameters:"),
@@ -72,5 +76,5 @@ model_params = {
 
 }
 
-server = mesa.visualization.ModularServer(Game, [canvas_element, overviewAgents], "Agent based modeling 4x Game", model_params)
+server = mesa.visualization.ModularServer(Game, [canvas_element, chart_element, overviewAgents], "Agent based modeling 4x Game", model_params)
 server.port = 8521
