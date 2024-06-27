@@ -1,10 +1,10 @@
-import re
 import os
 import mesa 
 import math
 
 from agents import Player, Planet
 from global_constants import * 
+from scheduler import RandomActivationByTypeFiltered
 
 
 class Game(mesa.Model):
@@ -32,18 +32,21 @@ class Game(mesa.Model):
         self.list_planets = []
         self.list_agents_colors = ["Aqua","Green","Pink","Gray","Purple","Yellow"]
         # Se moverán uno cada vez, es decir el primer turno se movera primero el agente 1 y el siguiente el agente 2 primero
-        self.schedule = mesa.time.RandomActivationByType(self)
+        self.schedule = RandomActivationByTypeFiltered(self)
         # Creacion de la matriz Torus=True significa que si el agente se encuentra en la izquierda del todo y sigue a la izquierda aparecera en la derecha 
         self.grid = mesa.space.MultiGrid(self.width, self.height, torus=True)
         # Tener un control sobre el numero de turnos del modelo
         self.step_count = 0
 
         # Datos que queremos ver 
-        # self.datacollector = mesa.DataCollector(
-        #     {
-        #         "Number of players": lambda l: l.schedule.get_type_count(Player)
-        #     }
-        # )
+        self.datacollector = mesa.DataCollector(
+            {
+                "Explorers": lambda l: l.schedule.get_type_count(Player, lambda agent: agent.getBehaviour() == "Explorer"),
+                "Chasers": lambda l: l.schedule.get_type_count(Player, lambda agent: agent.getBehaviour() == "Chaser"),
+                "Farmers": lambda l: l.schedule.get_type_count(Player, lambda agent: agent.getBehaviour() == "Farmer"),
+                "Specials": lambda l: l.schedule.get_type_count(Player, lambda agent: agent.getBehaviour() not in POSSIBLE_BEHAVIOURS)
+            }
+        )
         
         # Creacion de los jugadores evito que haya dos agentes en el mismo espacio con chekspace y creo y añado el agente
         for i in range(self.num_players):
@@ -399,7 +402,7 @@ class Game(mesa.Model):
             self.maybeRemoveAgent()
             self.addAgent()
 
-        #self.datacollector.collect(self)
+        self.datacollector.collect(self)
 
     # Método para comprobar rápidamente el funcionamiento del juego sin tener que ejecutar el servidor
     def run_model(self):
