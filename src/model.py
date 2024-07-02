@@ -347,16 +347,20 @@ class Game(mesa.Model):
                 agent.resetBalance()
 
     # Añadira un agente a la simulación 
-    def addAgent(self):
+    def addAgent(self, verbose=False):
         pos = (self.random.randrange(self.width), self.random.randrange(self.height))
         next_id = self.next_id()
-        list_behaviours = POSSIBLE_BEHAVIOURS + ["Random"]
         player = Player(next_id, self, pos, moore=MOORE_PLAYER)
-        behaviour = self.random.choice(list_behaviours)
-        if behaviour == "Random":
-            player.setBehaviour(behaviour+str(next_id), random_flag=True)
+        if verbose:
+            new_behaviour = input("Introduce el comportamiento del agente ")
+            player.setBehaviour(new_behaviour)
         else:
-            player.setBehaviour(behaviour)
+            list_behaviours = POSSIBLE_BEHAVIOURS + ["Random"]
+            behaviour = self.random.choice(list_behaviours)
+            if behaviour == "Random":
+                player.setBehaviour(behaviour+str(next_id), random_flag=True)
+            else:
+                player.setBehaviour(behaviour)
         try:
             chosen_color = self.list_agents_colors.pop(self.random.randrange(0, len(self.list_agents_colors)))
             player.setAgentColor(chosen_color)
@@ -401,6 +405,10 @@ class Game(mesa.Model):
             # Elimino al agente mas antiguo con balance negativo
             self.maybeRemoveAgent()
             self.addAgent()
+
+        # En el turno 20 se introducirá los agentes que se quieran llevar a experimento
+        if self.step_count == 20:
+            self.addAgent(verbose=True)
 
         self.datacollector.collect(self)
 
