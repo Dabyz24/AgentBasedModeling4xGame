@@ -1,7 +1,7 @@
 import mesa
 from weapons import Weapon
 from upgrades import Upgrades
-from behaviours import Explorer, Chaser, Farmer, CustomBehaviour, RandomBehaviour
+from behaviours import *
 from global_constants import *
 
 class Player(mesa.Agent):
@@ -249,6 +249,8 @@ class Player(mesa.Agent):
                     self.behaviour = Chaser()
                 elif new_behaviour == "Farmer":
                     self.behaviour = Farmer()
+            elif new_behaviour == "Agressive":
+                self.behaviour = Agressive()
             else:
                 self.behaviour = CustomBehaviour(new_behaviour)
 
@@ -295,7 +297,7 @@ class Player(mesa.Agent):
             return "T: " + str(self.tech) + " G: " + str(self.gold) + " P: " +str(self.num_planets) + " F: "+str(self.num_factories) + " <strong>Stellar Points: " + str(self.stellar_points)+"</strong>"
         return [self.pos, self.tech, self.gold, self.num_planets, self.num_factories, self.getPlayerWeapon()[0], self.stellar_points]
     
-    # Método para poder obtener la lista de todos los enemigos del jugador en la simulacion 
+    # Método para obtener contexto del entorno y saber quien es el agente que más puntos tiene, el que peor arma tiene, el que mas planetas tiene y el que mas oro tiene
     def getOtherPlayers(self):
         points_winner = float("-inf")
         worst_weapon = float("inf")
