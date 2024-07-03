@@ -316,6 +316,54 @@ class CustomBehaviour(Behaviour):
                 else:
                     print(f"This are the only valid numbers: {self._valid_numbers_priority}")
 
+    # Pensar una manera de incorporar la mejor accion posible si se encuentra con un planeta con un agente o con ambos, si no se encuentra con nada actuar normal
+    # def changeBehaviour(self, player, context_players, context_planets, dict_enemies):
+    #     self.resetBehaviour()
+    #     # Si hay algún planeta en su entorno mirara sus recursos y en función de si puede mantener el planeta eligira conquistarlo o no 
+    #     if len(context_planets) > 0:
+    #         # taxes_to_pay hace referencia a los gastos que tendra el agente para poder compararlo con su oro y ver si es rentable o no 
+    #         taxes_to_pay = TAXES_PLANET 
+    #         if player.getPlanets() > 1: 
+    #             taxes_to_pay = TAXES_PLANET * player.getPlanets()
+    #         # Si tengo más oro que lo que tengo que pagar por taxes
+    #         if player.getGold() > taxes_to_pay:
+    #             # Si tambien hay enemigos en su campo de vision 
+    #             if len(context_players) > 0:
+    #                 # Si el agente tiene al menos un arma 
+    #                 if player.getNumPlayerWeapon() != 0:
+                        
+                
+    # Si el balance es negativo lo que tiene que hacer es dependiendo de sus recursos (arma, oro...) perseguir a un agente con peor arma o ir a por un planeta con recursos
+    # Si el agente tiene un arma entonces perseguirá al agente que peor arma tenga para poder luchar contra el o al agente mas rico para ganar mayor cantidad de dinero
+    #     chosen_action = -1
+    #     if agent.getNumPlayerWeapon() != 0: 
+    #         if agent.getNumPlayerWeapon() >= worst_weapon_agent.getNumPlayerWeapon():
+    #             # perseguir al agente con peor arma worst_weapon_agent
+    #             list_positions = [worst_weapon_agent.getAgentPos()]
+    #             chosen_action = self._moveToTarget(agent, list_positions)
+    #         else:
+    #             # Si todos los agentes tiene un arma mejor que el agente entonces intentará mejorar su arma 
+    #             if agent.getGold() > WEAPON_GOLD_COST and agent.getTech() > WEAPON_TECH_COST and agent.getNumPlayerWeapon() < MAX_NUM_WEAPONS:
+    #                 chosen_action = ACTION_SPACE.get("Weapon")
+    #             # Si ya no se puede mejorar mas el arma tendré que buscar al agente con mas planetas para quitarle planetas
+    #             else:
+    #                 # Si hay un agente con un planeta o mas ire a por el 
+    #                 if agent_more_planets is not None:
+    #                     list_positions = [agent_more_planets.getAgentPos()]
+    #                     chosen_action = self._moveToTarget(agent, list_positions)
+    #                 # Si no hay ningun jugador con un planeta ire a por el planeta para conquistarlo
+    #                 else:
+    #                     list_positions = self.getAllPlanetPos()
+    #                     chosen_action = self._moveToTarget(agent, list_positions)
+    #     else:
+    #         list_positions = self.getAllPlanetPos()
+    #         chosen_action = self._moveToTarget(agent, list_positions)
+    #     # Si el agente tiene una mejora de daño o mejor arma que alguno de la simulación ir a por el 
+    #     # Si no buscar un planeta para conquistar
+    #     # Si no tiene dinero para mantenerlo tiene que buscar como obtener dinero que puede ser con una pelea o esperando a que las fabricas produzcan recursos para poder tenr un arma 
+    #     return chosen_action
+    
+
     def resetBehaviour(self):
         self.run_away = False
         self.dict_actions = copy.deepcopy(self.copy_dict_actions)
@@ -356,6 +404,35 @@ class RandomBehaviour(Behaviour):
         self.dict_actions = copy.deepcopy(self.copy_dict_actions)
         self.list_priorities = self.copy_list_priorities.copy()
         self.special_target = []
+
+class Agressive(Chaser):
+    """
+    Tipo de chaser que se centrará en atacar a los agentes con mayores recursos, empezará con un arma ya creada para poder luchar desde el principio
+    """
+    def __init__(self):
+        super().__init__()
+        self.setBehaviourName(self.__class__.__name__)  
+    
+    def changeBehaviour(self, player, context_players, context_planets, dict_enemies):
+        # Si el agente tiene algún vecino, ya sea otro jugador o planeta intentará identificar la situación para cambiar su comportamiento 
+        # Buscar el que mas recursos tenga y luchar con el, si tiene peor arma lo que hare será mejorar el arma y si no puede intetará mejorar upgradear
+        # Pero siempre perseguira al agente con mas oro
+        agent_more_gold = dict_enemies["More_Resources"] 
+        if player.getNumPlayerWeapon() != 0:
+            # Si tengo un arma peor que el agente con mas recursos intentare mejorarla 
+            if player.getNumPlayerWeapon() <= agent_more_gold.getNumPlayerWeapon():
+                # Si tiene todas las armas mejoradas, tendrá que buscar a otro rival con peor arma, porque no le interesará luchar con alguien con el mismo arma
+                if player.getNumPlayerWeapon() == MAX_NUM_WEAPONS and not player.getAgentUpgrades().isDamageUpgraded():
+                    self.list_priorities = ["Upgrade","Weapon","Move","Factory"]
+
+            # Se mueve hacia el jugador con mas recursos
+            self.addSpecialTarget(agent_more_gold.getAgentPos())
+            # Si no tiene armas se centrará en crearlas, actuando normal
+            return
+
+        else:
+            # Si no tiene nada alrededor o solo tiene planetas actuará como se le haya ordenado 
+            return 
 
 # Para poder comprobar el funcionamiento de la clase 
 if __name__ == "__main__":
