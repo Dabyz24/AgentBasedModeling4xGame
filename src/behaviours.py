@@ -429,7 +429,47 @@ class Agressive(Chaser):
             return
 
         # Si no tiene armas actuará normal para poder generarlas 
+        return
+
+class Friendly(Behaviour):
+    """
+    Agente que ha desarrollado la habilidad para cooperar con los demas ayudando a los mas necesitados
+    """
+    def __init__(self):
+        super().__init__()
+        self.setBehaviourName(self.__class__.__name__)
+        self.dict_actions["Move"]["To_Planet"] = True
+        self.dict_actions["Upgrade"]["Factory"] = True
+        # Este agente no tendrá acceso a las armas, por lo que no podrá atacar a nadie
+        self.list_priorities = ["Factory", "Upgrade", "Move"]
+
+    def changeBehaviour(self, player, context_players, context_planets, dict_enemies):
+        # Como el agente no puede atacar primero se tiene que centrar en construir fábricas para poder tener cierta economia
+        if len(context_planets) > 0:
+            # Si se encuentra con algun planeta reseteo el comportamiento para que se olvide de seguir al que menos oro tiene
+            self.resetBehaviour()
+            # Si me encuentro uno o mas planetas me dirijo a ellos
+            self.list_priorities = ["Move", "Factory", "Upgrade"]
+            
+        
+        else:
+            # Buscará a el agente que menos oro tenga en la simulación
+            agent_less_resources = dict_enemies["Less_Resources"]
+            self.addSpecialTarget(agent_less_resources.getAgentPos())
+            # Si está en su campo de vision le doy los recursos como si hubiese ganado la pelea y reseteo el comportamiento 
+            if agent_less_resources in context_players:
+                print(f"Regalo el 10% de riquezas a {agent_less_resources.getId()}")
+                agent_less_resources.addBattleResources(player)
+                self.resetBehaviour()
+
+        # Si no tiene nada alrededor actuará normal construyendo fabricas
         return 
+
+    def resetBehaviour(self):
+        self.run_away = False
+        self.dict_actions = {"Move": {"To_Planet": True, "To_Player":False}, "Factory": 0, "Weapon": 0, "Upgrade": {"Damage": False, "Factory":True}}
+        self.list_priorities = ["Factory", "Upgrade", "Move"]
+        self.special_target = []    
 
 # Para poder comprobar el funcionamiento de la clase 
 if __name__ == "__main__":
