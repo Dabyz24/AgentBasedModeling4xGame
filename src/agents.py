@@ -4,6 +4,9 @@ from upgrades import Upgrades
 from behaviours import *
 from global_constants import *
 
+# Constante para poder asignar el tipo de comportamiento a cada agente
+DICT_BEHAVIOURS = {"Explorer": Explorer(), "Chaser": Chaser(), "Farmer": Farmer(), "Agressive": Agressive(), "Friendly": Friendly()}
+
 class Player(mesa.Agent):
     def __init__(self, unique_id, model, pos, tech=INITIAL_PLAYER_TECH, gold=INITIAL_PLAYER_GOLD, num_planets=0, num_factories=0 ,stellar_points=0, moore=True):
         """
@@ -242,15 +245,8 @@ class Player(mesa.Agent):
         if random_flag:
             self.behaviour = RandomBehaviour(new_behaviour)
         else:
-            if new_behaviour in POSSIBLE_BEHAVIOURS:
-                if new_behaviour == "Explorer":
-                    self.behaviour = Explorer()
-                elif new_behaviour == "Chaser":
-                    self.behaviour = Chaser()
-                elif new_behaviour == "Farmer":
-                    self.behaviour = Farmer()
-            elif new_behaviour == "Agressive":
-                self.behaviour = Agressive()
+            if new_behaviour in DICT_BEHAVIOURS.keys():
+                self.behaviour = DICT_BEHAVIOURS[new_behaviour]
             else:
                 self.behaviour = CustomBehaviour(new_behaviour)
 
@@ -259,7 +255,7 @@ class Player(mesa.Agent):
     def setCustomBehaviour(self):
         name_behaviour = input("Choose a name for the behaviour: ").lower()
         name_behaviour = name_behaviour.capitalize()
-        if name_behaviour not in POSSIBLE_BEHAVIOURS:
+        if name_behaviour not in DICT_BEHAVIOURS.keys():
             is_random = input("Do you want a random behaviour?. (y/n): ").lower()
             if is_random == "y":
                 self.setBehaviour(name_behaviour, random_flag=True)
@@ -304,6 +300,7 @@ class Player(mesa.Agent):
         most_planets = float("-inf") 
         most_resources = 0
         most_gold = 0
+        less_gold = float("inf")
         dict_enemies = {}
         # Recorro la lista de todos los agentes restantes para poder guardar los agentes destacados
         for agent in self.model.get_agents_of_type(Player):
@@ -327,6 +324,9 @@ class Player(mesa.Agent):
             if agent.getGold() > most_resources:
                 most_resources = agent.getGold()
                 dict_enemies["More_Resources"] = agent
+            if agent.getGold() < less_gold or agent.getBalance() < 0:
+                less_gold = agent.getGold()
+                dict_enemies["Less_Resources"] = agent
 
         for planet in self.model.get_agents_of_type(Planet):
             # Buscar el planeta que mas oro tenga y si está inhabitado
