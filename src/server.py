@@ -65,7 +65,8 @@ chart_element = mesa.visualization.BarChartModule(
           {"Label": "Farmers", "Color": "#00AA00"},
           {"Label": "Specials", "Color": "#1591ea"}
      ],
-     canvas_height=500, canvas_width=500
+     canvas_height=150, canvas_width=500,
+
 )
 
 model_params = {
@@ -76,5 +77,13 @@ model_params = {
 
 }
 
-server = mesa.visualization.ModularServer(Game, [canvas_element, chart_element, overviewAgents], "Agent based modeling 4x Game", model_params)
+class TotalAgents(mesa.visualization.TextElement):
+    def __init__(self):
+       pass
+
+    def render(self, model):
+        return "<strong>Total players: " + str(model.schedule.get_type_count(Player)) + "</strong>"
+    
+total_agents = TotalAgents()
+server = mesa.visualization.ModularServer(Game, [canvas_element, total_agents, chart_element, overviewAgents], "Agent based modeling 4x Game", model_params)
 server.port = 8521
