@@ -329,7 +329,12 @@ class Game(mesa.Model):
             if type(agent) == Player:
                 players_dict[agent.getId()] = [agent.getAgentInfo(), agent.getBattlesWon(), agent.getAgentUpgrades().getUpgrades(), agent.getBehaviour(), agent.getListPriorities()]
             elif type(agent) == Planet:
-                planet_dict[agent.getPlanetId()] = [agent.getPlanetPos(), agent.getPlanetTech(), agent.getPlanetGold(), agent.getPlayer()]
+                if not agent.getPlayer():
+                    planet_agent = "None"
+                else:
+                    planet_agent = "Planeta conquistado por el agente: " + str(agent.getPlayer().getId())
+                planet_dict[agent.getPlanetId()] = [agent.getPlanetPos(), agent.getPlanetTech(), agent.getPlanetGold(), planet_agent]
+
         return players_dict, planet_dict
     
     def getListPlayers(self):
