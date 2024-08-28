@@ -8,18 +8,18 @@ class Weapon():
         Atributos:
             actual_weapon: Arma actual del agente, empezará sin arma
             num_upgrades: Numero de mejoras que se han hecho al arma como maximo se podrán 3
-            list_weapons: lista de armas del juego
             value_weapons: Diccionario con el daño asociado a cada arma
+            list_weapons: lista de armas del juego
         """
         self.actual_weapon = ""
         self.num_upgrades = 0
-        self.list_weapons = ["Lasers", "Plasma Cannon", "Guided missil"]
         self.value_weapons = {
             "Lasers": 2,
             "Plasma Cannon": 3,
             "Guided missil" : 5
         }
-        
+        self.list_weapons = list(self.value_weapons.keys())
+
 
     def upgradeWeapon(self):
         try:
@@ -42,3 +42,6 @@ class Weapon():
     
     def getNumUpgrades(self):
         return self.num_upgrades
+    
+    def __str__(self):
+        return self.actual_weapon
