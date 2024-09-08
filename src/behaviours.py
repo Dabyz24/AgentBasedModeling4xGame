@@ -306,7 +306,7 @@ class CustomBehaviour(Behaviour):
                 if all(number in self._valid_numbers_priority for number in different_priorities) and len(set(different_priorities)) == len(self.dict_actions) == len(different_priorities):
                         return different_priorities
                 else:
-                    print(f"This are the only valid numbers: {self._valid_numbers_priority}")
+                    print(f"These are the only valid numbers: {self._valid_numbers_priority}")
 
     def setFirstPriorityAction(self, action):
         # Primero busco el indice de la accion
@@ -407,14 +407,14 @@ class RandomBehaviour(Behaviour):
 
 class Agressive(Chaser):
     """
-    Tipo de chaser que se centrará en atacar a los agentes con mayores recursos, empezará con un arma ya creada para poder luchar desde el principio
+    Tipo de chaser que se centrará en atacar a los agentes con mayores recursos
     """
     def __init__(self):
         super().__init__()
         self.setBehaviourName(self.__class__.__name__)  
     
     def changeBehaviour(self, player, context_players, context_planets, dict_enemies):
-        # Buscar el que mas recursos tenga y luchar con el, si tiene peor arma lo que hare será mejorar el arma y si no puede intetará mejorar upgradear
+        # Buscar el que mas recursos tenga y luchar con el, si tiene peor arma lo que hare será mejorar el arma y si no puede intetará mejorar 
         # Pero siempre perseguira al agente con mas oro
         agent_more_gold = dict_enemies["More_Resources"] 
         if player.getNumPlayerWeapon() != 0:
