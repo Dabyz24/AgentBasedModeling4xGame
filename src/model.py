@@ -250,11 +250,17 @@ class Game(mesa.Model):
             new_behaviour = input("Introduce el comportamiento del agente ").lower().capitalize()
             player.setBehaviour(new_behaviour)
         else:
-            # Si no añade a la simulacion un agente Explorer, Chaser, Farmer o Random de manera aleatoria
-            list_behaviours = POSSIBLE_BEHAVIOURS + ["Random"]
+            # Si no añade a la simulacion un agente Explorer, Chaser, Farmer de manera aleatoria
+            list_behaviours = POSSIBLE_BEHAVIOURS + ["Random", "Agressive", "Optimal","Friendly"]
+            # list_behaviours = POSSIBLE_BEHAVIOURS + ["Random"]
+            # list_behaviours = POSSIBLE_BEHAVIOURS + ["Agressive"]
+            # list_behaviours = POSSIBLE_BEHAVIOURS + ["Optimal"]
+            # list_behaviours = POSSIBLE_BEHAVIOURS + ["Friendly"]
             behaviour = self.random.choice(list_behaviours)
             if behaviour == "Random":
                 player.setBehaviour(behaviour+str(next_id), random_flag=True)
+            elif behaviour == "Optimal":
+                player.setBehaviour(behaviour+str(next_id))
             else:
                 player.setBehaviour(behaviour)
         try:
@@ -296,8 +302,8 @@ class Game(mesa.Model):
             self.addAgent()
 
         # En el turno 20 se introducirá los agentes que se quieran llevar a experimento
-        if self.step_count == 20:
-            self.addAgent(verbose=True)
+        # if self.step_count == 20:
+        #     self.addAgent(verbose=True)
 
         self.datacollector.collect(self)
 
@@ -310,7 +316,7 @@ class Game(mesa.Model):
             self.step()
             for agent in self.schedule.agents:
                 if type(agent) == Player:
-                    if agent.getStellarPoints() >= 25000:
+                    if agent.getStellarPoints() >= 25000 or self.step_count == 100000:
                         done = True
             i += 1
             print("--------------------")
@@ -341,7 +347,7 @@ class Game(mesa.Model):
         return self.list_agents
 
 if __name__ == "__main__":
-    for i in range(0,10):
+    for i in range(0,20):
         model = Game()
         model.run_model()
         players, planets = model.getAllAgentsInfo()
