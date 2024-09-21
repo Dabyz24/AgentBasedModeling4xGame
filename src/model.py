@@ -1,6 +1,7 @@
 import os
 import mesa 
 import math
+import time 
 
 from agents import Player, Planet
 from global_constants import * 
@@ -251,11 +252,12 @@ class Game(mesa.Model):
             player.setBehaviour(new_behaviour)
         else:
             # Si no añade a la simulacion un agente Explorer, Chaser, Farmer de manera aleatoria
-            list_behaviours = POSSIBLE_BEHAVIOURS + ["Random", "Agressive", "Optimal","Friendly"]
+            list_behaviours = POSSIBLE_BEHAVIOURS + ["Random", "Agressive", "Optimal", "Friendly"]
             # list_behaviours = POSSIBLE_BEHAVIOURS + ["Random"]
             # list_behaviours = POSSIBLE_BEHAVIOURS + ["Agressive"]
             # list_behaviours = POSSIBLE_BEHAVIOURS + ["Optimal"]
             # list_behaviours = POSSIBLE_BEHAVIOURS + ["Friendly"]
+            # list_behaviours = POSSIBLE_BEHAVIOURS 
             behaviour = self.random.choice(list_behaviours)
             if behaviour == "Random":
                 player.setBehaviour(behaviour+str(next_id), random_flag=True)
@@ -348,8 +350,10 @@ class Game(mesa.Model):
 
 if __name__ == "__main__":
     for i in range(0,20):
+        start = time.time()
         model = Game()
         model.run_model()
+        end = time.time()
         players, planets = model.getAllAgentsInfo()
         dir_name = os.getcwd()
         path = os.path.join(dir_name, "saves")
@@ -362,7 +366,7 @@ if __name__ == "__main__":
         file_name = f"run_{i}.txt"
         path = os.path.join(dir_name, "saves", file_name)
         with open(path, "w+", encoding="utf-8") as my_file:
-            my_file.write(f"Ejecución terminada en {model.step_count} steps \n")
+            my_file.write(f"Ejecución terminada en {model.step_count} steps \nCon un tiempo de ejecución de {round(end-start, 2)} segundos \n")
             my_file.write("Los jugadores son: \n")
             for k, v in players.items():
                 my_file.write(f"Agent id {k} {v}\n")    
