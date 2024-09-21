@@ -4,12 +4,15 @@ En este trabajo se presenta una implementación de un sistema basado en agentes 
 
 ### Dependencias necesarias
 
-- Debemos instalar el framework completo
+- Se debe instalar el framework completo
 ```
 pip install mesa
 ```
-- Una vez tengamos el framework debemos instalar las siguientes dependencias auxiliares utilizadas para asegurar un correcto funcionamiento.
+- Una vez se tenga el framework se deben instalar las siguientes dependencias auxiliares utilizadas para asegurar un correcto funcionamiento.
   * Si ya dispones de estas dependencias no es necesario instalarlas.
+```
+pip install time 
+```
 ```
 pip install os 
 ```
