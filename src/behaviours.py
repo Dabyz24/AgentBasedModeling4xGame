@@ -259,6 +259,15 @@ class Farmer(Behaviour):
         self.list_priorities = ["Factory", "Upgrade", "Weapon", "Move"]
         self.special_target = []
 
+class DummyExplorer(Explorer):
+    # La idea es crear un Explorador que no tenga la capacidad de modificar su conducta con el entorno
+    def __init__(self):
+        super().__init__()
+        self.setBehaviourName(self.__class__.__name__)  
+    
+    def changeBehaviour(self, player, context_players, context_planets, dict_enemies):
+        return
+
 class CustomBehaviour(Behaviour):
 
     def __init__(self, behaviour_name):
