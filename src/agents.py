@@ -5,7 +5,7 @@ from behaviours import *
 from global_constants import *
 
 # Constante para poder asignar el tipo de comportamiento a cada agente
-DICT_BEHAVIOURS = {"Explorer": Explorer(), "Chaser": Chaser(), "Farmer": Farmer(), "Agressive": Agressive(), "Friendly": Friendly()}
+DICT_BEHAVIOURS = {"Explorer": Explorer(), "Chaser": Chaser(), "Farmer": Farmer(), "Agressive": Agressive(), "Friendly": Friendly(), "Dummyexplorer": DummyExplorer()}
 
 class Player(mesa.Agent):
     def __init__(self, unique_id, model, pos, tech=INITIAL_PLAYER_TECH, gold=INITIAL_PLAYER_GOLD, num_planets=0, num_factories=0 ,stellar_points=0, moore=True):
