@@ -11,7 +11,7 @@ from scheduler import RandomActivationByTypeFiltered
 class Game(mesa.Model):
     
     def __init__(self, width=WIDTH, height=HEIGHT, num_players=NUM_PLAYERS, num_planets=NUM_PLANETS, 
-                 tech_planet=TECH_PLANETS, gold_planet=GOLD_PLANETS, taxes_planet=TAXES_PLANET):
+                 tech_planet=TECH_PLANETS, gold_planet=GOLD_PLANETS, taxes_planet=TAXES_PLANET, seed=None):
         """
         width: Ancho de la matriz donde se encontraran los agentes
         height: Alto de la matriz donde se encontraran los agentes 
@@ -29,6 +29,7 @@ class Game(mesa.Model):
         self.tech_planet = tech_planet
         self.gold_planet = gold_planet
         self.taxes_planet = taxes_planet
+        self.seed = seed
         self.list_agents = []
         self.list_planets = []
         self.list_agents_colors = ["Aqua","Green","Pink","Gray","Purple","Yellow"]
@@ -48,6 +49,11 @@ class Game(mesa.Model):
             }
         )
         
+        if self.seed is None:
+            self.seed = self.random.randint(0, 10000)  
+            self.random.seed(self.seed)
+            print(f"Semilla utilizada es: {self.seed}")
+
         # Creacion de los jugadores evito que haya dos agentes en el mismo espacio con chekspace y creo y añado el agente
         for i in range(self.num_players):
             location_found = False
@@ -252,12 +258,14 @@ class Game(mesa.Model):
             player.setBehaviour(new_behaviour)
         else:
             # Si no añade a la simulacion un agente Explorer, Chaser, Farmer de manera aleatoria
-            list_behaviours = POSSIBLE_BEHAVIOURS + ["Random", "Agressive", "Optimal", "Friendly"]
+
+            # Diferentes inputs para los distintos experimentos
+            # list_behaviours = POSSIBLE_BEHAVIOURS + ["Random", "Agressive", "Optimal", "Friendly"]
             # list_behaviours = POSSIBLE_BEHAVIOURS + ["Random"]
             # list_behaviours = POSSIBLE_BEHAVIOURS + ["Agressive"]
             # list_behaviours = POSSIBLE_BEHAVIOURS + ["Optimal"]
             # list_behaviours = POSSIBLE_BEHAVIOURS + ["Friendly"]
-            # list_behaviours = POSSIBLE_BEHAVIOURS 
+            list_behaviours = POSSIBLE_BEHAVIOURS 
             behaviour = self.random.choice(list_behaviours)
             if behaviour == "Random":
                 player.setBehaviour(behaviour+str(next_id), random_flag=True)
@@ -303,8 +311,9 @@ class Game(mesa.Model):
             self.maybeRemoveAgent()
             self.addAgent()
 
-        # En el turno 20 se introducirá los agentes que se quieran llevar a experimento
+        # En el turno 20 se introducirá los agentes que se quieran llevar a experimento cambio dinamico del comportamiento Explorer por DummyExplorer
         # if self.step_count == 20:
+        #     self.list_agents[0].setBehaviour("Dummyexplorer")
         #     self.addAgent(verbose=True)
 
         self.datacollector.collect(self)
@@ -366,7 +375,8 @@ if __name__ == "__main__":
         file_name = f"run_{i}.txt"
         path = os.path.join(dir_name, "saves", file_name)
         with open(path, "w+", encoding="utf-8") as my_file:
-            my_file.write(f"Ejecución terminada en {model.step_count} steps \nCon un tiempo de ejecución de {round(end-start, 2)} segundos \n")
+            my_file.write(f"Ejecución terminada en {model.step_count} steps \nCon un tiempo de ejecución de {round(end-start, 2)} segundos\n")
+            my_file.write(f"La semilla utilizada es: {model.seed}\n")
             my_file.write("Los jugadores son: \n")
             for k, v in players.items():
                 my_file.write(f"Agent id {k} {v}\n")    
