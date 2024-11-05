@@ -4,6 +4,7 @@ from agents import Player, Planet
 from model import Game
 from global_constants import NUM_PLAYERS, NUM_PLANETS, TAXES_PLANET
 
+# Método para configurar la visualización de los agentes 
 def game_portrayal(agent):
     if agent is None:
         return
@@ -43,6 +44,7 @@ def game_portrayal(agent):
 
     return portrayal
 
+# Método para obtener la leyenda de los jugadores en el servidor
 def overviewAgents(model):
     summary = model.propertiesAgents()
     aux_str = ""
@@ -56,8 +58,10 @@ def overviewAgents(model):
                     <br> <hr>""")
     return aux_str
 
+# Configuración de la plantilla con la visualizacion de los agentes
 canvas_element = mesa.visualization.CanvasGrid(game_portrayal, 20, 20, 500, 500)
 
+# Gráfico de barras dividio por el tipo de agentes
 chart_element = mesa.visualization.BarChartModule(
      [
           {"Label": "Explorers", "Color": "#AA0000"},
@@ -69,14 +73,15 @@ chart_element = mesa.visualization.BarChartModule(
 
 )
 
+# Parámetros modificables del servidor
 model_params = {
         "title": mesa.visualization.StaticText("Parameters:"),
         "num_players": mesa.visualization.Slider("Number of players", NUM_PLAYERS, 1, 6),
         "num_planets": mesa.visualization.Slider("Number of planets", NUM_PLANETS, 2, 20),
         "taxes_planet": mesa.visualization.Slider("Taxes apply to planets", TAXES_PLANET, 10, 100, 5),
-
 }
 
+# Clase que permite obtener el número total de agentes
 class TotalAgents(mesa.visualization.TextElement):
     def __init__(self):
        pass
@@ -85,5 +90,13 @@ class TotalAgents(mesa.visualization.TextElement):
         return "<strong>Total players: " + str(model.schedule.get_type_count(Player)) + "</strong>"
     
 total_agents = TotalAgents()
+
+# Permite controlar la semilla en la ejecución, para poder comprobar diferentes ejecuciones
+custom_seed = input("Quieres una semilla personalizada (y/n): ")
+if custom_seed.lower() == "y":
+    new_seed_value = int(input("Valor de la seed deseada: "))
+    model_params.update({"seed": new_seed_value})
+
+# inicialización del servidor
 server = mesa.visualization.ModularServer(Game, [canvas_element, total_agents, chart_element, overviewAgents], "Agent based modeling 4x Game", model_params)
 server.port = 8521
