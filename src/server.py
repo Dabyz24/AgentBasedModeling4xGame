@@ -48,13 +48,13 @@ def game_portrayal(agent):
 def overviewAgents(model):
     summary = model.propertiesAgents()
     aux_str = ""
-    for i, k in summary.items():
+    for agent, resources in summary.items():
         aux_str += (f"""
-                    <span style="display: inline-block; width:10px; height:10px; background-color:{i.getAgentColor()};border-style:solid;border-width:1px;"></span>
-                    <strong>Agent: {i.getId()} </strong> Resources: {k} <br>
-                    Behaviour: <strong> {i.getBehaviour()} </strong>
-                    Weapon: <strong>{i.getPlayerWeapon()[0]} </strong> Battles Won: {i.getBattlesWon()} 
-                    Upgrades: <strong>{i.getAgentUpgrades().getUpgrades()} </strong>
+                    <span style="display: inline-block; width:10px; height:10px; background-color:{agent.getAgentColor()};border-style:solid;border-width:1px;"></span>
+                    <strong>Agent: {agent.getId()} </strong> Resources: {resources} Balance: {agent.getBalance()}<br>
+                    Behaviour: <strong> {agent.getBehaviour()} </strong>
+                    Weapon: <strong>{agent.getPlayerWeapon()[0]} </strong> Battles Won: {agent.getBattlesWon()} 
+                    Upgrades: <strong>{agent.getAgentUpgrades().getUpgrades()} </strong>
                     <br> <hr>""")
     return aux_str
 
