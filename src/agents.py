@@ -5,7 +5,7 @@ from behaviours import *
 from global_constants import *
 
 # Constante para poder asignar el tipo de comportamiento a cada agente
-DICT_BEHAVIOURS = {"Explorer": Explorer(), "Chaser": Chaser(), "Farmer": Farmer(), "Agressive": Agressive(), "Friendly": Friendly(), "Dummyexplorer": DummyExplorer()}
+DICT_BEHAVIOURS = {"Explorer": Explorer(), "Chaser": Chaser(), "Farmer": Farmer(), "Agressive": Agressive(), "Friendly": Friendly()}
 
 class Player(mesa.Agent):
     def __init__(self, unique_id, model, pos, tech=INITIAL_PLAYER_TECH, gold=INITIAL_PLAYER_GOLD, num_planets=0, num_factories=0 ,stellar_points=0, moore=True):
@@ -302,8 +302,10 @@ class Player(mesa.Agent):
         most_gold = 0
         less_gold = float("inf")
         dict_enemies = {}
+        list_player = (list(self.model.schedule.agents_by_type[Player].values()))
+        list_planets = (list(self.model.schedule.agents_by_type[Planet].values()))
         # Recorro la lista de todos los agentes restantes para poder guardar los agentes destacados
-        for agent in self.model.get_agents_of_type(Player):
+        for agent in list_player:
             if agent is self:
                 continue
             if agent.getStellarPoints() > points_winner:
@@ -328,7 +330,7 @@ class Player(mesa.Agent):
                 less_gold = agent.getGold()
                 dict_enemies["Less_Resources"] = agent
 
-        for planet in self.model.get_agents_of_type(Planet):
+        for planet in list_planets:
             # Buscar el planeta que mas oro tenga y si está inhabitado
             if planet.getPlanetGold() > most_gold and not planet.isInhabit():
                 most_gold = planet.getPlanetGold()
