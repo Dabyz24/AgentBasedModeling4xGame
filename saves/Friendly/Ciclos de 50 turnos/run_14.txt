@@ -1,0 +1,27 @@
+Ejecución terminada en 8505 steps 
+Con un tiempo de ejecución de 16.04 segundos
+La semilla utilizada es: 1847
+Los jugadores son: 
+Agent id 75 [[(9, 2), 54888, 47755, 7, 44, 'Guided missil', 25004], 525, 'None', 'Explorer', (['Move', 'Factory', 'Weapon', 'Upgrade'], ['To_Planet'], [])]
+Agent id 145 [[(17, 19), 45551, 53624, 0, 43, 'Guided missil', 689], 1362, 'D ↑ ', 'Chaser', (['Upgrade', 'Weapon', 'Factory', 'Move'], ['To_Player'], ['Damage'])]
+Agent id 152 [[(18, 18), 46480, 58920, 0, 42, 'Guided missil', 694], 1051, 'D ↑ ', 'Chaser', (['Upgrade', 'Weapon', 'Factory', 'Move'], ['To_Player'], ['Damage'])]
+Agent id 157 [[(4, 16), 17572, 28512, 0, 41, 'Guided missil', 106], 524, 'F ↑ ', 'Farmer', (['Factory', 'Upgrade', 'Weapon', 'Move'], [], ['Factory'])]
+Agent id 158 [[(0, 19), 9860, 15792, 0, 35, 'Plasma Cannon', 729], 99, 'None', 'Explorer', (['Move', 'Factory', 'Weapon', 'Upgrade'], ['To_Planet'], [])]
+Agent id 166 [[(17, 18), 19373, 30114, 0, 38, 'Guided missil', 71], 250, 'F ↑ ', 'Farmer', (['Factory', 'Upgrade', 'Weapon', 'Move'], [], ['Factory'])]
+Agent id 167 [[(19, 0), 3904, 6558, 0, 28, 'Lasers', 227], 30, 'None', 'Explorer', (['Move', 'Factory', 'Weapon', 'Upgrade'], ['To_Planet'], [])]
+Agent id 170 [[(2, 10), 12754, 7246, 0, 37, 'Guided missil', 12], 126, 'F ↑ ', 'Farmer', (['Factory', 'Upgrade', 'Weapon', 'Move'], [], ['Factory'])]
+Agent id 171 [[(1, 19), 27072, 35174, 1, 29, 'Guided missil', 74], 96, 'D ↑ ', 'Chaser', (['Upgrade', 'Weapon', 'Factory', 'Move'], ['To_Player'], ['Damage'])]
+Agent id 172 [[(19, 0), 491, 1142, 0, 17, 'N', 41], 0, 'None', 'Explorer', (['Move', 'Factory', 'Weapon', 'Upgrade'], ['To_Planet'], [])]
+Agent id 173 [[(2, 10), 12545, 2570, 0, 27, 'Guided missil', -2], 25, 'D ↑ ', 'Chaser', (['Upgrade', 'Weapon', 'Factory', 'Move'], ['To_Player'], ['Damage'])]
+Agent id 174 [[(4, 3), 1020, 1115, 0, 5, 'N', 0], 0, 'None', 'Friendly', (['Move', 'Factory', 'Upgrade'], ['To_Planet'], ['Factory'])]
+Los planetas son: 
+Planet id 0 [(8, 14), 2, 44, 'Planeta conquistado por el agente: 75']
+Planet id 1 [(12, 6), 6, 46, 'Planeta conquistado por el agente: 75']
+Planet id 2 [(6, 2), 7, 13, 'None']
+Planet id 3 [(1, 18), 18, 37, 'Planeta conquistado por el agente: 171']
+Planet id 4 [(9, 11), 15, 12, 'None']
+Planet id 5 [(12, 0), 7, 47, 'Planeta conquistado por el agente: 75']
+Planet id 6 [(15, 18), 17, 35, 'Planeta conquistado por el agente: 75']
+Planet id 7 [(17, 8), 5, 19, 'Planeta conquistado por el agente: 75']
+Planet id 8 [(7, 17), 19, 14, 'Planeta conquistado por el agente: 75']
+Planet id 9 [(3, 10), 12, 10, 'Planeta conquistado por el agente: 75']

@@ -1,0 +1,28 @@
+Ejecución terminada en 9184 steps 
+Con un tiempo de ejecución de 15.45 segundos
+La semilla utilizada es: 8210
+Los jugadores son: 
+Agent id 1 [[(6, 2), 99978, 151343, 8, 47, 'Guided missil', 25005], 1309, 'None', 'Explorer', (['Move', 'Factory', 'Weapon', 'Upgrade'], ['To_Planet'], [])]
+Agent id 7 [[(13, 4), 86933, 137774, 1, 47, 'Guided missil', 20187], 1220, 'None', 'Explorer', (['Move', 'Factory', 'Weapon', 'Upgrade'], ['To_Planet'], [])]
+Agent id 10 [[(17, 17), 113957, 84787, 0, 49, 'Guided missil', 2722], 6379, 'D ↑ ', 'Chaser', (['Weapon', 'Upgrade', 'Move', 'Factory'], ['To_Player'], ['Damage'])]
+Agent id 21 [[(17, 17), 71818, 68184, 0, 49, 'Guided missil', 1842], 4902, 'D ↑ ', 'Chaser', (['Weapon', 'Upgrade', 'Move', 'Factory'], ['To_Player'], ['Damage'])]
+Agent id 22 [[(6, 7), 58787, 85586, 0, 46, 'Guided missil', 10866], 715, 'None', 'Explorer', (['Move', 'Factory', 'Weapon', 'Upgrade'], ['To_Planet'], [])]
+Agent id 23 [[(17, 17), 90430, 94184, 0, 50, 'Guided missil', 1763], 4484, 'D ↑ ', 'Chaser', (['Weapon', 'Upgrade', 'Move', 'Factory'], ['To_Player'], ['Damage'])]
+Agent id 38 [[(0, 18), 127002, 144306, 0, 50, 'Guided missil', 788], 1862, 'D ↑ ', 'Chaser', (['Weapon', 'Upgrade', 'Move', 'Factory'], ['To_Player'], ['Damage'])]
+Agent id 40 [[(18, 17), 63518, 72761, 0, 47, 'Guided missil', 851], 673, 'F ↑ ', 'Farmer', (['Move', 'Factory', 'Upgrade', 'Weapon'], ['To_Player'], ['Factory'])]
+Agent id 41 [[(18, 18), 112496, 143027, 0, 48, 'Guided missil', 399], 1419, 'D ↑ ', 'Chaser', (['Weapon', 'Upgrade', 'Move', 'Factory'], ['To_Player'], ['Damage'])]
+Agent id 43 [[(18, 18), 131928, 175857, 0, 49, 'Guided missil', 487], 1120, 'D ↑ ', 'Chaser', (['Weapon', 'Upgrade', 'Move', 'Factory'], ['To_Player'], ['Damage'])]
+Agent id 46 [[(0, 19), 34444, 46654, 0, 39, 'Guided missil', -28], 86, 'None', 'Explorer', (['Move', 'Factory', 'Weapon', 'Upgrade'], ['To_Planet'], [])]
+Agent id 48 [[(19, 19), 719, 1735, 0, 21, 'N', -100], 0, 'None', 'Explorer', (['Move', 'Factory', 'Weapon', 'Upgrade'], ['To_Planet'], [])]
+Agent id 49 [[(18, 17), 63, 120, 0, 9, 'N', -39], 0, 'None', 'Friendly', (['Move', 'Factory', 'Upgrade'], ['To_Planet'], ['Factory'])]
+Los planetas son: 
+Planet id 0 [(17, 7), 9, 36, 'Planeta conquistado por el agente: 1']
+Planet id 1 [(4, 4), 8, 22, 'Planeta conquistado por el agente: 7']
+Planet id 2 [(7, 12), 19, 25, 'Planeta conquistado por el agente: 1']
+Planet id 3 [(7, 2), 2, 29, 'Planeta conquistado por el agente: 1']
+Planet id 4 [(15, 3), 16, 49, 'Planeta conquistado por el agente: 1']
+Planet id 5 [(11, 12), 12, 31, 'Planeta conquistado por el agente: 1']
+Planet id 6 [(17, 13), 3, 42, 'None']
+Planet id 7 [(4, 11), 15, 20, 'Planeta conquistado por el agente: 1']
+Planet id 8 [(9, 6), 14, 20, 'Planeta conquistado por el agente: 1']
+Planet id 9 [(2, 1), 12, 18, 'Planeta conquistado por el agente: 1']

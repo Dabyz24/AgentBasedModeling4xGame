@@ -1,0 +1,27 @@
+Ejecución terminada en 6155 steps 
+Con un tiempo de ejecución de 11.73 segundos
+La semilla utilizada es: 6557
+Los jugadores son: 
+Agent id 17 [[(13, 3), 25880, 29320, 4, 44, 'Guided missil', 25005], 652, 'None', 'Explorer', (['Move', 'Factory', 'Weapon', 'Upgrade'], ['To_Planet'], [])]
+Agent id 105 [[(14, 17), 18357, 11852, 0, 41, 'Guided missil', 377], 984, 'D ↑ ', 'Chaser', (['Upgrade', 'Weapon', 'Factory', 'Move'], ['To_Player'], ['Damage'])]
+Agent id 109 [[(15, 2), 20642, 17762, 0, 39, 'Guided missil', 275], 807, 'D ↑ ', 'Chaser', (['Upgrade', 'Weapon', 'Factory', 'Move'], ['To_Player'], ['Damage'])]
+Agent id 111 [[(14, 4), 27385, 25104, 0, 39, 'Guided missil', 248], 633, 'D ↑ ', 'Chaser', (['Upgrade', 'Weapon', 'Factory', 'Move'], ['To_Player'], ['Damage'])]
+Agent id 116 [[(15, 18), 16654, 11088, 0, 40, 'Guided missil', 131], 441, 'D ↑ ', 'Chaser', (['Upgrade', 'Weapon', 'Factory', 'Move'], ['To_Player'], ['Damage'])]
+Agent id 118 [[(3, 3), 2017, 3553, 0, 29, 'N', 281], 0, 'None', 'Explorer', (['Move', 'Factory', 'Weapon', 'Upgrade'], ['To_Planet'], [])]
+Agent id 120 [[(16, 0), 14146, 10793, 1, 37, 'Guided missil', 52], 263, 'D ↑ ', 'Chaser', (['Upgrade', 'Weapon', 'Factory', 'Move'], ['To_Player'], ['Damage'])]
+Agent id 122 [[(14, 17), 15537, 1355, 0, 37, 'Guided missil', 27], 199, 'D ↑ ', 'Chaser', (['Upgrade', 'Weapon', 'Factory', 'Move'], ['To_Player'], ['Damage'])]
+Agent id 124 [[(14, 3), 14643, 7888, 0, 34, 'Guided missil', 46], 124, 'D ↑ ', 'Chaser', (['Upgrade', 'Weapon', 'Factory', 'Move'], ['To_Player'], ['Damage'])]
+Agent id 125 [[(15, 18), 21532, 3193, 0, 33, 'Guided missil', 21], 89, 'D ↑ ', 'Chaser', (['Upgrade', 'Weapon', 'Factory', 'Move'], ['To_Player'], ['Damage'])]
+Agent id 126 [[(3, 4), 403, 1252, 1, 16, 'Guided missil', 42], 2, 'None', 'Farmer', (['Move', 'Factory', 'Upgrade', 'Weapon'], ['To_Player'], ['Factory'])]
+Agent id 127 [[(15, 5), 681, 525, 0, 5, 'N', -6], 0, 'None', 'Friendly', (['Move', 'Factory', 'Upgrade'], ['To_Planet'], ['Factory'])]
+Los planetas son: 
+Planet id 0 [(0, 19), 15, 44, 'None']
+Planet id 1 [(5, 6), 8, 34, 'Planeta conquistado por el agente: 17']
+Planet id 2 [(12, 13), 17, 42, 'None']
+Planet id 3 [(16, 12), 1, 24, 'None']
+Planet id 4 [(5, 0), 11, 43, 'Planeta conquistado por el agente: 17']
+Planet id 5 [(0, 2), 3, 34, 'Planeta conquistado por el agente: 126']
+Planet id 6 [(3, 14), 2, 13, 'None']
+Planet id 7 [(11, 6), 14, 34, 'Planeta conquistado por el agente: 17']
+Planet id 8 [(15, 0), 1, 30, 'Planeta conquistado por el agente: 120']
+Planet id 9 [(8, 15), 12, 21, 'Planeta conquistado por el agente: 17']
