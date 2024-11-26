@@ -185,6 +185,9 @@ class Player(mesa.Agent):
 
     def getFactories(self):
         return self.num_factories
+    
+    def setFactories(self, number):
+        self.num_factories = number
 
     def getPlayerWeapon(self):
         return self.player_weapon.getWeapon()
@@ -246,6 +249,10 @@ class Player(mesa.Agent):
             self.behaviour = RandomBehaviour(new_behaviour)
         else:
             if new_behaviour in DICT_BEHAVIOURS.keys():
+                if new_behaviour == "Friendly":
+                    self.setGold(1000)
+                    self.setTech(1000)
+                    self.setFactories(5)
                 self.behaviour = DICT_BEHAVIOURS[new_behaviour]
             else:
                 self.behaviour = CustomBehaviour(new_behaviour)
@@ -300,7 +307,7 @@ class Player(mesa.Agent):
         most_planets = float("-inf") 
         most_resources = 0
         most_gold = 0
-        less_gold = float("inf")
+        less_balance = float("inf")
         dict_enemies = {}
         list_player = (list(self.model.schedule.agents_by_type[Player].values()))
         list_planets = (list(self.model.schedule.agents_by_type[Planet].values()))
@@ -326,9 +333,9 @@ class Player(mesa.Agent):
             if agent.getGold() > most_resources:
                 most_resources = agent.getGold()
                 dict_enemies["More_Resources"] = agent
-            if agent.getGold() < less_gold or agent.getBalance() < 0:
-                less_gold = agent.getGold()
-                dict_enemies["Less_Resources"] = agent
+            if agent.getBalance() < less_balance and agent.getBehaviour() != "Friendly":
+                less_balance = agent.getBalance()
+                dict_enemies["Less_Balance"] = agent
 
         for planet in list_planets:
             # Buscar el planeta que mas oro tenga y si está inhabitado
