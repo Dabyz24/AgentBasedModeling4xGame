@@ -259,14 +259,15 @@ class Farmer(Behaviour):
         self.list_priorities = ["Factory", "Upgrade", "Weapon", "Move"]
         self.special_target = []
 
-class DummyExplorer(Explorer):
-    # La idea es crear un Explorador que no tenga la capacidad de modificar su conducta con el entorno
+
+class Agressive(Chaser):
+    """
+    Tipo de chaser que se centrará en atacar a los agentes con mayores recursos
+    """
     def __init__(self):
         super().__init__()
         self.setBehaviourName(self.__class__.__name__)  
-    
-    def changeBehaviour(self, player, context_players, context_planets, dict_enemies):
-        return
+
 
 class CustomBehaviour(Behaviour):
 
@@ -318,16 +319,15 @@ class CustomBehaviour(Behaviour):
                     print(f"These are the only valid numbers: {self._valid_numbers_priority}")
 
     def setFirstPriorityAction(self, action):
-        # Primero busco el indice de la accion
+        # Primero busca el indice de la accion
         index = self.list_priorities.index(action)
-        # Si no es el primer elemento lo ordeno para que asi sea 
+        # Si no es el primer elemento lo ordena para que asi sea 
         if index != 0:
             self.list_priorities.pop(index)
             self.list_priorities.insert(0, action)
         # Si ya es el primero actuo normal
         return self.list_priorities
 
-    # Pensar una manera de incorporar la mejor accion posible si se encuentra con un planeta con un agente o con ambos, si no se encuentra con nada actuar normal
     def changeBehaviour(self, player, context_players, context_planets, dict_enemies):
         self.resetBehaviour()
         # Si hay algún planeta en su entorno mirara sus recursos y en función de si puede mantener el planeta eligira conquistarlo o no 
@@ -379,6 +379,7 @@ class CustomBehaviour(Behaviour):
         self.list_priorities = self.copy_list_priorities.copy()
         self.special_target = []
 
+
 class RandomBehaviour(Behaviour):
     def __init__(self, behaviour_name):
         super().__init__()
@@ -401,44 +402,12 @@ class RandomBehaviour(Behaviour):
             # Por último guardo la lista de prioridad en la variable correspondiente
             self.list_priorities.append(action)
 
-    # def changeBehaviour(self, context=[]):
-    #     # Modifica el orden de la lista de forma aleatoria 
-    #     random.shuffle(self.list_priorities)
-    #     for action in list(self.dict_actions.keys()):
-    #         if isinstance(self.dict_actions.get(action), dict): 
-    #             self.getRandomSpecialActions(action)
-
     def resetBehaviour(self):
         self.run_away = False
         self.dict_actions = copy.deepcopy(self.copy_dict_actions)
         self.list_priorities = self.copy_list_priorities.copy()
         self.special_target = []
 
-class Agressive(Chaser):
-    """
-    Tipo de chaser que se centrará en atacar a los agentes con mayores recursos
-    """
-    def __init__(self):
-        super().__init__()
-        self.setBehaviourName(self.__class__.__name__)  
-    
-    def changeBehaviour(self, player, context_players, context_planets, dict_enemies):
-        # Buscar el que mas recursos tenga y luchar con el, si tiene peor arma lo que hare será mejorar el arma y si no puede intetará mejorar 
-        # Pero siempre perseguira al agente con mas oro
-        agent_more_gold = dict_enemies["More_Resources"] 
-        if player.getNumPlayerWeapon() != 0:
-            # Si tengo un arma peor que el agente con mas recursos intentare mejorarla 
-            if player.getNumPlayerWeapon() <= agent_more_gold.getNumPlayerWeapon():
-                # Si tiene todas las armas mejoradas, tendrá que buscar upgradear para poder ganar el maximo de duelos al agente con mas recursos
-                if player.getNumPlayerWeapon() == MAX_NUM_WEAPONS and not player.getAgentUpgrades().isDamageUpgraded():
-                    self.list_priorities = ["Upgrade","Weapon","Move","Factory"]
-
-            # Se mueve hacia el jugador con mas recursos
-            self.addSpecialTarget(agent_more_gold.getAgentPos())
-            return
-
-        # Si no tiene armas actuará normal para poder generarlas 
-        return
 
 class Friendly(Behaviour):
     """
@@ -450,65 +419,29 @@ class Friendly(Behaviour):
         self.dict_actions["Move"]["To_Planet"] = True
         self.dict_actions["Upgrade"]["Factory"] = True
         # Este agente no tendrá acceso a las armas, por lo que no podrá atacar a nadie
-        self.list_priorities = ["Factory", "Upgrade", "Move"]
+        self.list_priorities = ["Move", "Factory", "Upgrade"]
+        self.friend = None
 
     def changeBehaviour(self, player, context_players, context_planets, dict_enemies):
-        # Como el agente no puede atacar primero se tiene que centrar en construir fábricas para poder tener cierta economia
-        if len(context_planets) > 0:
-            # Si se encuentra con algun planeta reseteo el comportamiento para que se olvide de seguir al que menos oro tiene
-            self.resetBehaviour()
-            # Si me encuentro uno o mas planetas me dirijo a ellos
-            self.list_priorities = ["Move", "Factory", "Upgrade"]
-            
-        
-        else:
-            # Buscará a el agente que menos oro tenga en la simulación
-            agent_less_resources = dict_enemies["Less_Resources"]
-            self.addSpecialTarget(agent_less_resources.getAgentPos())
-            # Si está en su campo de vision le doy los recursos como si hubiese ganado la pelea y reseteo el comportamiento 
-            if agent_less_resources in context_players:
-                print(f"Regalo el 10% de riquezas a {agent_less_resources.getId()}")
-                agent_less_resources.addBattleResources(player)
-                self.resetBehaviour()
-
-        # Si no tiene nada alrededor actuará normal construyendo fabricas
+        # Este agente comenzará con 1000 puntos de tecnologia, 1000 de oro y 5 fábricas para poder generar oro 
+        # Resetea el comportamiento para olvidar a su anterior amigo 
+        self.resetBehaviour()
+        # Buscará a el agente que menos balance tenga en la simulación
+        self.friend = dict_enemies["Less_Balance"]
+        self.addSpecialTarget(self.friend.getAgentPos())
+        # Si está en su campo de vision le donará los recursos como si hubiese ganado la pelea y reseteo el comportamiento 
+        if self.friend in context_players:
+            print(f"Dona el 10% de riquezas a {self.friend.getId()} y un punto estelar")
+            self.friend.addBattleResources(player)
+            self.friend.addPoint()
+            player.addPoint()
         return 
 
     def resetBehaviour(self):
         self.run_away = False
+        self.friend = None
         self.dict_actions = {"Move": {"To_Planet": True, "To_Player":False}, "Factory": 0, "Weapon": 0, "Upgrade": {"Damage": False, "Factory":True}}
-        self.list_priorities = ["Factory", "Upgrade", "Move"]
+        self.list_priorities = ["Move", "Factory", "Upgrade"]
         self.special_target = []    
-
-# Para poder comprobar el funcionamiento de la clase 
-if __name__ == "__main__":
-    comportamiento = RandomBehaviour("Random")
-    explorador = Explorer()
-    perseguidor = Chaser()
-    granjero = Farmer()
-    custom = CustomBehaviour("nombre")
-    # for i in range(100):
-    #     print(RandomBehaviour(str(i)).getPriorities())
-
-    print(f"nombre de comporamiento de Clase RandomBehaviour -> {comportamiento.actual_behaviour}")
-    print(f"nombre de comporamiento de Clase Explorer -> {explorador.actual_behaviour}")
-    print(f"nombre de comporamiento de Clase Chaser -> {perseguidor.actual_behaviour}")
-    print(f"nombre de comporamiento de Clase Farmer -> {granjero.actual_behaviour}")
-    print(f"nombre de comporamiento de Clase Personalizada -> {custom.actual_behaviour}")
-    print("Clase RandomBehaviour")
-    print(comportamiento.getPrioritiesStr())
-    print(comportamiento.getPriorities())
-    for i in range(0,10):
-        comportamiento.changeBehaviour()
-        print(comportamiento.getPriorities())
-        print("comportamiento resetado")
-        comportamiento.resetBehaviour()
-        print(comportamiento.getPriorities())
-    print("Clase Explorador")
-    print(explorador.getPrioritiesStr())
-    print(explorador.getPriorities())
-    print("Clase Personalizada")
-    print(custom.getPrioritiesStr())
-    print(custom.getPriorities())
 
                
