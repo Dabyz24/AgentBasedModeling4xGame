@@ -255,8 +255,7 @@ class Game(mesa.Model):
         player = Player(next_id, self, pos, moore=MOORE_PLAYER)
         # Si tiene verbose en True se preguntara para añadir un agente indicando el nombre, si el nombre es conocido se le asignara ese comportamiento
         if verbose:
-            # new_behaviour = input("Introduce el comportamiento del agente ").lower().capitalize()
-            new_behaviour = "Friendly"
+            new_behaviour = input("Introduce el comportamiento del agente ").lower().capitalize()
             player.setBehaviour(new_behaviour)
         else:
             # Si no añade a la simulacion un agente Explorer, Chaser, Farmer de manera aleatoria
