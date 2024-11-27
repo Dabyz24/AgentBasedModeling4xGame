@@ -3,10 +3,10 @@ import mesa
 import math
 import time 
 
-from agents import Player, Planet
+from agents import Player, Planet, DICT_BEHAVIOURS
 from global_constants import * 
 from scheduler import RandomActivationByTypeFiltered
-
+from dynamic_methods import *
 
 class Game(mesa.Model):
     
@@ -20,6 +20,7 @@ class Game(mesa.Model):
         tech_planet: Tecnología que tendrá cada planeta
         gold_planet: Oro que tendrá cada planeta
         taxes_planet: Impuesto que deberán pagar por cada planeta
+        seed: Permite recrear una simulación predeterminada
         """
         super().__init__()
         self.width = width
@@ -88,10 +89,10 @@ class Game(mesa.Model):
         self.running = True
         self.datacollector.collect(self)
         # Confirmacion para saber si quieres los comportamientos estandar o quieres establecer comportamientos personalizados
-        random_behaviours = input("Do you want standard behaviours? (y/n): ").lower()
-        if random_behaviours != "y":
-            for agent in self.list_agents:
-                agent.setCustomBehaviour()
+        # random_behaviours = input("Do you want standard behaviours? (y/n): ").lower()
+        # if random_behaviours != "y":
+        #     for agent in self.list_agents:
+        #         agent.setCustomBehaviour()
 
     # Método que comprueba que exista un espacio de dos casillas entre los jugadores y los planetas
     def checkSpace(self, moore, custom_radius=1):
@@ -254,15 +255,15 @@ class Game(mesa.Model):
         player = Player(next_id, self, pos, moore=MOORE_PLAYER)
         # Si tiene verbose en True se preguntara para añadir un agente indicando el nombre, si el nombre es conocido se le asignara ese comportamiento
         if verbose:
-            new_behaviour = input("Introduce el comportamiento del agente ").lower().capitalize()
+            # new_behaviour = input("Introduce el comportamiento del agente ").lower().capitalize()
+            new_behaviour = "Friendly"
             player.setBehaviour(new_behaviour)
         else:
             # Si no añade a la simulacion un agente Explorer, Chaser, Farmer de manera aleatoria
 
             # Diferentes inputs para los distintos experimentos
-            # list_behaviours = POSSIBLE_BEHAVIOURS + ["Random", "Agressive", "Optimal", "Friendly"]
+            # list_behaviours = POSSIBLE_BEHAVIOURS + ["Random", "Optimal", "Friendly"]
             # list_behaviours = POSSIBLE_BEHAVIOURS + ["Random"]
-            # list_behaviours = POSSIBLE_BEHAVIOURS + ["Agressive"]
             # list_behaviours = POSSIBLE_BEHAVIOURS + ["Optimal"]
             # list_behaviours = POSSIBLE_BEHAVIOURS + ["Friendly"]
             list_behaviours = POSSIBLE_BEHAVIOURS 
@@ -302,7 +303,7 @@ class Game(mesa.Model):
             agent.step(chosen_action)
         for planet in self.list_planets:
             planet.step()
-        # Al final de cada turno compruebo que agentes tienen planetas para asignarles sus puntos correspondientes 
+        # Al final de cada turno se comprueba que agentes tienen planetas para asignarles sus puntos correspondientes 
         self.addStellarPoints()
 
 # Cada 100 turnos se revisa el número de stellar points que han ganado los agentes y el primero que es infrerior a 0 se elimina y se crea uno nuevo
@@ -310,12 +311,50 @@ class Game(mesa.Model):
             # Elimino al agente mas antiguo con balance negativo
             self.maybeRemoveAgent()
             self.addAgent()
-
-        # En el turno 20 se introducirá los agentes que se quieran llevar a experimento cambio dinamico del comportamiento Explorer por DummyExplorer
+            # Funcionalidad para añadir un agente cualquiera en el turno 100 (utilizado para pruebas de Friendly)
+            # if self.step_count == 100:
+            #     self.addAgent(verbose=True)
+            
+# -------------------- PRUEBAS DINÁMICAS --------------------
+    # ---- Cambio dinámico en Explorer ----
+    # Añadir dinámicamente clase DummyExplorer y añadirle método changeBehaviour sin funcionalidad
         # if self.step_count == 20:
-        #     self.list_agents[0].setBehaviour("Dummyexplorer")
-        #     self.addAgent(verbose=True)
+        #     explorer_class = DICT_BEHAVIOURS["Explorer"].__class__
+        #     new_explorer_class = type("DummyExplorer", (explorer_class, ), {})
+        #     # Se añade el nuevo comportamiento al diccionario para poder hacer uso de setBehaviour
+        #     DICT_BEHAVIOURS.update({"DummyExplorer": new_explorer_class()})
+        #     self.list_agents[0].setBehaviour("DummyExplorer")
+        #     # Asignar el método a la instancia de manera dinámica
+        #     new_explorer_class.changeBehaviour = changeBehaviourDummyExplorer
 
+    # ---- Cambio dinámico en Chaser ----
+    # Añadir dinámicamente clase Agressive y añadirle método changeBehaviour con otra funcionalidad y un nuevo atributo
+        # if self.step_count == 50:
+        #     # Si solo se quiere cambiar un agente, ejecutar esta línea. Si se quiere cambiar en toda la clase Chaser, comentar esta línea
+        #     self.list_agents[1].setBehaviour("Agressive")
+        #     # Se obtiene la clase Agrressive
+        #     agressive_class = self.list_agents[1].getCompleteBehaviour().__class__
+        #     setattr(agressive_class, "agent_more_points", None)
+        #     # Asignar el método a la instancia de manera dinámica
+        #     agressive_class.changeBehaviour = changeBehaviourChaser
+
+    # ---- Cambio dinámico en Farmer ----
+    # Añadir dinámicamente una clase que mejore a los Farmer, para que puedan actuar mejor, con una idea similar
+        # if self.step_count == 10:
+        #     farmer_class = self.list_agents[2].getCompleteBehaviour().__class__
+        #     new_farmer_class = type("OptimalFarmer", (farmer_class, ), {})
+        #     # Farmer modificado, cambiar el nombre de la clase
+        #     # Asignar el método a la instancia de manera dinámica
+        #     DICT_BEHAVIOURS.update({"OptimalFarmer": new_farmer_class()})
+        #     self.list_agents[2].setBehaviour("OptimalFarmer")
+        #     # Se crea el nuevo método check_money
+        #     new_farmer_class.check_money = check_money
+        #     # Se ajusta nuevos valores predeterminados para Farmer
+        #     new_farmer_class.resetBehaviour = resetBehaviourFarmer
+        #     new_farmer_class.changeBehaviour = changeBehaviourFarmer
+            
+            
+# Recogida de todos los datos para el data collector finalizando el método
         self.datacollector.collect(self)
 
     # Método para comprobar rápidamente el funcionamiento del juego sin tener que ejecutar el servidor
@@ -358,9 +397,17 @@ class Game(mesa.Model):
         return self.list_agents
 
 if __name__ == "__main__":
-    for i in range(0,20):
+    # Lista de las semillas utilizadas en las simulaciones, por si se quiere reproducir los experimentos
+    list_seeds = [
+            2909, 1487, 1390, 5370, 5107, 4891, 4515, 8177, 6900, 8579,
+            7476, 7916, 826, 5253, 1847, 4847, 3459, 683, 5656, 848,
+            4539, 3529, 7223, 6528, 713, 2262, 7967, 8210, 5555, 4660,
+            5680, 7997, 8276, 4230, 6147, 1411, 6561, 5487, 9536, 1539,
+            4264, 359, 9448, 9787, 4472, 5293, 2870, 6557, 4551, 7616
+        ]
+    for i in range(0,50):
         start = time.time()
-        model = Game()
+        model = Game(seed=list_seeds[i])
         model.run_model()
         end = time.time()
         players, planets = model.getAllAgentsInfo()
