@@ -298,7 +298,7 @@ class Game(mesa.Model):
                 action = agent.selectAction()
                 # Establezco la accion a realizar por el agente
                 chosen_action = self.chooseAction(agent,action)
-            print(f"agent: {agent.getId()} elige el movimiento {action, chosen_action}")
+            print(f"agent: {agent.getId()} elige la acción {action, chosen_action}")
             agent.step(chosen_action)
         for planet in self.list_planets:
             planet.step()
