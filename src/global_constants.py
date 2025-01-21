@@ -48,13 +48,18 @@ MAX_NUM_WEAPONS = 3
 # Conjunto de acciones posibles por el agente
 ACTION_SPACE = {(-1,-1): 0 , (-1,0): 1, (-1,1): 2, (0,-1): 3, (0,1): 4, (1,-1): 5, (1,0): 6, (1,1): 7, "Factory": 8, "Upgrade":9, "Weapon":10}
 """ 
-Las siglas se corresponden con:
-        LLD = Lower Left Diagonal, L = Left, ULD = Upper Left Diagonal
-        D = Down, U = Up
-        LRD = Lower Right Diagonal, R = Right, URD = Upper right diagonal y hacen referencia al indice de la lista de posibles movientos de cada agente 
-    Factory = Fabricar una fabrica 
-    Upgrade = Crear una mejora de una habilidad
-    Weapon = Crear un arma  
+Los números se corresponden con:
+    0 => Abajo izquierda
+    1 => Izquierda
+    2 => Arriba izquierda
+    3 => Abajo
+    4 => Arriba
+    5 => Abajo derecha
+    6 => Derecha
+    7 => Arriba derecha 
+    8 => Factory = Construir una fabrica 
+    9 => Upgrade = Crear una mejora de una habilidad
+    10 => Weapon = Crear un arma  
 """
 POSSIBLE_ACTIONS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
