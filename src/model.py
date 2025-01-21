@@ -68,7 +68,7 @@ class Game(mesa.Model):
             player.setAgentColor(chosen_color)
             # Asigno un comportamiento diferente a cada agente
             player.setBehaviour(POSSIBLE_BEHAVIOURS[(0+i)%len(POSSIBLE_BEHAVIOURS)])
-            # Añado el agente a la simulacion, añadiendolo a la lista de agentes al terreno de juego y añadiendolo al schedule
+            # Añado el agente a la simulacion, añadiendolo a la lista de agentes, al terreno de juego y añadiendolo al schedule
             self.list_agents.append(player)
             self.grid.place_agent(player, pos)
             self.schedule.add(player)
@@ -104,7 +104,7 @@ class Game(mesa.Model):
             return False, pos
         return True, pos
 
-    # Método para poder tener la informcaion agrupada del agente para poder representarla en el servidor
+    # Método para poder tener la informacion agrupada del agente para poder representarla en el servidor
     def propertiesAgents(self):
         summary = {}    
         for i in self.list_agents:
@@ -315,31 +315,38 @@ class Game(mesa.Model):
             #     self.addAgent(verbose=True)
             
 # -------------------- PRUEBAS DINÁMICAS --------------------
-    # ---- Cambio dinámico en Explorer ----
-    # Añadir dinámicamente clase DummyExplorer y añadirle método changeBehaviour sin funcionalidad
+    # ---- Cambio dinámico en Explorer 6.1.1 ----
+    # Se añade dinámicamente clase DummyExplorer y se le quita la funcionalidad al método changeBehaviour 
         # if self.step_count == 20:
-        #     explorer_class = DICT_BEHAVIOURS["Explorer"].__class__
-        #     new_explorer_class = type("DummyExplorer", (explorer_class, ), {})
-        #     # Se añade el nuevo comportamiento al diccionario para poder hacer uso de setBehaviour
-        #     DICT_BEHAVIOURS.update({"DummyExplorer": new_explorer_class()})
-        #     self.list_agents[0].setBehaviour("DummyExplorer")
-        #     # Asignar el método a la instancia de manera dinámica
-        #     new_explorer_class.changeBehaviour = changeBehaviourDummyExplorer
+            # Cambio en primera instancia 
+            
+            # explorer_class = DICT_BEHAVIOURS["Explorer"].__class__
+            # new_explorer_class = type("DummyExplorer", (explorer_class, ), {})
+            # Se añade el nuevo comportamiento al diccionario para poder hacer uso de setBehaviour
+            # DICT_BEHAVIOURS.update({"DummyExplorer": new_explorer_class()})
+            # self.list_agents[0].setBehaviour("DummyExplorer")
+            # Asignar el método a la instancia de manera dinámica
+            # new_explorer_class.changeBehaviour = changeBehaviourDummyExplorer
+            
+            # Cambio en toda la clase Explorer
+            # explorer_class = DICT_BEHAVIOURS["Explorer"].__class__
+            # explorer_class.changeBehaviour = changeBehaviourDummyExplorer
 
-    # ---- Cambio dinámico en Chaser ----
-    # Añadir dinámicamente clase Agressive y añadirle método changeBehaviour con otra funcionalidad y un nuevo atributo
+    # ---- Cambio dinámico en Chaser 6.1.2 ----
+    # Se añade dinámicamente clase Agressive y otra funcionalidad con un nuevo atributo
         # if self.step_count == 50:
-        #     # Si solo se quiere cambiar un agente, ejecutar esta línea. Si se quiere cambiar en toda la clase Chaser, comentar esta línea
-        #     self.list_agents[1].setBehaviour("Agressive")
-        #     # Se obtiene la clase Agrressive
-        #     agressive_class = self.list_agents[1].getCompleteBehaviour().__class__
-        #     setattr(agressive_class, "agent_more_points", None)
-        #     # Asignar el método a la instancia de manera dinámica
-        #     agressive_class.changeBehaviour = changeBehaviourChaser
+            # Si solo se quiere cambiar un agente, ejecutar la línea inferior. Si se quiere cambiar en toda la clase Chaser, comentar la línea inferior
+            # self.list_agents[1].setBehaviour("Agressive")
+            # Se obtiene la clase Agrressive
+            # agressive_class = self.list_agents[1].getCompleteBehaviour().__class__
+            # setattr(agressive_class, "agent_more_points", None)
+            # Asignar el método a la instancia de manera dinámica
+            # agressive_class.changeBehaviour = changeBehaviourChaser
 
-    # ---- Cambio dinámico en Farmer ----
-    # Añadir dinámicamente una clase que mejore a los Farmer, para que puedan actuar mejor, con una idea similar
+    # ---- Cambio dinámico en Farmer 6.1.3 ----
+    # Añadir dinámicamente clase OptimalFarmer que mejore a los Farmer, con otra funcionalidad y un nuevo método 
         # if self.step_count == 10:
+        #     # Si solo se quiere cambiar la primera instancia cambiar el nombre a new_farmer_class y comentar la creacion de la clase OptimalFarmer
         #     farmer_class = self.list_agents[2].getCompleteBehaviour().__class__
         #     new_farmer_class = type("OptimalFarmer", (farmer_class, ), {})
         #     # Farmer modificado, cambiar el nombre de la clase
@@ -351,7 +358,6 @@ class Game(mesa.Model):
         #     # Se ajusta nuevos valores predeterminados para Farmer
         #     new_farmer_class.resetBehaviour = resetBehaviourFarmer
         #     new_farmer_class.changeBehaviour = changeBehaviourFarmer
-            
             
 # Recogida de todos los datos para el data collector finalizando el método
         self.datacollector.collect(self)
